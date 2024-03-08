@@ -97,6 +97,10 @@ public class User extends NovaItem {
                 List.of(), null);
     }
 
+    public User(String id, String token, String name, String surname, String email, String password) {
+        this(id, name, surname, email, null, token, password, List.of(), null);
+    }
+
     public User(String id, String name, String surname, String email, String profilePicUrl,
                 String token, String password, List<Project> projects, Project project) {
         super(id);
