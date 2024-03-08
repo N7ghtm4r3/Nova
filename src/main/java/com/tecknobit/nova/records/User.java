@@ -1,9 +1,7 @@
-package com.tecknobit.nova.records.users;
+package com.tecknobit.nova.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.Project;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -23,6 +21,8 @@ public class User extends NovaItem {
     public static final String DEFAULT_PROFILE_PIC = "profiles/defProfilePic.png";
 
     public static final String USER_KEY = "user";
+
+    public static final String SERVER_SECRET_KEY = "server_secret";
 
     public static final String USERS_KEY = "users";
 

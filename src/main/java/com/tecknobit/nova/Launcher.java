@@ -1,5 +1,7 @@
 package com.tecknobit.nova;
 
+import com.tecknobit.apimanager.apis.ServerProtector;
+import com.tecknobit.apimanager.exceptions.SaveData;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -13,6 +15,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.security.NoSuchAlgorithmException;
 
 import static com.tecknobit.nova.Launcher.DEFAULT_CONFIGURATION_FILE_PATH;
 
@@ -29,7 +33,11 @@ public class Launcher {
      */
     public static final String DEFAULT_CONFIGURATION_FILE_PATH = "app.properties";
 
-    public static void main(String[] args) {
+    public static final ServerProtector protector = new ServerProtector("tecknobit/nova/backend",
+            " to correctly register a new user in the Nova system ");
+
+    public static void main(String[] args) throws NoSuchAlgorithmException, SaveData {
+        protector.launch(args);
         SpringApplication.run(Launcher.class, args);
     }
 

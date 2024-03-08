@@ -2,14 +2,13 @@ package com.tecknobit.nova.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.nova.records.release.Release;
-import com.tecknobit.nova.records.users.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.users.User.*;
+import static com.tecknobit.nova.records.User.*;
 
 @Entity
 @Table(name = PROJECTS_KEY)
@@ -47,7 +46,10 @@ public class Project extends NovaItem {
     @Column(name = LOGO_URL_KEY)
     private final String logoUrl;
 
-    @Column(name = PROJECT_NAME_KEY)
+    @Column(
+            name = PROJECT_NAME_KEY,
+            unique = true
+    )
     private final String name;
 
     @OneToMany(
