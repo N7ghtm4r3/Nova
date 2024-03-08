@@ -1,0 +1,22 @@
+package com.tecknobit.nova.controllers;
+
+import com.tecknobit.nova.helpers.ProjectsHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
+import static com.tecknobit.nova.records.users.User.PROJECTS_KEY;
+
+@RestController
+@RequestMapping(BASE_ENDPOINT + PROJECTS_KEY)
+public class ProjectsController extends NovaController {
+
+    private ProjectsHelper projectsHelper;
+
+    @Autowired
+    public ProjectsController(ProjectsHelper projectsHelper) {
+        this.projectsHelper = projectsHelper;
+    }
+
+}

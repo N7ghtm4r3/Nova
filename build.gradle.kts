@@ -1,18 +1,28 @@
 plugins {
     id("java")
     id("maven-publish")
+    id("org.springframework.boot") version "3.2.3"
 }
+
+apply(plugin = "io.spring.dependency-management")
 
 group = "com.tecknobit"
 version = "1.0.0"
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.3")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.2.3")
+    implementation("org.springframework.boot:spring-boot-maven-plugin:3.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.3")
+    implementation("mysql:mysql-connector-java:8.0.33")
+    implementation("com.github.N7ghtm4r3:APIManager:2.2.1")
 }
 
 tasks {
