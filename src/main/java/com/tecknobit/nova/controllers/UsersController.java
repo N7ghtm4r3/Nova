@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.DELETE;
@@ -84,13 +85,17 @@ public class UsersController extends NovaController {
                                 return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
                             }
                         } else {
-                            User user = usersHelper.signInUser(email);
-                            if(user != null) {
-                                id = user.getId();
-                                token = user.getToken();
-                                profilePicUrl = user.getProfilePicUrl();
-                            } else
+                            try {
+                                User user = usersHelper.signInUser(email, password);
+                                if(user != null) {
+                                    id = user.getId();
+                                    token = user.getToken();
+                                    profilePicUrl = user.getProfilePicUrl();
+                                } else
+                                    return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                            } catch (NoSuchAlgorithmException e) {
                                 return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                            }
                         }
                         return successResponse(new JSONObject()
                                 .put(IDENTIFIER_KEY, id)
