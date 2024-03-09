@@ -45,6 +45,10 @@ public class ProjectsHelper implements ResourcesManager {
                 .put(AUTHOR_KEY, authorId);
     }
 
+    public Project getProject(String userId, String projectId) {
+        return projectsRepository.getProject(projectId, userId);
+    }
+
     public record ProjectPayload(MultipartFile logoUrl, String name) {}
 
 }

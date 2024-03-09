@@ -3,6 +3,7 @@ package com.tecknobit.nova.controllers;
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ProjectsHelper.ProjectPayload;
+import com.tecknobit.nova.records.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.GET;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.POST;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.nova.records.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.User.PROJECTS_KEY;
 import static com.tecknobit.nova.records.User.TOKEN_KEY;
 
@@ -75,6 +77,28 @@ public class ProjectsController extends NovaController {
             }
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @GetMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = GET)
+    public <T>  T getProject(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if(isMe(id, token)) {
+            Project project = projectsHelper.getProject(id, projectId);
+            if(project != null)
+                return (T) successResponse(project);
+            else
+                return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        } else
+            return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
 }

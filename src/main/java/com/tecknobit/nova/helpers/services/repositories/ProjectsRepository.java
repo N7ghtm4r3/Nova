@@ -28,8 +28,8 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
     );
 
     @Query(
-            value = "SELECT " + PROJECTS_KEY + ".* FROM " + PROJECTS_KEY + " as " + PROJECTS_KEY + " INNER JOIN "
-                    + PROJECT_MEMBERS_TABLE + " as " + PROJECT_MEMBERS_TABLE + " ON " + PROJECTS_KEY + "."
+            value = "SELECT " + PROJECTS_KEY + ".* FROM " + PROJECTS_KEY + " AS " + PROJECTS_KEY + " INNER JOIN "
+                    + PROJECT_MEMBERS_TABLE + " AS " + PROJECT_MEMBERS_TABLE + " ON " + PROJECTS_KEY + "."
                     + IDENTIFIER_KEY + "=" + PROJECT_MEMBERS_TABLE + "." + IDENTIFIER_KEY + " WHERE "
                     + MEMBER_IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
@@ -59,6 +59,21 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(LOGO_URL_KEY) String logoUrl,
             @Param(NAME_KEY) String name,
             @Param(AUTHOR_KEY) String author
+    );
+    
+    @Query(
+            value = "SELECT * FROM " + PROJECTS_KEY + " WHERE " + AUTHOR_KEY + "=:" + AUTHOR_KEY
+                    + " AND " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY
+                    + " UNION SELECT " + PROJECTS_KEY + ".* FROM " + PROJECTS_KEY + " AS " + PROJECTS_KEY
+                    + " INNER JOIN " + PROJECT_MEMBERS_TABLE + " AS " + PROJECT_MEMBERS_TABLE
+                    + " ON " + PROJECTS_KEY + "." + IDENTIFIER_KEY + "=" + PROJECT_MEMBERS_TABLE
+                    + "." + IDENTIFIER_KEY + " WHERE " + PROJECT_MEMBERS_TABLE + "." + MEMBER_IDENTIFIER_KEY
+                    + "=:" + AUTHOR_KEY + " AND " + PROJECTS_KEY + "." + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    Project getProject(
+          @Param(IDENTIFIER_KEY) String projectId,
+          @Param(AUTHOR_KEY) String userId
     );
 
 }

@@ -17,6 +17,8 @@ public class Project extends NovaItem {
 
     public static final String PROJECT_MEMBERS_TABLE = "project_members";
 
+    public static final String PROJECT_IDENTIFIER_KEY = "projectId";
+
     public static final String PROJECT_KEY = "project";
 
     public static final String AUTHOR_KEY = "author";
