@@ -2,10 +2,13 @@ package com.tecknobit.nova.controllers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
+import com.tecknobit.nova.helpers.services.ProjectsHelper.ProjectPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.GET;
+import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.POST;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.User.PROJECTS_KEY;
@@ -45,6 +48,33 @@ public class ProjectsController extends NovaController {
             return (T) successResponse(projectsHelper.getProjects(id));
         else
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PostMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects", method = POST)
+    public String addProject(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token,
+            @ModelAttribute ProjectPayload payload
+    ) {
+        if(isMe(id, token)) {
+            try {
+                MultipartFile logo = payload.logoUrl();
+                String name = payload.name();
+                if(!logo.isEmpty() && (name != null && !name.isEmpty()))
+                    return successResponse(projectsHelper.addProject(name, logo, generateIdentifier(), id));
+                else
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            } catch (Exception e) {
+                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            }
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
 }

@@ -7,19 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
 
 import static com.tecknobit.apimanager.apis.APIRequest.SHA256_ALGORITHM;
-import static com.tecknobit.nova.helpers.ResourcesProvider.IMAGES_PATH;
 import static com.tecknobit.nova.helpers.ResourcesProvider.PROFILES_DIRECTORY;
 
 @Service
-public class UsersHelper {
+public class UsersHelper implements ResourcesManager {
 
     @Autowired
     private UsersRepository usersRepository;
@@ -44,13 +39,9 @@ public class UsersHelper {
     }
 
     public String changeProfilePic(MultipartFile profilePic, String userId) throws IOException {
-        String suffix = Objects.requireNonNull(profilePic.getResource().getFilename()).split("\\.")[1];
-        File file = new File(IMAGES_PATH + PROFILES_DIRECTORY + "/" + userId + "." + suffix);
-        try (OutputStream outputStream = new FileOutputStream(file)) {
-            outputStream.write(profilePic.getBytes());
-        }
-        String profilePicPath = file.getPath().replaceAll("\\\\", "/").replace(IMAGES_PATH, "");
+        String profilePicPath = createResource(profilePic, PROFILES_DIRECTORY, userId);
         usersRepository.changeProfilePic(profilePicPath, userId);
+        saveResource(profilePic, profilePicPath);
         return profilePicPath;
     }
 

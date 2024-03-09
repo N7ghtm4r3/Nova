@@ -21,7 +21,7 @@ public class Project extends NovaItem {
 
     public static final String AUTHOR_KEY = "author";
 
-    public static final String LOGO_URL_KEY = "logoUrl";
+    public static final String LOGO_URL_KEY = "logo_url";
 
     public static final String PROJECT_NAME_KEY = "name";
 

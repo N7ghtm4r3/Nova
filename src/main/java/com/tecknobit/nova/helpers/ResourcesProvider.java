@@ -20,6 +20,8 @@ public class ResourcesProvider {
 
     public static final String PROFILES_DIRECTORY = IMAGES_DIRECTORIES[0];
 
+    public static final String LOGOS_DIRECTORY = IMAGES_DIRECTORIES[1];
+
     private ResourcesProvider() {
     }
 
