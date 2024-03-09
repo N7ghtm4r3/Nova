@@ -14,11 +14,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class ReleaseEvent extends NovaItem {
 
-    public static final String RELEASE_EVENTS_KEY = "releaseEvents";
+    public static final String RELEASE_EVENTS_KEY = "release_events";
 
-    public static final String RELEASE_EVENT_KEY = "releaseEvent";
+    public static final String RELEASE_EVENT_KEY = "release_event";
 
-    public static final String RELEASE_EVENT_DATE_KEY = "releaseEventDate";
+    public static final String RELEASE_EVENT_DATE_KEY = "release_event_date";
 
     public enum ReleaseTag {
 

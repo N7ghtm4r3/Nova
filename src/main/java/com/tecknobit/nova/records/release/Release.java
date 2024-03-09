@@ -28,17 +28,17 @@ public class Release extends NovaItem {
 
     public static final String RELEASES_KEY = "releases";
     
-    public static final String RELEASE_VERSION_KEY = "releaseVersion";
+    public static final String RELEASE_VERSION_KEY = "release_version";
 
-    public static final String RELEASE_STATUS_KEY = "releaseStatus";
+    public static final String RELEASE_STATUS_KEY = "release_status";
 
-    public static final String RELEASE_NOTES_KEY = "releaseNotes";
+    public static final String RELEASE_NOTES_KEY = "release_notes";
 
-    public static final String CREATION_DATE_KEY = "creationDate";
+    public static final String CREATION_DATE_KEY = "creation_date";
 
-    public static final String RELEASE_EVENTS_KEY = "releaseEvents";
+    public static final String RELEASE_EVENTS_KEY = "release_events";
 
-    public static final String APPROBATION_DATE_KEY = "approbationDate";
+    public static final String APPROBATION_DATE_KEY = "approbation_date";
 
     public enum ReleaseStatus {
 

@@ -1,6 +1,6 @@
 package com.tecknobit.nova.controllers;
 
-import com.tecknobit.nova.helpers.ProjectsHelper;
+import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -3,11 +3,12 @@ package com.tecknobit.nova.controllers;
 import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode;
 import com.tecknobit.apimanager.formatters.JsonHelper;
-import com.tecknobit.nova.helpers.repositories.UsersRepository;
+import com.tecknobit.nova.helpers.services.repositories.UsersRepository;
 import com.tecknobit.nova.records.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public abstract class NovaController {
 
     public static final String LIST_ENDPOINT = "list";
 
+    public static final String WRONG_PROCEDURE_MESSAGE = "Wrong procedure";
+
     /**
      * {@code NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE} message to use when the request is by a not authorized user or
      * tried to fetch wrong details
@@ -39,12 +42,16 @@ public abstract class NovaController {
     @Autowired
     protected UsersRepository usersRepository;
 
-    protected JsonHelper jsonHelper;
+    protected JsonHelper jsonHelper = new JsonHelper("{}");
 
     protected User me;
 
     protected String generateIdentifier() {
         return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    protected void loadJsonHelper(Map<String, String> payload) {
+        jsonHelper.setJSONObjectSource(new JSONObject(payload));
     }
 
     protected boolean isMe(String id, String token) {

@@ -11,7 +11,7 @@ import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REJ
 @Table(name = REJECTED_RELEASE_EVENTS_KEY)
 public class RejectedReleaseEvent extends ReleaseStandardEvent {
 
-    public static final String REJECTED_RELEASE_EVENTS_KEY = "rejectedReleaseEvents";
+    public static final String REJECTED_RELEASE_EVENTS_KEY = "rejected_release_events";
 
     public static final String REJECTED_RELEASE_EVENT_KEY = "rejectedReleaseEvent";
 

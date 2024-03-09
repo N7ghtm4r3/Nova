@@ -1,18 +1,16 @@
 package com.tecknobit.nova.controllers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
-import com.tecknobit.apimanager.formatters.JsonHelper;
-import com.tecknobit.nova.helpers.UsersHelper;
+import com.tecknobit.nova.helpers.services.UsersHelper;
 import com.tecknobit.nova.records.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.DELETE;
-import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.POST;
+import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.protector;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
 import static com.tecknobit.nova.helpers.InputValidator.*;
@@ -42,9 +40,18 @@ public class UsersController extends NovaController {
     @PostMapping(path = SIGN_UP_ENDPOINT)
     @RequestPath(path = "/api/v1/users/signUp", method = POST)
     public String signUp(@RequestBody Map<String, String> payload) {
-        jsonHelper = new JsonHelper(new JSONObject(payload));
-        if(protector.serverSecretMatches(jsonHelper.getString(SERVER_SECRET_KEY)))
-            return executeAuth(payload, true);
+        loadJsonHelper(payload);
+        if(protector.serverSecretMatches(jsonHelper.getString(SERVER_SECRET_KEY))) {
+            String name = jsonHelper.getString(NAME_KEY);
+            String surname = jsonHelper.getString(SURNAME_KEY);
+            if(isNameValid(name)) {
+                if(isSurnameValid(surname))
+                    return executeAuth(payload, name, surname);
+                else
+                    return failedResponse(WRONG_SURNAME_MESSAGE);
+            } else
+                return failedResponse(WRONG_NAME_MESSAGE);
+        }
         else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
@@ -52,64 +59,143 @@ public class UsersController extends NovaController {
     @PostMapping(path = SIGN_IN_ENDPOINT)
     @RequestPath(path = "/api/v1/users/signIn", method = POST)
     public String signIn(@RequestBody Map<String, String> payload) {
-        return executeAuth(payload, false);
+        return executeAuth(payload);
     }
 
-    private String executeAuth(Map<String, String> payload, boolean signUp) {
-        jsonHelper = new JsonHelper(new JSONObject(payload));
-        String name = jsonHelper.getString(NAME_KEY);
-        String surname = jsonHelper.getString(SURNAME_KEY);
+    private String executeAuth(Map<String, String> payload, String ... personalData) {
+        loadJsonHelper(payload);
         String email = jsonHelper.getString(EMAIL_KEY);
         String password = jsonHelper.getString(PASSWORD_KEY);
-        if(isNameValid(name)) {
-            if(isSurnameValid(surname)) {
-                if(isEmailValid(email)) {
-                    if(isPasswordValid(password)) {
-                        String id;
-                        String token;
-                        String profilePicUrl;
-                        if(signUp) {
-                            id = generateIdentifier();
-                            token = generateIdentifier();
-                            profilePicUrl = "toInsertTheDefaultPath";
-                            try {
-                                usersHelper.signUpUser(
-                                        id,
-                                        token,
-                                        name,
-                                        surname,
-                                        email,
-                                        password
-                                );
-                            } catch (Exception e) {
-                                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-                            }
-                        } else {
-                            try {
-                                User user = usersHelper.signInUser(email, password);
-                                if(user != null) {
-                                    id = user.getId();
-                                    token = user.getToken();
-                                    profilePicUrl = user.getProfilePicUrl();
-                                } else
-                                    return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-                            } catch (NoSuchAlgorithmException e) {
-                                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-                            }
-                        }
-                        return successResponse(new JSONObject()
-                                .put(IDENTIFIER_KEY, id)
-                                .put(TOKEN_KEY, token)
-                                .put(PROFILE_PIC_URL_KEY, profilePicUrl)
+        if(isEmailValid(email)) {
+            if(isPasswordValid(password)) {
+                String id;
+                String token;
+                String profilePicUrl;
+                JSONObject response = new JSONObject();
+                if(personalData.length == 2) {
+                    id = generateIdentifier();
+                    token = generateIdentifier();
+                    profilePicUrl = "toInsertTheDefaultPath";
+                    try {
+                        usersHelper.signUpUser(
+                                id,
+                                token,
+                                personalData[0],
+                                personalData[1],
+                                email,
+                                password
                         );
-                    } else
-                        return failedResponse(WRONG_PASSWORD_MESSAGE);
-                } else
-                    return failedResponse(WRONG_EMAIL_MESSAGE);
+                    } catch (Exception e) {
+                        return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                    }
+                } else {
+                    try {
+                        User user = usersHelper.signInUser(email, password);
+                        if(user != null) {
+                            id = user.getId();
+                            token = user.getToken();
+                            profilePicUrl = user.getProfilePicUrl();
+                            response.put(NAME_KEY, user.getName());
+                            response.put(SURNAME_KEY, user.getSurname());
+                        } else
+                            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                    } catch (Exception e) {
+                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                    }
+                }
+                return successResponse(response
+                        .put(IDENTIFIER_KEY, id)
+                        .put(TOKEN_KEY, token)
+                        .put(PROFILE_PIC_URL_KEY, profilePicUrl)
+                );
             } else
-                return failedResponse(WRONG_SURNAME_MESSAGE);
+                return failedResponse(WRONG_PASSWORD_MESSAGE);
         } else
-            return failedResponse(WRONG_NAME_MESSAGE);
+            return failedResponse(WRONG_EMAIL_MESSAGE);
+    }
+
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PROFILE_PIC_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}/changeProfilePic", method = PATCH)
+    public String changeProfilePic(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestParam(PROFILE_PIC_URL_KEY) MultipartFile profilePic
+    ) {
+        if(isMe(id, token)) {
+            if(!profilePic.isEmpty()) {
+                JSONObject response = new JSONObject();
+                try {
+                    String profilePicUrl = usersHelper.changeProfilePic(profilePic, id);
+                    response.put(PROFILE_PIC_URL_KEY, profilePicUrl);
+                } catch (Exception e) {
+                    response.put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC);
+                }
+                return successResponse(response);
+            } else
+                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_EMAIL_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}/changeEmail", method = PATCH)
+    public String changeEmail(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token)) {
+            loadJsonHelper(payload);
+            String email = jsonHelper.getString(EMAIL_KEY);
+            if(isEmailValid(email)) {
+                try {
+                    usersHelper.changeEmail(email, id);
+                    return successResponse();
+                } catch (Exception e) {
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                }
+            } else
+                return failedResponse(WRONG_EMAIL_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PASSWORD_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}/changePassword", method = PATCH)
+    public String changePassword(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token)) {
+            loadJsonHelper(payload);
+            String password = jsonHelper.getString(PASSWORD_KEY);
+            if(isPasswordValid(password)) {
+                try {
+                    usersHelper.changePassword(password, id);
+                    return successResponse();
+                } catch (Exception e) {
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                }
+            } else
+                return failedResponse(WRONG_PASSWORD_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
     @DeleteMapping(
@@ -120,8 +206,8 @@ public class UsersController extends NovaController {
     )
     @RequestPath(path = "/api/v1/users/{id}", method = DELETE)
     public String deleteAccount(
-            @RequestHeader(TOKEN_KEY) String token,
-            @PathVariable(IDENTIFIER_KEY) String id
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token
     ) {
         if(isMe(id, token)) {
             usersHelper.deleteUser(id);

@@ -1,4 +1,4 @@
-package com.tecknobit.nova.helpers.repositories;
+package com.tecknobit.nova.helpers.services.repositories;
 
 import com.tecknobit.nova.records.Project;
 import org.springframework.data.jpa.repository.JpaRepository;

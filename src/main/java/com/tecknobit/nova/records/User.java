@@ -32,17 +32,13 @@ public class User extends NovaItem {
 
     public static final String PROJECTS_KEY = "projects";
 
-    public static final String PUBLIC_USER_KEY = "publicUser";
-
-    public static final String PUBLIC_USERS_KEY = "publicUsers";
-
     public static final String NAME_KEY = "name";
 
     public static final String SURNAME_KEY = "surname";
 
     public static final String EMAIL_KEY = "email";
 
-    public static final String PROFILE_PIC_URL_KEY = "profilePicUrl";
+    public static final String PROFILE_PIC_URL_KEY = "profile_pic_url";
 
     @Column(name = NAME_KEY)
     private final String name;
@@ -58,8 +54,7 @@ public class User extends NovaItem {
 
     @Column(
             name = PROFILE_PIC_URL_KEY,
-            columnDefinition = "text default '" + DEFAULT_PROFILE_PIC + "'",
-            insertable = false
+            columnDefinition = "text default '" + DEFAULT_PROFILE_PIC + "'"
     )
     private final String profilePicUrl;
 

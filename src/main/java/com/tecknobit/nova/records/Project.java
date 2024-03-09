@@ -22,11 +22,11 @@ public class Project extends NovaItem {
 
     public static final String PROJECT_NAME_KEY = "name";
 
-    public static final String PROJECT_MEMBERS_KEY = "projectMembers";
+    public static final String PROJECT_MEMBERS_KEY = "project_members";
 
-    public static final String WORKING_PROGRESS_VERSION_KEY = "workingProgressVersion";
+    public static final String WORKING_PROGRESS_VERSION_KEY = "working_progress_version";
 
-    public static final String PROJECT_RELEASES_KEY = "projectReleases";
+    public static final String PROJECT_RELEASES_KEY = "project_releases";
 
     @ManyToOne(
             fetch = FetchType.LAZY,

@@ -1,6 +1,6 @@
-package com.tecknobit.nova.helpers;
+package com.tecknobit.nova.helpers.services;
 
-import com.tecknobit.nova.helpers.repositories.ProjectsRepository;
+import com.tecknobit.nova.helpers.services.repositories.ProjectsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
