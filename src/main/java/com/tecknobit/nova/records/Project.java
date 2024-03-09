@@ -1,5 +1,6 @@
 package com.tecknobit.nova.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.nova.records.release.Release;
 import jakarta.persistence.*;
@@ -14,6 +15,8 @@ import static com.tecknobit.nova.records.User.*;
 @Table(name = PROJECTS_KEY)
 public class Project extends NovaItem {
 
+    public static final String PROJECT_MEMBERS_TABLE = "project_members";
+
     public static final String PROJECT_KEY = "project";
 
     public static final String AUTHOR_KEY = "author";
@@ -22,7 +25,7 @@ public class Project extends NovaItem {
 
     public static final String PROJECT_NAME_KEY = "name";
 
-    public static final String PROJECT_MEMBERS_KEY = "project_members";
+    public static final String PROJECT_MEMBERS_KEY = "projectMembers";
 
     public static final String WORKING_PROGRESS_VERSION_KEY = "working_progress_version";
 
@@ -37,6 +40,7 @@ public class Project extends NovaItem {
             TOKEN_KEY,
             PASSWORD_KEY,
             PROJECTS_KEY,
+            AUTHORED_PROJECTS_KEY,
             "hibernateLazyInitializer",
             "handler"
     })
@@ -52,14 +56,17 @@ public class Project extends NovaItem {
     )
     private final String name;
 
-    @OneToMany(
-            mappedBy = PROJECT_KEY,
-            cascade = CascadeType.ALL
+    @ManyToMany(cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = PROJECT_MEMBERS_TABLE,
+            joinColumns = {@JoinColumn(name = IDENTIFIER_KEY)},
+            inverseJoinColumns = {@JoinColumn(name = MEMBER_IDENTIFIER_KEY)}
     )
     @JsonIgnoreProperties({
             TOKEN_KEY,
             PASSWORD_KEY,
             PROJECTS_KEY,
+            AUTHORED_PROJECTS_KEY,
             "hibernateLazyInitializer",
             "handler"
     })
@@ -105,10 +112,12 @@ public class Project extends NovaItem {
         return projectMembers;
     }
 
+    @JsonIgnore
     public String getWorkingProgressVersion() {
         return workingProgressVersion;
     }
 
+    @JsonIgnore
     public String getWorkingProgressVersionText() {
         if(workingProgressVersion == null)
             return null;

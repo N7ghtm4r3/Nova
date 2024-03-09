@@ -1,14 +1,12 @@
 package com.tecknobit.nova.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.Project.*;
+import static com.tecknobit.nova.records.Project.AUTHOR_KEY;
+import static com.tecknobit.nova.records.Project.PROJECT_MEMBERS_KEY;
 
 @Entity
 @Table(name = User.USERS_KEY)
@@ -22,6 +20,8 @@ public class User extends NovaItem {
 
     public static final String USER_KEY = "user";
 
+    public static final String MEMBER_IDENTIFIER_KEY = "member_id";
+
     public static final String SERVER_SECRET_KEY = "server_secret";
 
     public static final String USERS_KEY = "users";
@@ -29,6 +29,8 @@ public class User extends NovaItem {
     public static final String TOKEN_KEY = "token";
 
     public static final String PASSWORD_KEY = "password";
+
+    public static final String AUTHORED_PROJECTS_KEY = "authoredProjects";
 
     public static final String PROJECTS_KEY = "projects";
 
@@ -72,32 +74,24 @@ public class User extends NovaItem {
             mappedBy = AUTHOR_KEY,
             cascade = CascadeType.ALL
     )
+    private final List<Project> authoredProjects;
+
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            mappedBy = PROJECT_MEMBERS_KEY
+    )
     private final List<Project> projects;
 
-    @ManyToOne(
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL
-    )
-    @JoinColumn(name = PROJECT_KEY)
-    @JsonIgnoreProperties({
-            PROJECT_MEMBERS_KEY,
-            "hibernateLazyInitializer",
-            "handler"
-    })
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private final Project project;
-
     public User() {
-        this(null, null, null, null, null, null, null,
-                List.of(), null);
+        this(null, null, null, null, null, null, null, List.of(), List.of());
     }
 
     public User(String id, String token, String name, String surname, String email, String password) {
-        this(id, name, surname, email, null, token, password, List.of(), null);
+        this(id, name, surname, email, null, token, password, List.of(), List.of());
     }
 
-    public User(String id, String name, String surname, String email, String profilePicUrl,
-                String token, String password, List<Project> projects, Project project) {
+    public User(String id, String name, String surname, String email, String profilePicUrl, String token,
+                String password, List<Project> authoredProjects, List<Project> projects) {
         super(id);
         this.name = name;
         this.surname = surname;
@@ -105,8 +99,8 @@ public class User extends NovaItem {
         this.profilePicUrl = profilePicUrl;
         this.token = token;
         this.password = password;
+        this.authoredProjects = authoredProjects;
         this.projects = projects;
-        this.project = project;
     }
 
     public String getName() {
@@ -131,6 +125,10 @@ public class User extends NovaItem {
 
     public String getPassword() {
         return password;
+    }
+
+    public List<Project> getAuthoredProjects() {
+        return authoredProjects;
     }
 
     public List<Project> getProjects() {

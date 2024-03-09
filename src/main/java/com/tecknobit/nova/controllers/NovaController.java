@@ -1,6 +1,7 @@
 package com.tecknobit.nova.controllers;
 
 import com.tecknobit.apimanager.annotations.Structure;
+import com.tecknobit.apimanager.apis.sockets.SocketManager;
 import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.nova.helpers.services.repositories.UsersRepository;
@@ -8,6 +9,7 @@ import com.tecknobit.nova.records.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,6 +67,13 @@ public abstract class NovaController {
 
     protected String successResponse() {
         return plainResponse(SUCCESSFUL, RESPONSE_SUCCESSFUL_MESSAGE);
+    }
+
+    protected <V> HashMap<String, V> successResponse(V value) {
+        HashMap<String, V> response = new HashMap<>();
+        response.put(RESPONSE_MESSAGE_KEY, value);
+        response.put(RESPONSE_STATUS_KEY, (V) SocketManager.StandardResponseCode.SUCCESSFUL);
+        return response;
     }
 
     protected String successResponse(JSONObject message) {

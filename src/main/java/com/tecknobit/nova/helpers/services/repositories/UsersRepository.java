@@ -16,7 +16,7 @@ import static com.tecknobit.nova.records.User.*;
 public interface UsersRepository extends JpaRepository<User, String> {
 
     @Query(
-            value = "SELECT * FROM " + USERS_KEY + " WHERE " + EMAIL_KEY + "=?",
+            value = "SELECT * FROM " + USERS_KEY + " WHERE " + EMAIL_KEY + "=:" + EMAIL_KEY,
             nativeQuery = true
     )
     User findUserByEmail(
@@ -26,8 +26,8 @@ public interface UsersRepository extends JpaRepository<User, String> {
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
-            value = "UPDATE " + USERS_KEY + " SET " + PROFILE_PIC_URL_KEY + "=? WHERE "
-                    + IDENTIFIER_KEY + "=?",
+            value = "UPDATE " + USERS_KEY + " SET " + PROFILE_PIC_URL_KEY + "=:" + PROFILE_PIC_URL_KEY + "WHERE "
+                    + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
     )
     void changeProfilePic(
@@ -38,8 +38,8 @@ public interface UsersRepository extends JpaRepository<User, String> {
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
-            value = "UPDATE " + USERS_KEY + " SET " + EMAIL_KEY + "=? WHERE "
-                    + IDENTIFIER_KEY + "=?",
+            value = "UPDATE " + USERS_KEY + " SET " + EMAIL_KEY + "=:" + EMAIL_KEY + " WHERE "
+                    + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
     )
     void changeEmail(
@@ -50,8 +50,8 @@ public interface UsersRepository extends JpaRepository<User, String> {
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
-            value = "UPDATE " + USERS_KEY + " SET " + PASSWORD_KEY + "=? WHERE "
-                    + IDENTIFIER_KEY + "=?",
+            value = "UPDATE " + USERS_KEY + " SET " + PASSWORD_KEY + "=:" + PASSWORD_KEY + " WHERE "
+                    + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
     )
     void changePassword(
