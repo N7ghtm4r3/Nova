@@ -1,7 +1,9 @@
-package com.tecknobit.nova.records;
+package com.tecknobit.nova.records.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.nova.records.NovaItem;
+import com.tecknobit.nova.records.User;
 import com.tecknobit.nova.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -17,7 +19,7 @@ public class Project extends NovaItem {
 
     public static final String PROJECT_MEMBERS_TABLE = "project_members";
 
-    public static final String PROJECT_IDENTIFIER_KEY = "projectId";
+    public static final String PROJECT_IDENTIFIER_KEY = "project_id";
 
     public static final String PROJECT_KEY = "project";
 
@@ -83,12 +85,18 @@ public class Project extends NovaItem {
     )
     private final List<Release> releases;
 
+    @OneToMany(
+            mappedBy = PROJECT_KEY,
+            cascade = CascadeType.ALL
+    )
+    private final List<JoiningQRCode> joiningQRCodes;
+
     public Project() {
-        this(null, null, null, null, List.of(), null, List.of());
+        this(null, null, null, null, List.of(), null, List.of(), List.of());
     }
 
     public Project(String id, User author, String logoUrl, String name, List<User> projectMembers,
-                   String workingProgressVersion, List<Release> releases) {
+                   String workingProgressVersion, List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
         super(id);
         this.author = author;
         this.logoUrl = logoUrl;
@@ -96,6 +104,7 @@ public class Project extends NovaItem {
         this.projectMembers = projectMembers;
         this.workingProgressVersion = workingProgressVersion;
         this.releases = releases;
+        this.joiningQRCodes = joiningQRCodes;
     }
 
     public User getAuthor() {
@@ -130,6 +139,11 @@ public class Project extends NovaItem {
 
     public List<Release> getReleases() {
         return releases;
+    }
+
+    @JsonIgnore
+    public List<JoiningQRCode> getJoiningQRCodes() {
+        return joiningQRCodes;
     }
 
 }

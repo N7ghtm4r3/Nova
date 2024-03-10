@@ -1,7 +1,8 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.nova.helpers.services.repositories.ProjectsRepository;
-import com.tecknobit.nova.records.Project;
+import com.tecknobit.nova.records.project.JoiningQRCode;
+import com.tecknobit.nova.records.project.Project;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.tecknobit.nova.helpers.ResourcesProvider.LOGOS_DIRECTORY;
-import static com.tecknobit.nova.records.Project.AUTHOR_KEY;
-import static com.tecknobit.nova.records.Project.LOGO_URL_KEY;
+import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
+import static com.tecknobit.nova.records.project.Project.LOGO_URL_KEY;
 import static com.tecknobit.nova.records.User.*;
+import static java.lang.System.currentTimeMillis;
 
 @Service
 public class ProjectsHelper implements ResourcesManager {
@@ -47,6 +49,23 @@ public class ProjectsHelper implements ResourcesManager {
 
     public Project getProject(String userId, String projectId) {
         return projectsRepository.getProject(projectId, userId);
+    }
+
+    public void createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails) {
+        projectsRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), projectId,
+                membersEmails.toString().toLowerCase());
+    }
+
+    public JoiningQRCode getJoiningQrcode(String QRCodeId) {
+        return projectsRepository.getJoiningQRCode(QRCodeId);
+    }
+
+    public void joinMember(String projectId, String memberId) {
+        projectsRepository.joinMember(projectId, memberId);
+    }
+
+    public void deleteJoiningQrcode(String QRCodeId) {
+        projectsRepository.deleteJoiningQRCode(QRCodeId);
     }
 
     public record ProjectPayload(MultipartFile logoUrl, String name) {}

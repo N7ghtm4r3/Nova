@@ -1,12 +1,13 @@
 package com.tecknobit.nova.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tecknobit.nova.records.project.Project;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.Project.AUTHOR_KEY;
-import static com.tecknobit.nova.records.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
+import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 
 @Entity
 @Table(name = User.USERS_KEY)

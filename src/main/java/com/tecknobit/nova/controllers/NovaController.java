@@ -52,8 +52,12 @@ public abstract class NovaController {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    protected void loadJsonHelper(Map<String, String> payload) {
+    protected <V> void loadJsonHelper(Map<String, V> payload) {
         jsonHelper.setJSONObjectSource(new JSONObject(payload));
+    }
+
+    protected <V> void loadJsonHelper(String payload) {
+        jsonHelper.setJSONObjectSource(payload);
     }
 
     protected boolean isMe(String id, String token) {

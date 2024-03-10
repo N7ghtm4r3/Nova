@@ -3,7 +3,7 @@ package com.tecknobit.nova.records.release;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.Project;
+import com.tecknobit.nova.records.project.Project;
 import com.tecknobit.nova.records.release.events.ReleaseEvent;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -11,8 +11,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.Project.PROJECT_KEY;
-import static com.tecknobit.nova.records.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.nova.records.project.Project.PROJECT_KEY;
+import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.nova.records.release.Release.*;
 
 @Entity

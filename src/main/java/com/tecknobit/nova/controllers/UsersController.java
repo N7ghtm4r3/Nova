@@ -82,7 +82,7 @@ public class UsersController extends NovaController {
                                 token,
                                 personalData[0],
                                 personalData[1],
-                                email,
+                                email.toLowerCase(),
                                 password
                         );
                     } catch (Exception e) {
@@ -90,7 +90,7 @@ public class UsersController extends NovaController {
                     }
                 } else {
                     try {
-                        User user = usersHelper.signInUser(email, password);
+                        User user = usersHelper.signInUser(email.toLowerCase(), password);
                         if(user != null) {
                             id = user.getId();
                             token = user.getToken();

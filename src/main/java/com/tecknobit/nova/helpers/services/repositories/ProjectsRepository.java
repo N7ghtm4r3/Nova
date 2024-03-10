@@ -1,6 +1,7 @@
 package com.tecknobit.nova.helpers.services.repositories;
 
-import com.tecknobit.nova.records.Project;
+import com.tecknobit.nova.records.project.JoiningQRCode;
+import com.tecknobit.nova.records.project.Project;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.Project.*;
 import static com.tecknobit.nova.records.User.*;
+import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
+import static com.tecknobit.nova.records.project.Project.*;
+import static com.tecknobit.nova.records.release.Release.CREATION_DATE_KEY;
 
 @Service
 @Repository
@@ -74,6 +77,67 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
     Project getProject(
           @Param(IDENTIFIER_KEY) String projectId,
           @Param(AUTHOR_KEY) String userId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "INSERT INTO " + JOINING_QRCODES_TABLE +
+                    " ("
+                    + IDENTIFIER_KEY + ","
+                    + CREATION_DATE_KEY + ","
+                    + PROJECT_IDENTIFIER_KEY + ","
+                    + PROJECT_MEMBERS_TABLE + ")"
+                    + " VALUES ("
+                    + ":" + IDENTIFIER_KEY + ","
+                    + ":" + CREATION_DATE_KEY + ","
+                    + ":" + PROJECT_IDENTIFIER_KEY + ","
+                    + ":" + PROJECT_MEMBERS_TABLE
+                    + ")",
+            nativeQuery = true
+    )
+    void insertJoiningQRCode(
+            @Param(IDENTIFIER_KEY) String joiningQRCodeId,
+            @Param(CREATION_DATE_KEY) long creationDate,
+            @Param(PROJECT_IDENTIFIER_KEY) String projectId,
+            @Param(PROJECT_MEMBERS_TABLE) String projectMembers
+    );
+
+    @Query(
+            value = "SELECT * FROM " + JOINING_QRCODES_TABLE + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    JoiningQRCode getJoiningQRCode(
+            @Param(IDENTIFIER_KEY) String joiningQRCodeId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "INSERT INTO " + PROJECT_MEMBERS_TABLE +
+                    " ("
+                    + IDENTIFIER_KEY + ","
+                    + MEMBER_IDENTIFIER_KEY +
+                    " )"
+                    + " VALUES ("
+                    + ":" + IDENTIFIER_KEY + ","
+                    + ":" + MEMBER_IDENTIFIER_KEY
+                    + ")",
+            nativeQuery = true
+    )
+    void joinMember(
+            @Param(IDENTIFIER_KEY) String projectId,
+            @Param(MEMBER_IDENTIFIER_KEY) String memberId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + JOINING_QRCODES_TABLE + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deleteJoiningQRCode(
+            @Param(IDENTIFIER_KEY) String joiningQRCodeId
     );
 
 }
