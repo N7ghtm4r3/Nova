@@ -41,9 +41,12 @@ public class ProjectsController extends NovaController {
 
     private final ProjectsHelper projectsHelper;
 
+    private final UsersHelper usersHelper;
+
     @Autowired
-    public ProjectsController(ProjectsHelper projectsHelper) {
+    public ProjectsController(ProjectsHelper projectsHelper, UsersHelper usersHelper) {
         this.projectsHelper = projectsHelper;
+        this.usersHelper = usersHelper;
     }
 
     @GetMapping(
@@ -154,7 +157,7 @@ public class ProjectsController extends NovaController {
             if(joiningQRCode.isValid()) {
                 String email = jsonHelper.getString(EMAIL_KEY, "").toLowerCase();
                 if(isEmailValid(email)) {
-                    if(joiningQRCode.getMembersEmails().contains(email)) {
+                    if(joiningQRCode.listEmails().contains(email)) {
                         User user = usersRepository.findUserByEmail(email);
                         JSONObject response = new JSONObject();
                         String userId;
@@ -167,7 +170,6 @@ public class ProjectsController extends NovaController {
                                     if(isPasswordValid(password)) {
                                         userId = generateIdentifier();
                                         String token = generateIdentifier();
-                                        UsersHelper usersHelper = new UsersHelper();
                                         try {
                                             usersHelper.signUpUser(
                                                     userId,
@@ -191,7 +193,7 @@ public class ProjectsController extends NovaController {
                                 return failedResponse(WRONG_NAME_MESSAGE);
                         } else
                             userId = user.getId();
-                        projectsHelper.joinMember(joiningQRCode.getProject().getId(), userId);
+                        projectsHelper.joinMember(joiningQRCode, email, userId);
                         return successResponse(response);
                     } else
                         return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);

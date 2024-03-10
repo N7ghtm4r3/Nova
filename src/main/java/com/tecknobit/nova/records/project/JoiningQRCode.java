@@ -8,7 +8,8 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.tecknobit.nova.records.project.JoiningQRCode.*;
+import static com.tecknobit.nova.Launcher.BASE_64_DECODER;
+import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.nova.records.release.Release.CREATION_DATE_KEY;
@@ -32,16 +33,16 @@ public class JoiningQRCode extends NovaItem {
     private final Project project;
 
     @Column(name = PROJECT_MEMBERS_KEY)
-    private final List<String> membersEmails;
+    private final String membersEmails;
 
     @Column(name = CREATION_DATE_KEY)
     private final long creationDate;
 
     public JoiningQRCode() {
-        this(null, null, List.of(), -1);
+        this(null, null, "", -1);
     }
 
-    public JoiningQRCode(String QRCodeId, Project project, List<String> membersEmails, long creationDate) {
+    public JoiningQRCode(String QRCodeId, Project project, String membersEmails, long creationDate) {
         super(QRCodeId);
         this.project = project;
         this.membersEmails = membersEmails;
@@ -52,8 +53,12 @@ public class JoiningQRCode extends NovaItem {
         return project;
     }
 
-    public List<String> getMembersEmails() {
+    public String getMembersEmails() {
         return membersEmails;
+    }
+
+    public List<String> listEmails() {
+        return List.of(new String(BASE_64_DECODER.decode(membersEmails.getBytes())));
     }
 
     public long getCreationDate() {
@@ -61,7 +66,7 @@ public class JoiningQRCode extends NovaItem {
     }
 
     public boolean isValid() {
-        return (creationDate - System.currentTimeMillis()) < TimeUnit.MINUTES.toMillis(15);
+        return (System.currentTimeMillis() - creationDate) < TimeUnit.MINUTES.toMillis(15);
     }
 
 }
