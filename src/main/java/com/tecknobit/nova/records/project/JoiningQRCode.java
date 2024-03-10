@@ -1,10 +1,12 @@
 package com.tecknobit.nova.records.project;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.nova.records.NovaItem;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -57,8 +59,12 @@ public class JoiningQRCode extends NovaItem {
         return membersEmails;
     }
 
-    public List<String> listEmails() {
-        return List.of(new String(BASE_64_DECODER.decode(membersEmails.getBytes())));
+    @JsonIgnore
+    public ArrayList<String> listEmails() {
+        String emailsValues = new String(BASE_64_DECODER.decode(membersEmails.getBytes())).replaceAll(" ", "");
+        if(emailsValues.isEmpty())
+            return new ArrayList<>();
+        return new ArrayList<>(List.of(emailsValues.split(",")));
     }
 
     public long getCreationDate() {

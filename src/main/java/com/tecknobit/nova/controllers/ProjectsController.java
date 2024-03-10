@@ -157,46 +157,52 @@ public class ProjectsController extends NovaController {
             if(joiningQRCode.isValid()) {
                 String email = jsonHelper.getString(EMAIL_KEY, "").toLowerCase();
                 if(isEmailValid(email)) {
-                    if(joiningQRCode.listEmails().contains(email)) {
-                        User user = usersRepository.findUserByEmail(email);
-                        JSONObject response = new JSONObject();
-                        String userId;
-                        if(user == null) {
-                            String name = jsonHelper.getString(NAME_KEY);
-                            String surname = jsonHelper.getString(SURNAME_KEY);
-                            String password = jsonHelper.getString(PASSWORD_KEY);
-                            if(isNameValid(name)) {
-                                if(isSurnameValid(surname)) {
-                                    if(isPasswordValid(password)) {
-                                        userId = generateIdentifier();
-                                        String token = generateIdentifier();
-                                        try {
-                                            usersHelper.signUpUser(
-                                                    userId,
-                                                    token,
-                                                    name,
-                                                    surname,
-                                                    email,
-                                                    password
-                                            );
-                                            response.put(IDENTIFIER_KEY, userId)
-                                                    .put(TOKEN_KEY, token)
-                                                    .put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC);
-                                        } catch (NoSuchAlgorithmException e) {
+                    Project project = joiningQRCode.getProject();
+                    if(project.hasNotMember(email)) {
+                        if(joiningQRCode.listEmails().contains(email)) {
+                            User user = usersRepository.findUserByEmail(email);
+                            JSONObject response = new JSONObject();
+                            String userId;
+                            if(user == null) {
+                                String name = jsonHelper.getString(NAME_KEY);
+                                String surname = jsonHelper.getString(SURNAME_KEY);
+                                String password = jsonHelper.getString(PASSWORD_KEY);
+                                if(isNameValid(name)) {
+                                    if(isSurnameValid(surname)) {
+                                        if(isPasswordValid(password)) {
+                                            userId = generateIdentifier();
+                                            String token = generateIdentifier();
+                                            try {
+                                                usersHelper.signUpUser(
+                                                        userId,
+                                                        token,
+                                                        name,
+                                                        surname,
+                                                        email,
+                                                        password
+                                                );
+                                                response.put(IDENTIFIER_KEY, userId)
+                                                        .put(TOKEN_KEY, token)
+                                                        .put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC);
+                                            } catch (NoSuchAlgorithmException e) {
+                                                return failedResponse(WRONG_PASSWORD_MESSAGE);
+                                            }
+                                        } else
                                             return failedResponse(WRONG_PASSWORD_MESSAGE);
-                                        }
                                     } else
-                                        return failedResponse(WRONG_PASSWORD_MESSAGE);
+                                        return failedResponse(WRONG_SURNAME_MESSAGE);
                                 } else
-                                    return failedResponse(WRONG_SURNAME_MESSAGE);
+                                    return failedResponse(WRONG_NAME_MESSAGE);
                             } else
-                                return failedResponse(WRONG_NAME_MESSAGE);
+                                userId = user.getId();
+                            projectsHelper.joinMember(joiningQRCode, email, userId);
+                            return successResponse(response);
                         } else
-                            userId = user.getId();
-                        projectsHelper.joinMember(joiningQRCode, email, userId);
-                        return successResponse(response);
-                    } else
-                        return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                    } else {
+                        projectsHelper.removeMemberFromMailingList(joiningQRCode, email);
+                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                    }
                 } else
                     return failedResponse(WRONG_EMAIL_MESSAGE);
             } else {

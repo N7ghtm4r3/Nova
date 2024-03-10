@@ -58,26 +58,35 @@ public class ProjectsHelper implements ResourcesManager {
     }
 
     public void createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails) {
-        joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), projectId, BASE_64_ENCODER
-                .encodeToString(formatAllowedEmails(membersEmails).getBytes())
-        );
+        joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), projectId,
+                formatAllowedEmails(membersEmails));
     }
 
     public JoiningQRCode getJoiningQrcode(String QRCodeId) {
         return joiningQRCodeRepository.getJoiningQRCode(QRCodeId);
     }
 
+    public void removeMemberFromMailingList(JoiningQRCode joiningQRCode, String email) {
+        ArrayList<String> membersEmails = joiningQRCode.listEmails();
+        if(membersEmails.contains(email)) {
+            membersEmails.remove(email);
+            String QRCodeId = joiningQRCode.getId();
+            if(membersEmails.isEmpty())
+                joiningQRCodeRepository.deleteJoiningQRCode(QRCodeId);
+            else
+                joiningQRCodeRepository.updateJoiningQRCode(QRCodeId, formatAllowedEmails(membersEmails));
+        }
+    }
+
     public void joinMember(JoiningQRCode joiningQRCode, String email, String memberId) {
-        List<String> membersEmails = new ArrayList<>(joiningQRCode.listEmails());
-        membersEmails.remove(email);
-        joiningQRCodeRepository.updateJoiningQRCode(joiningQRCode.getId(), formatAllowedEmails(membersEmails));
+        removeMemberFromMailingList(joiningQRCode, email);
         projectsRepository.joinMember(joiningQRCode.getProject().getId(), memberId);
     }
 
     private String formatAllowedEmails(List<String> emails) {
-        return emails.toString().toLowerCase()
+        return BASE_64_ENCODER.encodeToString(emails.toString().toLowerCase()
                 .replace("[", "")
-                .replace("]", "");
+                .replace("]", "").getBytes());
     }
 
     public void deleteJoiningQrcode(String QRCodeId) {
