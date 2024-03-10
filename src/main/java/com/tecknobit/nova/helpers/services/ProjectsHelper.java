@@ -93,6 +93,15 @@ public class ProjectsHelper implements ResourcesManager {
         joiningQRCodeRepository.deleteJoiningQRCode(QRCodeId);
     }
 
+    public void removeMember(String projectId, String memberId) {
+        projectsRepository.removeMember(projectId, memberId);
+    }
+
+    public void deleteProject(String projectId) {
+        projectsRepository.removeAllMembers(projectId);
+        projectsRepository.deleteProject(projectId);
+    }
+
     public record ProjectPayload(MultipartFile logoUrl, String name) {}
 
 }

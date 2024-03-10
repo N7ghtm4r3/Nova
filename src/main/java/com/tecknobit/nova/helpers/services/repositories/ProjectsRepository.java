@@ -95,4 +95,36 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(MEMBER_IDENTIFIER_KEY) String memberId
     );
 
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + PROJECT_MEMBERS_TABLE + " WHERE " + IDENTIFIER_KEY + "=:"
+                    + IDENTIFIER_KEY + " AND " + MEMBER_IDENTIFIER_KEY + "=:" + MEMBER_IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void removeMember(
+            @Param(IDENTIFIER_KEY) String projectId,
+            @Param(MEMBER_IDENTIFIER_KEY) String memberId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + PROJECT_MEMBERS_TABLE + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void removeAllMembers(
+            @Param(IDENTIFIER_KEY) String projectId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + PROJECTS_KEY + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deleteProject(
+            @Param(IDENTIFIER_KEY) String projectId
+    );
+
 }

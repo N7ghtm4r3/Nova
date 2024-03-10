@@ -75,7 +75,7 @@ public class UsersController extends NovaController {
                 if(personalData.length == 2) {
                     id = generateIdentifier();
                     token = generateIdentifier();
-                    profilePicUrl = "toInsertTheDefaultPath";
+                    profilePicUrl = DEFAULT_PROFILE_PIC;
                     try {
                         usersHelper.signUpUser(
                                 id,

@@ -146,7 +146,15 @@ public class Project extends NovaItem {
         return joiningQRCodes;
     }
 
-    public boolean hasNotMember(String memberEmail) {
+    public boolean hasMemberId(String memberId) {
+        for (User member : projectMembers) {
+            if(member.getId().equals(memberId))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasNotMemberEmail(String memberEmail) {
         for (User member : projectMembers) {
             if(member.getEmail().equals(memberEmail))
                 return false;

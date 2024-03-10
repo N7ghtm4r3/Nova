@@ -100,7 +100,7 @@ public class ProjectsController extends NovaController {
             }
     )
     @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = GET)
-    public <T>  T getProject(
+    public <T> T getProject(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
             @RequestHeader(TOKEN_KEY) String token
@@ -158,7 +158,7 @@ public class ProjectsController extends NovaController {
                 String email = jsonHelper.getString(EMAIL_KEY, "").toLowerCase();
                 if(isEmailValid(email)) {
                     Project project = joiningQRCode.getProject();
-                    if(project.hasNotMember(email)) {
+                    if(project.hasNotMemberEmail(email)) {
                         if(joiningQRCode.listEmails().contains(email)) {
                             User user = usersRepository.findUserByEmail(email);
                             JSONObject response = new JSONObject();
@@ -213,9 +213,88 @@ public class ProjectsController extends NovaController {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
     }
 
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + REMOVE_MEMBER_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/removeMember", method = PATCH)
+    public String removeMember(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+            loadJsonHelper(payload);
+            String memberId = jsonHelper.getString(MEMBER_IDENTIFIER_KEY);
+            Project project = projectsHelper.getProject(id, projectId);
+            if(project.hasMemberId(memberId) && !isProjectAuthor(memberId, projectId)) {
+                projectsHelper.removeMember(projectId, memberId);
+                return successResponse();
+            } else
+                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @DeleteMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + LEAVE_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/leave", method = DELETE)
+    public String leave(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if(isMe(id, token)) {
+            Project project = projectsHelper.getProject(id, projectId);
+            if(project != null) {
+                if(!isProjectAuthor(project, id)) {
+                    projectsHelper.removeMember(projectId, id);
+                    return successResponse();
+                } else
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            } else
+                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @DeleteMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = DELETE)
+    public String deleteProject(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if(isMe(id, token) && isProjectAuthor(id, projectId)) {
+            projectsHelper.deleteProject(projectId);
+            return successResponse();
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
     private boolean isAuthorizedUser(String userId, String projectId) {
         Project project = projectsHelper.getProject(userId, projectId);
-        return ((project != null) && ((project.getAuthor().getId().equals(userId)) /*|| TO-DO: CHECK IF THE USER IS A VENDOR*/));
+        return isProjectAuthor(project, userId) /*|| TO-DO: CHECK IF THE USER IS A VENDOR*/;
+    }
+
+    private boolean isProjectAuthor(String userId, String projectId) {
+        return isProjectAuthor(projectsHelper.getProject(userId, projectId), userId);
+    }
+
+    private boolean isProjectAuthor(Project project, String userId) {
+        return project != null && project.getAuthor().getId().equals(userId);
     }
 
 }
