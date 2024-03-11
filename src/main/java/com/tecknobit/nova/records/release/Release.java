@@ -1,5 +1,6 @@
 package com.tecknobit.nova.records.release;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.nova.records.NovaItem;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static com.tecknobit.nova.records.project.Project.PROJECT_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
-import static com.tecknobit.nova.records.release.Release.*;
+import static com.tecknobit.nova.records.release.Release.RELEASES_KEY;
 
 @Entity
 @Table(name = RELEASES_KEY)
@@ -26,6 +27,8 @@ public class Release extends NovaItem {
 
     public static final String RELEASE_KEY = "release";
 
+    public static final String RELEASE_IDENTIFIER = "release_id";
+
     public static final String RELEASES_KEY = "releases";
     
     public static final String RELEASE_VERSION_KEY = "release_version";
@@ -33,6 +36,8 @@ public class Release extends NovaItem {
     public static final String RELEASE_STATUS_KEY = "release_status";
 
     public static final String RELEASE_NOTES_KEY = "release_notes";
+
+    public static final String RELEASE_NOTES_CONTENT_KEY = "content";
 
     public static final String CREATION_DATE_KEY = "creation_date";
 
@@ -86,11 +91,19 @@ public class Release extends NovaItem {
     private final String releaseVersion;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = RELEASE_STATUS_KEY)
+    @Column(
+            name = RELEASE_STATUS_KEY,
+            columnDefinition = "VARCHAR(20) DEFAULT 'New'",
+            insertable = false
+    )
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer",
+            "handler"
+    })
     private final ReleaseStatus status;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private final ReleaseNote releaseNotes;
+    @Column(name = RELEASE_NOTES_KEY)
+    private final String releaseNotes;
 
     @Column(name = CREATION_DATE_KEY)
     private final long creationDate;
@@ -99,16 +112,24 @@ public class Release extends NovaItem {
             mappedBy = RELEASE_KEY,
             cascade = CascadeType.ALL
     )
+    @JsonIgnoreProperties({
+            "hibernateLazyInitializer",
+            "handler"
+    })
     private final List<ReleaseEvent> releaseEvents;
 
-    @Column(name = APPROBATION_DATE_KEY)
+    @Column(
+            name = APPROBATION_DATE_KEY,
+            columnDefinition = "INTEGER DEFAULT '-1'",
+            insertable = false
+    )
     private final long approbationDate;
 
     public Release() {
         this(null, null, null, null, null, -1, List.of(), -1);
     }
 
-    public Release(String id, Project project, String releaseVersion, ReleaseStatus status, ReleaseNote releaseNotes,
+    public Release(String id, Project project, String releaseVersion, ReleaseStatus status, String releaseNotes,
                    long creationDate, List<ReleaseEvent> releaseEvents, long approbationDate) {
         super(id);
         this.project = project;
@@ -120,6 +141,7 @@ public class Release extends NovaItem {
         this.approbationDate = approbationDate;
     }
 
+    @JsonIgnore
     public Project getProject() {
         return project;
     }
@@ -132,7 +154,7 @@ public class Release extends NovaItem {
         return status;
     }
 
-    public ReleaseNote getReleaseNotes() {
+    public String getReleaseNotes() {
         return releaseNotes;
     }
 
@@ -140,6 +162,7 @@ public class Release extends NovaItem {
         return creationDate;
     }
 
+    @JsonIgnore
     public String getCreationDate() {
         return TimeFormatter.getStringDate(creationDate);
     }
@@ -152,6 +175,7 @@ public class Release extends NovaItem {
         return approbationDate;
     }
 
+    @JsonIgnore
     public String getApprobationDate() {
         return TimeFormatter.getStringDate(approbationDate);
     }

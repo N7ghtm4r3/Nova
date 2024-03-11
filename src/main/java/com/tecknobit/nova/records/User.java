@@ -57,7 +57,7 @@ public class User extends NovaItem {
 
     @Column(
             name = PROFILE_PIC_URL_KEY,
-            columnDefinition = "text default '" + DEFAULT_PROFILE_PIC + "'",
+            columnDefinition = "TEXT DEFAULT '" + DEFAULT_PROFILE_PIC + "'",
             insertable = false
     )
     private final String profilePicUrl;

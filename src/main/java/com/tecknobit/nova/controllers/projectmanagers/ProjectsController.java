@@ -1,4 +1,4 @@
-package com.tecknobit.nova.controllers;
+package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.apimanager.formatters.JsonHelper;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
+import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
 import static com.tecknobit.nova.helpers.InputValidator.*;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
@@ -29,7 +30,7 @@ import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 
 @RestController
 @RequestMapping(BASE_ENDPOINT)
-public class ProjectsController extends NovaController {
+public class ProjectsController extends ProjectManager {
 
     public static final String ADD_MEMBERS_ENDPOINT = "/addMembers";
 
@@ -39,13 +40,11 @@ public class ProjectsController extends NovaController {
 
     public static final String LEAVE_ENDPOINT = "/leave";
 
-    private final ProjectsHelper projectsHelper;
-
     private final UsersHelper usersHelper;
 
     @Autowired
     public ProjectsController(ProjectsHelper projectsHelper, UsersHelper usersHelper) {
-        this.projectsHelper = projectsHelper;
+        super(projectsHelper);
         this.usersHelper = usersHelper;
     }
 
@@ -138,7 +137,7 @@ public class ProjectsController extends NovaController {
                         .put(IDENTIFIER_KEY, QRCodeId)
                 );
             } else
-                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                return failedResponse(WRONG_MAILING_LIST_MESSAGE);
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
@@ -282,19 +281,6 @@ public class ProjectsController extends NovaController {
             return successResponse();
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-    }
-
-    private boolean isAuthorizedUser(String userId, String projectId) {
-        Project project = projectsHelper.getProject(userId, projectId);
-        return isProjectAuthor(project, userId) /*|| TO-DO: CHECK IF THE USER IS A VENDOR*/;
-    }
-
-    private boolean isProjectAuthor(String userId, String projectId) {
-        return isProjectAuthor(projectsHelper.getProject(userId, projectId), userId);
-    }
-
-    private boolean isProjectAuthor(Project project, String userId) {
-        return project != null && project.getAuthor().getId().equals(userId);
     }
 
 }

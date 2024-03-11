@@ -1,4 +1,4 @@
-package com.tecknobit.nova.helpers.services.repositories;
+package com.tecknobit.nova.helpers.services.repositories.projectsutils;
 
 import com.tecknobit.nova.records.project.JoiningQRCode;
 import jakarta.transaction.Transactional;

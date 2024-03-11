@@ -8,18 +8,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
 
-import static com.tecknobit.nova.helpers.ResourcesProvider.IMAGES_PATH;
+import static com.tecknobit.nova.helpers.ResourcesProvider.RESOURCES_PATH;
 
 public interface ResourcesManager {
 
-    default String createResource(MultipartFile resource, String resourcesDirectory, String resourceId) throws IOException {
+    default String createResource(MultipartFile resource, String resourcesDirectory, String resourceId) {
         String suffix = Objects.requireNonNull(resource.getResource().getFilename()).split("\\.")[1];
         return resourcesDirectory + "/" + resourceId + "." + suffix;
     }
 
     default void saveResource(MultipartFile resource, String path) throws IOException {
-        File file = new File(IMAGES_PATH + path);
-        try (OutputStream outputStream = new FileOutputStream(file)) {
+        File resourceFile = new File(RESOURCES_PATH +  path);
+        try (OutputStream outputStream = new FileOutputStream(resourceFile)) {
             outputStream.write(resource.getBytes());
         }
     }

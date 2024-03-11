@@ -1,5 +1,6 @@
 package com.tecknobit.nova.records.release.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
@@ -8,6 +9,8 @@ import com.tecknobit.nova.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER;
 
 @Entity
 @Structure
@@ -46,7 +49,7 @@ public abstract class ReleaseEvent extends NovaItem {
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
-    @JoinColumn(name = RELEASE_EVENTS_KEY)
+    @JoinColumn(name = RELEASE_IDENTIFIER)
     @JsonIgnoreProperties({
             RELEASE_EVENTS_KEY,
             "hibernateLazyInitializer",
@@ -68,6 +71,7 @@ public abstract class ReleaseEvent extends NovaItem {
         this.releaseEventDate = releaseEventDate;
     }
 
+    @JsonIgnore
     public Release getRelease() {
         return release;
     }
@@ -76,6 +80,7 @@ public abstract class ReleaseEvent extends NovaItem {
         return releaseEventDate;
     }
 
+    @JsonIgnore
     public String getReleaseEventDate() {
         return TimeFormatter.getStringDate(releaseEventDate);
     }

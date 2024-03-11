@@ -1,7 +1,7 @@
 package com.tecknobit.nova.helpers.services;
 
-import com.tecknobit.nova.helpers.services.repositories.JoiningQRCodeRepository;
-import com.tecknobit.nova.helpers.services.repositories.ProjectsRepository;
+import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
+import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
 import com.tecknobit.nova.records.project.JoiningQRCode;
 import com.tecknobit.nova.records.project.Project;
 import org.json.JSONObject;
@@ -14,11 +14,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.tecknobit.nova.Launcher.BASE_64_ENCODER;
 import static com.tecknobit.nova.helpers.ResourcesProvider.LOGOS_DIRECTORY;
+import static com.tecknobit.nova.records.User.*;
 import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
 import static com.tecknobit.nova.records.project.Project.LOGO_URL_KEY;
-import static com.tecknobit.nova.records.User.*;
 import static java.lang.System.currentTimeMillis;
 
 @Service
@@ -84,9 +83,9 @@ public class ProjectsHelper implements ResourcesManager {
     }
 
     private String formatAllowedEmails(List<String> emails) {
-        return BASE_64_ENCODER.encodeToString(emails.toString().toLowerCase()
+        return emails.toString().toLowerCase()
                 .replace("[", "")
-                .replace("]", "").getBytes());
+                .replace("]", "");
     }
 
     public void deleteJoiningQrcode(String QRCodeId) {

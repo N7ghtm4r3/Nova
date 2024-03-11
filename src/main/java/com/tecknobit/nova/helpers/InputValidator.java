@@ -16,6 +16,12 @@ public class InputValidator {
 
     public static final String WRONG_MAILING_LIST_MESSAGE = "Mailing list is not valid";
 
+    public static final String WRONG_RELEASE_VERSION_MESSAGE = "The version for the release is not valid";
+
+    public static final String WRONG_RELEASE_NOTES_MESSAGE = "The notes for the release are not valid";
+
+    public static final String WRONG_ASSETS_MESSAGE = "The assets uploaded are not valid";
+
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
     private InputValidator() {
@@ -49,6 +55,14 @@ public class InputValidator {
             return true;
         }
         return false;
+    }
+
+    public static boolean isReleaseVersionValid(String releaseVersion) {
+        return isInputValid(releaseVersion);
+    }
+
+    public static boolean areReleaseNotesValid(String releaseNotes) {
+        return isInputValid(releaseNotes);
     }
 
     private static boolean isInputValid(String field) {

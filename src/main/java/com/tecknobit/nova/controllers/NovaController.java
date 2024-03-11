@@ -48,10 +48,6 @@ public abstract class NovaController {
 
     protected User me;
 
-    protected String generateIdentifier() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
-    }
-
     protected <V> void loadJsonHelper(Map<String, V> payload) {
         jsonHelper.setJSONObjectSource(new JSONObject(payload));
     }

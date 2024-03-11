@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.tecknobit.nova.Launcher.BASE_64_DECODER;
 import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
@@ -61,7 +60,7 @@ public class JoiningQRCode extends NovaItem {
 
     @JsonIgnore
     public ArrayList<String> listEmails() {
-        String emailsValues = new String(BASE_64_DECODER.decode(membersEmails.getBytes())).replaceAll(" ", "");
+        String emailsValues = membersEmails.replaceAll(" ", "");
         if(emailsValues.isEmpty())
             return new ArrayList<>();
         return new ArrayList<>(List.of(emailsValues.split(",")));

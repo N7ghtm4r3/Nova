@@ -162,4 +162,18 @@ public class Project extends NovaItem {
         return true;
     }
 
+    public boolean hasRelease(String releaseId) {
+        for (Release release : releases)
+            if(release.getId().equals(releaseId))
+                return true;
+        return false;
+    }
+
+    public boolean hasNotReleaseVersion(String releaseVersion) {
+        for (Release release : releases)
+            if(release.getReleaseVersion().equals(releaseVersion))
+                return false;
+        return true;
+    }
+
 }

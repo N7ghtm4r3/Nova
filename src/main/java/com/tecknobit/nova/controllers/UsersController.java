@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
+import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.Launcher.protector;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
 import static com.tecknobit.nova.helpers.InputValidator.*;

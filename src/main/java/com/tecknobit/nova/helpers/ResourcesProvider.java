@@ -11,31 +11,30 @@ public class ResourcesProvider {
 
     public static final String CUSTOM_CONFIGURATION_FILE_PATH = "nova.properties";
 
-    /**
-     * {@code IMAGES_PATH} path for the images folder
-     */
-    public static final String IMAGES_PATH = "images/";
+    public static final String RESOURCES_PATH = "resources/";
 
-    public static final String[] IMAGES_DIRECTORIES = {"profiles", "logos"};
+    public static final String[] RESOURCES_DIRECTORIES = {"profiles", "logos", "assets"};
 
-    public static final String PROFILES_DIRECTORY = IMAGES_DIRECTORIES[0];
+    public static final String PROFILES_DIRECTORY = RESOURCES_DIRECTORIES[0];
 
-    public static final String LOGOS_DIRECTORY = IMAGES_DIRECTORIES[1];
+    public static final String LOGOS_DIRECTORY = RESOURCES_DIRECTORIES[1];
+
+    public static final String ASSETS_DIRECTORY = RESOURCES_DIRECTORIES[2];
 
     private ResourcesProvider() {
     }
 
     public static void createResourceDirectories() {
-        File images = new File(IMAGES_PATH);
-        if(!images.exists())
-            if(!images.mkdir())
-                printError("images");
-        for (String directory : IMAGES_DIRECTORIES) {
-            File subDirectory = new File(IMAGES_PATH + directory);
-            if(!subDirectory.exists())
-                if(!subDirectory.mkdir())
-                    printError(directory);
-        }
+        createResourceDirectory(RESOURCES_PATH);
+        for (String directory : RESOURCES_DIRECTORIES)
+            createResourceDirectory(RESOURCES_PATH + directory);
+    }
+
+    private static void createResourceDirectory(String resDirectory) {
+        File directory = new File(resDirectory);
+        if(!directory.exists())
+            if(!directory.mkdir())
+                printError(resDirectory.replaceAll("/", ""));
     }
 
     private static void printError(String directory) {

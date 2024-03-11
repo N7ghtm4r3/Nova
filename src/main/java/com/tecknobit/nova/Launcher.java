@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.util.UUID;
 
 import static com.tecknobit.nova.helpers.ResourcesProvider.*;
 
@@ -31,10 +31,6 @@ import static com.tecknobit.nova.helpers.ResourcesProvider.*;
 @EnableJpaRepositories("com.tecknobit.nova.helpers.services.repositories")
 public class Launcher {
 
-    public static final Base64.Encoder BASE_64_ENCODER = Base64.getEncoder();
-
-    public static final Base64.Decoder BASE_64_DECODER = Base64.getDecoder();
-
     public static final ServerProtector protector = new ServerProtector("tecknobit/nova/backend",
             " to correctly register a new user in the Nova system ");
 
@@ -42,6 +38,10 @@ public class Launcher {
         ResourcesProvider.createResourceDirectories();
         protector.launch(args);
         SpringApplication.run(Launcher.class, args);
+    }
+
+    public static String generateIdentifier() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     /**
@@ -92,7 +92,7 @@ public class Launcher {
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
             registry.addResourceHandler("/**")
-                    .addResourceLocations("file:" + IMAGES_PATH)
+                    .addResourceLocations("file:" + RESOURCES_PATH)
                     .setCachePeriod(0)
                     .resourceChain(true)
                     .addResolver(new PathResourceResolver());
