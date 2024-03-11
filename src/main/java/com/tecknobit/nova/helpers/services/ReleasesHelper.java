@@ -50,7 +50,7 @@ public class ReleasesHelper implements ResourcesManager {
         for (MultipartFile asset : assets) {
             if(!asset.isEmpty()) {
                 String assetId = generateIdentifier();
-                String assetPath = createResource(asset, ASSETS_DIRECTORY, assetId);
+                String assetPath = createAssetResource(asset, assetId);
                 releaseEventsRepository.insertAsset(
                         assetId,
                         assetPath,

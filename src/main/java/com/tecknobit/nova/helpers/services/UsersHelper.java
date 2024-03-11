@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.tecknobit.apimanager.apis.APIRequest.SHA256_ALGORITHM;
-import static com.tecknobit.nova.helpers.ResourcesProvider.PROFILES_DIRECTORY;
 
 @Service
 public class UsersHelper implements ResourcesManager {
@@ -39,7 +38,7 @@ public class UsersHelper implements ResourcesManager {
     }
 
     public String changeProfilePic(MultipartFile profilePic, String userId) throws IOException {
-        String profilePicPath = createResource(profilePic, PROFILES_DIRECTORY, userId);
+        String profilePicPath = createProfileResource(profilePic, userId);
         usersRepository.changeProfilePic(profilePicPath, userId);
         saveResource(profilePic, profilePicPath);
         return profilePicPath;
@@ -55,6 +54,7 @@ public class UsersHelper implements ResourcesManager {
 
     public void deleteUser(String id) {
         usersRepository.deleteById(id);
+        deleteProfileResource(id);
     }
 
     private String hash(String secret) throws NoSuchAlgorithmException {

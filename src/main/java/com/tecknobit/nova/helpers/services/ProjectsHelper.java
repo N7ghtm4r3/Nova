@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.tecknobit.nova.helpers.ResourcesProvider.LOGOS_DIRECTORY;
 import static com.tecknobit.nova.records.User.*;
 import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
 import static com.tecknobit.nova.records.project.Project.LOGO_URL_KEY;
@@ -37,7 +36,7 @@ public class ProjectsHelper implements ResourcesManager {
     }
 
     public JSONObject addProject(String name, MultipartFile logo, String projectId, String authorId) throws IOException {
-        String logoUrl = createResource(logo, LOGOS_DIRECTORY, projectId);
+        String logoUrl = createLogoResource(logo, projectId);
         projectsRepository.addProject(
                 projectId,
                 logoUrl,
@@ -99,6 +98,7 @@ public class ProjectsHelper implements ResourcesManager {
     public void deleteProject(String projectId) {
         projectsRepository.removeAllMembers(projectId);
         projectsRepository.deleteProject(projectId);
+        deleteLogoResource(projectId);
     }
 
     public record ProjectPayload(MultipartFile logoUrl, String name) {}

@@ -134,6 +134,7 @@ public class UsersController extends NovaController {
                     String profilePicUrl = usersHelper.changeProfilePic(profilePic, id);
                     response.put(PROFILE_PIC_URL_KEY, profilePicUrl);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     response.put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC);
                 }
                 return successResponse(response);
