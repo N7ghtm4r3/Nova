@@ -24,6 +24,8 @@ public class InputValidator {
 
     public static final String WRONG_REASONS_MESSAGE = "The reasons of the rejection are not valid";
 
+    public static final String WRONG_TAG_COMMENT_MESSAGE = "The comment for the tag is not valid";
+
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
     private InputValidator() {
@@ -69,6 +71,10 @@ public class InputValidator {
 
     public static boolean areRejectionReasonsValid(String reasons) {
         return isInputValid(reasons);
+    }
+
+    public static boolean isTagCommentValid(String comment) {
+        return isInputValid(comment);
     }
 
     private static boolean isInputValid(String field) {

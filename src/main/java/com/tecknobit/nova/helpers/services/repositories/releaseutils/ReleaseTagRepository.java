@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.release.events.RejectedTag.REJECTED_TAGS_KEY;
-import static com.tecknobit.nova.records.release.events.RejectedTag.TAG_KEY;
+import static com.tecknobit.nova.records.release.events.RejectedTag.*;
 import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
 
 @Service
@@ -38,6 +37,19 @@ public interface ReleaseTagRepository extends JpaRepository<RejectedTag, String>
             @Param(IDENTIFIER_KEY) String rejectedTagId,
             @Param(TAG_KEY) String tag,
             @Param(RELEASE_EVENT_KEY) String eventId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + REJECTED_TAGS_KEY + " SET "
+                    + COMMENT_KEY + "=:" + COMMENT_KEY
+                    + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void fillRejectedTag(
+            @Param(IDENTIFIER_KEY) String rejectedTagId,
+            @Param(COMMENT_KEY) String comment
     );
 
 }

@@ -17,6 +17,10 @@ import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER_KEY;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class ReleaseEvent extends NovaItem {
 
+    public static final String RELEASE_EVENT_IDENTIFIER_KEY = "release_event_id";
+
+    public static final String RELEASE_TAG_IDENTIFIER_KEY = "release_tag_id";
+
     public static final String RELEASE_EVENTS_KEY = "release_events";
 
     public static final String RELEASE_EVENT_KEY = "release_event";

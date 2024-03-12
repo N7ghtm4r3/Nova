@@ -6,6 +6,7 @@ import com.tecknobit.nova.helpers.services.ReleasesHelper;
 import com.tecknobit.nova.records.project.Project;
 import com.tecknobit.nova.records.release.Release;
 import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
+import com.tecknobit.nova.records.release.events.RejectedReleaseEvent;
 import com.tecknobit.nova.records.release.events.ReleaseEvent.ReleaseTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,14 @@ import static com.tecknobit.nova.records.User.PROJECTS_KEY;
 import static com.tecknobit.nova.records.User.TOKEN_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.Release.*;
-import static com.tecknobit.nova.records.release.Release.ReleaseStatus.Verifying;
+import static com.tecknobit.nova.records.release.Release.ReleaseStatus.*;
 import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.ASSET_UPLOADING_EVENT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
 import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REASONS_KEY;
 import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.TAGS_KEY;
+import static com.tecknobit.nova.records.release.events.RejectedTag.COMMENT_KEY;
+import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_IDENTIFIER_KEY;
+import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_TAG_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
 
 @RestController
@@ -39,6 +43,10 @@ public class ReleasesController extends ProjectManager {
     public static final String ADD_RELEASE_ENDPOINT = "/addRelease";
 
     public static final String COMMENT_ASSET_ENDPOINT = "/comment/";
+
+    public static final String EVENTS_ENDPOINT = "/events/";
+
+    public static final String TAGS_ENDPOINT = "/tags/";
 
     private final ReleasesHelper releasesHelper;
 
@@ -125,7 +133,7 @@ public class ReleasesController extends ProjectManager {
             Release release = getReleaseIfAuthorized(releaseId);
             if(release != null) {
                 switch (release.getStatus()) {
-                    case New, Rejected -> {
+                    case New, Rejected, Beta, Alpha -> {
                         try {
                             if(releasesHelper.uploadAssets(releaseId, assets))
                                 return successResponse();
@@ -162,7 +170,7 @@ public class ReleasesController extends ProjectManager {
             @RequestHeader(TOKEN_KEY) String token,
             @RequestBody String payload
     ) {
-        if(isMe(id, token) && isUserClient(id, projectId)) {
+        if(isMe(id, token) && isUserQualified(id, projectId)) {
             Release release = getReleaseIfAuthorized(releaseId);
             if(release != null && release.getStatus() == Verifying) {
                 AssetUploadingEvent event = release.hasAssetUploadingEvent(eventId);
@@ -201,6 +209,110 @@ public class ReleasesController extends ProjectManager {
                             }
                         }
                     } catch (Exception e) {
+                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                    }
+                } else
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            } else
+                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PutMapping(
+            path = "{" + RELEASE_IDENTIFIER_KEY + "}" + EVENTS_ENDPOINT + "{" + RELEASE_EVENT_IDENTIFIER_KEY + "}"
+                    + TAGS_ENDPOINT + "{" + RELEASE_TAG_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(
+            path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/events/{release_event_id}/tags/{release_tag_id}",
+            method = PUT
+    )
+    public String fillRejectedTag(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
+            @PathVariable(RELEASE_EVENT_IDENTIFIER_KEY) String eventId,
+            @PathVariable(RELEASE_TAG_IDENTIFIER_KEY) String rejectedTagId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token) && isUserQualified(id, projectId)) {
+            Release release = getReleaseIfAuthorized(releaseId);
+            if(release != null && release.getStatus() == Rejected) {
+                RejectedReleaseEvent rejectedReleaseEvent = release.hasRejectedReleaseEvent(eventId);
+                if(rejectedReleaseEvent != null && rejectedReleaseEvent.hasTag(rejectedTagId)
+                        && release.isLastEvent(rejectedReleaseEvent)) {
+                    loadJsonHelper(payload);
+                    String comment = jsonHelper.getString(COMMENT_KEY);
+                    if(isTagCommentValid(comment)) {
+                        releasesHelper.insertTagComment(
+                                comment,
+                                rejectedTagId
+                        );
+                        return successResponse();
+                    } else
+                        return failedResponse(WRONG_TAG_COMMENT_MESSAGE);
+                } else
+                    return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+            } else
+                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PatchMapping(
+            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
+    public String promoteRelease(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+            Release release = getReleaseIfAuthorized(releaseId);
+            if(release != null) {
+                loadJsonHelper(payload);
+                String sReleaseStatus = jsonHelper.getString(RELEASE_STATUS_KEY);
+                boolean allowedToPromote;
+                ReleaseStatus currentReleaseStatus = release.getStatus();
+                switch (currentReleaseStatus) {
+                    case Approved, Beta, Alpha -> allowedToPromote = true;
+                    default -> allowedToPromote = false;
+                }
+                if(allowedToPromote && sReleaseStatus != null) {
+                    try {
+                        ReleaseStatus releaseStatus = ReleaseStatus.valueOf(sReleaseStatus);
+                        switch (releaseStatus) {
+                            case Beta -> {
+                                if(currentReleaseStatus != Approved)
+                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                                releasesHelper.setBetaStatus(releaseId);
+                            }
+                            case Alpha -> {
+                                if(currentReleaseStatus == Alpha)
+                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                                releasesHelper.setAlphaStatus(releaseId);
+                            }
+                            case Latest -> {
+                                if(currentReleaseStatus == Beta)
+                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                                releasesHelper.setLatestStatus(releaseId);
+                            }
+                            default -> {
+                                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                            }
+                        }
+                        return successResponse();
+                    } catch (IllegalArgumentException e) {
                         return failedResponse(WRONG_PROCEDURE_MESSAGE);
                     }
                 } else

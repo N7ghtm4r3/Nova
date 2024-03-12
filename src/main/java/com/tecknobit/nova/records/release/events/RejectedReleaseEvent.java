@@ -47,4 +47,11 @@ public class RejectedReleaseEvent extends ReleaseStandardEvent {
         return tags;
     }
 
+    public boolean hasTag(String tagId) {
+        for (RejectedTag tag : tags)
+            if(tag.getId().equals(tagId))
+                return true;
+        return false;
+    }
+
 }

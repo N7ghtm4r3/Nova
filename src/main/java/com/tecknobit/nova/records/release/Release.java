@@ -6,6 +6,7 @@ import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.nova.records.NovaItem;
 import com.tecknobit.nova.records.project.Project;
 import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
+import com.tecknobit.nova.records.release.events.RejectedReleaseEvent;
 import com.tecknobit.nova.records.release.events.ReleaseEvent;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -16,6 +17,7 @@ import java.util.List;
 import static com.tecknobit.nova.records.project.Project.PROJECT_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.nova.records.release.Release.RELEASES_KEY;
+import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
 
 @Entity
 @Table(name = RELEASES_KEY)
@@ -117,6 +119,7 @@ public class Release extends NovaItem {
             "hibernateLazyInitializer",
             "handler"
     })
+    @OrderBy(RELEASE_EVENT_DATE_KEY)
     private final List<ReleaseEvent> releaseEvents;
 
     @Column(
@@ -186,6 +189,21 @@ public class Release extends NovaItem {
             if(event.getId().equals(eventId) && event instanceof AssetUploadingEvent)
                 return (AssetUploadingEvent) event;
         return null;
+    }
+
+    public RejectedReleaseEvent hasRejectedReleaseEvent(String eventId) {
+        for (ReleaseEvent event : releaseEvents)
+            if(event.getId().equals(eventId) && event instanceof RejectedReleaseEvent)
+                return (RejectedReleaseEvent) event;
+        return null;
+    }
+
+    public boolean isLastEvent(ReleaseEvent event) {
+        long inputTimestamp = event.getReleaseEventTimestamp();
+        for (ReleaseEvent checkEvent : releaseEvents)
+            if(inputTimestamp < checkEvent.getReleaseEventTimestamp())
+                return false;
+        return true;
     }
 
 }

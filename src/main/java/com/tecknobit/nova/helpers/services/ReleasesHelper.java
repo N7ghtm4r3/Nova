@@ -90,15 +90,8 @@ public class ReleasesHelper implements ResourcesManager {
         releaseEventsRepository.setUploadingCommented(eventId);
     }
 
-    private long insertReleaseEvent(String releaseId, ReleaseStatus status) {
-        long eventDate = System.currentTimeMillis();
-        releaseEventsRepository.insertReleaseEvent(
-                generateIdentifier(),
-                eventDate,
-                releaseId,
-                status.name()
-        );
-        return eventDate;
+    public void insertTagComment(String comment, String rejectedTagId) {
+        releaseTagRepository.fillRejectedTag(rejectedTagId, comment);
     }
 
     @Wrapper
@@ -117,13 +110,35 @@ public class ReleasesHelper implements ResourcesManager {
     }
 
     @Wrapper
-    private void setBetaStatus(String releaseId) {
+    public void setBetaStatus(String releaseId) {
         setReleaseStatus(releaseId, Beta);
+    }
+
+    @Wrapper
+    public void setAlphaStatus(String releaseId) {
+        setReleaseStatus(releaseId, Alpha);
+    }
+
+    @Wrapper
+    public void setLatestStatus(String releaseId) {
+        setReleaseStatus(releaseId, Latest);
     }
 
     private void setReleaseStatus(String releaseId, ReleaseStatus status) {
         releasesRepository.updateReleaseStatus(releaseId, status.name());
+        if(status != Verifying && status != Rejected)
+            insertReleaseEvent(releaseId, status);
     }
 
+    private long insertReleaseEvent(String releaseId, ReleaseStatus status) {
+        long eventDate = System.currentTimeMillis();
+        releaseEventsRepository.insertReleaseEvent(
+                generateIdentifier(),
+                eventDate,
+                releaseId,
+                status.name()
+        );
+        return eventDate;
+    }
 
 }

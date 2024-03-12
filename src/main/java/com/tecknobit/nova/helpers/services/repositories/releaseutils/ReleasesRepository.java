@@ -17,6 +17,16 @@ import static com.tecknobit.nova.records.release.Release.*;
 @Repository
 public interface ReleasesRepository extends JpaRepository<Release, String> {
 
+    /*@Query(
+            value = "SELECT * FROM " + RELEASES_KEY
+                    + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY
+                    + " ORDER BY " + ,
+            nativeQuery = true
+    )
+    Release getRelease(
+            @Param(IDENTIFIER_KEY) String releaseId
+    );*/
+
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
