@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.nova.records.NovaItem;
 import com.tecknobit.nova.records.project.Project;
+import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
 import com.tecknobit.nova.records.release.events.ReleaseEvent;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -27,7 +28,7 @@ public class Release extends NovaItem {
 
     public static final String RELEASE_KEY = "release";
 
-    public static final String RELEASE_IDENTIFIER = "release_id";
+    public static final String RELEASE_IDENTIFIER_KEY = "release_id";
 
     public static final String RELEASES_KEY = "releases";
     
@@ -120,7 +121,7 @@ public class Release extends NovaItem {
 
     @Column(
             name = APPROBATION_DATE_KEY,
-            columnDefinition = "INTEGER DEFAULT '-1'",
+            columnDefinition = "BIGINT DEFAULT '-1'",
             insertable = false
     )
     private final long approbationDate;
@@ -178,6 +179,13 @@ public class Release extends NovaItem {
     @JsonIgnore
     public String getApprobationDate() {
         return TimeFormatter.getStringDate(approbationDate);
+    }
+
+    public AssetUploadingEvent hasAssetUploadingEvent(String eventId) {
+        for (ReleaseEvent event : releaseEvents)
+            if(event.getId().equals(eventId) && event instanceof AssetUploadingEvent)
+                return (AssetUploadingEvent) event;
+        return null;
     }
 
 }

@@ -18,6 +18,10 @@ public class ReleaseStandardEvent extends ReleaseEvent {
     @Enumerated(EnumType.STRING)
     protected final ReleaseStatus status;
 
+    public ReleaseStandardEvent() {
+        this(null, -1, null, null);
+    }
+
     public ReleaseStandardEvent(String id, long releaseEventDate, Release release, ReleaseStatus status) {
         super(id, release, releaseEventDate);
         this.status = status;

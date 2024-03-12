@@ -5,11 +5,14 @@ import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ReleasesHelper;
 import com.tecknobit.nova.records.project.Project;
 import com.tecknobit.nova.records.release.Release;
+import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
+import com.tecknobit.nova.records.release.events.ReleaseEvent.ReleaseTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
@@ -21,7 +24,12 @@ import static com.tecknobit.nova.records.User.PROJECTS_KEY;
 import static com.tecknobit.nova.records.User.TOKEN_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.Release.*;
+import static com.tecknobit.nova.records.release.Release.ReleaseStatus.Verifying;
+import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.ASSET_UPLOADING_EVENT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
+import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REASONS_KEY;
+import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.TAGS_KEY;
+import static com.tecknobit.nova.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
 
 @RestController
 @RequestMapping(BASE_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"
@@ -29,6 +37,8 @@ import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.Asse
 public class ReleasesController extends ProjectManager {
 
     public static final String ADD_RELEASE_ENDPOINT = "/addRelease";
+
+    public static final String COMMENT_ASSET_ENDPOINT = "/comment/";
 
     private final ReleasesHelper releasesHelper;
 
@@ -75,7 +85,7 @@ public class ReleasesController extends ProjectManager {
     }
 
     @GetMapping(
-            path = "{" + RELEASE_IDENTIFIER + "}",
+            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
@@ -84,7 +94,7 @@ public class ReleasesController extends ProjectManager {
     public <T> T getRelease(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
-            @PathVariable(RELEASE_IDENTIFIER) String releaseId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token
     ) {
         if(isMe(id, token) && amIProjectMember(id, projectId)) {
@@ -98,7 +108,7 @@ public class ReleasesController extends ProjectManager {
     }
 
     @PutMapping(
-            path = "{" + RELEASE_IDENTIFIER + "}",
+            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
@@ -107,7 +117,7 @@ public class ReleasesController extends ProjectManager {
     public String uploadAsset(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
-            @PathVariable(RELEASE_IDENTIFIER) String releaseId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token,
             @RequestParam(ASSETS_UPLOADED_KEY) MultipartFile[] assets
     ) {
@@ -128,6 +138,73 @@ public class ReleasesController extends ProjectManager {
                         return failedResponse(WRONG_PROCEDURE_MESSAGE);
                     }
                 }
+            } else
+                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PostMapping(
+            path = "{" + RELEASE_IDENTIFIER_KEY + "}" + COMMENT_ASSET_ENDPOINT + "{" + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(
+            path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
+            method = POST
+    )
+    public String commentAsset(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
+            @PathVariable(ASSET_UPLOADING_EVENT_IDENTIFIER_KEY) String eventId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody String payload
+    ) {
+        if(isMe(id, token) && isUserClient(id, projectId)) {
+            Release release = getReleaseIfAuthorized(releaseId);
+            if(release != null && release.getStatus() == Verifying) {
+                AssetUploadingEvent event = release.hasAssetUploadingEvent(eventId);
+                if(event != null && !event.isCommented()) {
+                    loadJsonHelper(payload);
+                    try {
+                        ReleaseStatus status = ReleaseStatus.valueOf(jsonHelper.getString(RELEASE_EVENT_STATUS_KEY));
+                        switch (status) {
+                            case Approved -> {
+                                releasesHelper.approveAsset(releaseId, eventId);
+                                return successResponse();
+                            }
+                            case Rejected -> {
+                                String reasons = jsonHelper.getString(REASONS_KEY);
+                                if(areRejectionReasonsValid(reasons)) {
+                                    try {
+                                        ArrayList<String> tags = jsonHelper.fetchList(TAGS_KEY, new ArrayList<>());
+                                        ArrayList<ReleaseTag> rejectedTags = new ArrayList<>();
+                                        for (String tag : tags)
+                                            rejectedTags.add(ReleaseTag.fetchReleaseTag(tag));
+                                        releasesHelper.rejectAsset(
+                                                releaseId,
+                                                eventId,
+                                                reasons,
+                                                rejectedTags
+                                        );
+                                        return successResponse();
+                                    } catch (IllegalArgumentException e) {
+                                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                                    }
+                                } else
+                                    return failedResponse(WRONG_REASONS_MESSAGE);
+                            }
+                            default -> {
+                                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                            }
+                        }
+                    } catch (Exception e) {
+                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                    }
+                } else
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
             } else
                 return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         } else

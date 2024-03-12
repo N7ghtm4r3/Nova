@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.FAILED;
 import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.SUCCESSFUL;
@@ -52,7 +51,7 @@ public abstract class NovaController {
         jsonHelper.setJSONObjectSource(new JSONObject(payload));
     }
 
-    protected <V> void loadJsonHelper(String payload) {
+    protected void loadJsonHelper(String payload) {
         jsonHelper.setJSONObjectSource(payload);
     }
 

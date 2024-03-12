@@ -47,7 +47,21 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
-            value = "UPDATE " + RELEASES_KEY + " SET " + RELEASE_STATUS_KEY + "=:" + RELEASE_STATUS_KEY
+            value = "UPDATE " + RELEASES_KEY + " SET "
+                    + APPROBATION_DATE_KEY + "=:" + APPROBATION_DATE_KEY
+                    + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void approveAsset(
+            @Param(IDENTIFIER_KEY) String releaseId,
+            @Param(APPROBATION_DATE_KEY) long approbationDate
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + RELEASES_KEY + " SET "
+                    + RELEASE_STATUS_KEY + "=:" + RELEASE_STATUS_KEY
                     + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
     )

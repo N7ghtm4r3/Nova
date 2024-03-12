@@ -22,6 +22,8 @@ public class InputValidator {
 
     public static final String WRONG_ASSETS_MESSAGE = "The assets uploaded are not valid";
 
+    public static final String WRONG_REASONS_MESSAGE = "The reasons of the rejection are not valid";
+
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
     private InputValidator() {
@@ -63,6 +65,10 @@ public class InputValidator {
 
     public static boolean areReleaseNotesValid(String releaseNotes) {
         return isInputValid(releaseNotes);
+    }
+
+    public static boolean areRejectionReasonsValid(String reasons) {
+        return isInputValid(reasons);
     }
 
     private static boolean isInputValid(String field) {

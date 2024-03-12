@@ -1,5 +1,6 @@
 package com.tecknobit.nova.records.release.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.nova.records.NovaItem;
 import com.tecknobit.nova.records.release.events.ReleaseEvent.ReleaseTag;
@@ -7,9 +8,9 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REJECTED_RELEASE_EVENT_KEY;
 import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.TAGS_KEY;
-import static com.tecknobit.nova.records.release.events.RejectedTag.*;
+import static com.tecknobit.nova.records.release.events.RejectedTag.REJECTED_TAGS_KEY;
+import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
 
 @Entity
 @Table(name = REJECTED_TAGS_KEY)
@@ -25,7 +26,7 @@ public final class RejectedTag extends NovaItem {
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
-    @JoinColumn(name = REJECTED_RELEASE_EVENT_KEY)
+    @JoinColumn(name = RELEASE_EVENT_KEY)
     @JsonIgnoreProperties({
             TAGS_KEY,
             "hibernateLazyInitializer",
@@ -38,7 +39,11 @@ public final class RejectedTag extends NovaItem {
     @Column(name = TAG_KEY)
     private final ReleaseTag tag;
 
-    @Column(name = COMMENT_KEY)
+    @Column(
+            name = COMMENT_KEY,
+            columnDefinition = "TEXT DEFAULT NULL",
+            insertable = false
+    )
     private final String comment;
 
     public RejectedTag() {
@@ -52,15 +57,16 @@ public final class RejectedTag extends NovaItem {
         this.comment = comment;
     }
 
-    public RejectedReleaseEvent rejectedReleaseEvent() {
+    @JsonIgnore
+    public RejectedReleaseEvent getRejectedReleaseEvent() {
         return rejectedReleaseEvent;
     }
 
-    public ReleaseTag tag() {
+    public ReleaseTag getTag() {
         return tag;
     }
 
-    public String comment() {
+    public String getComment() {
         return comment;
     }
 

@@ -10,7 +10,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER;
+import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER_KEY;
 
 @Entity
 @Structure
@@ -43,13 +43,23 @@ public abstract class ReleaseEvent extends NovaItem {
             return color;
         }
 
+        public static ReleaseTag fetchReleaseTag(String releaseTag) {
+            return switch (releaseTag) {
+                case "Bug" -> Bug;
+                case "Issue" -> Issue;
+                case "LayoutChange" -> LayoutChange;
+                case "Tip" -> Tip;
+                default -> throw new IllegalArgumentException();
+            };
+        }
+
     }
 
     @ManyToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
-    @JoinColumn(name = RELEASE_IDENTIFIER)
+    @JoinColumn(name = RELEASE_IDENTIFIER_KEY)
     @JsonIgnoreProperties({
             RELEASE_EVENTS_KEY,
             "hibernateLazyInitializer",

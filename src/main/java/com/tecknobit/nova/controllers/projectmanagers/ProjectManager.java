@@ -26,6 +26,12 @@ public abstract class ProjectManager extends NovaController {
         return isProjectAuthor(project, userId) /*|| TO-DO: CHECK IF THE USER IS A VENDOR*/;
     }
 
+    protected boolean isUserClient(String userId, String projectId) {
+        Project project = projectsHelper.getProject(userId, projectId);
+        currentProject = project;
+        return ((project != null)) && project.memberIsClient(userId);
+    }
+
     protected boolean isProjectAuthor(String userId, String projectId) {
         return isProjectAuthor(projectsHelper.getProject(userId, projectId), userId);
     }
