@@ -74,7 +74,8 @@ public class User extends NovaItem {
 
     @OneToMany(
             mappedBy = AUTHOR_KEY,
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private final List<Project> authoredProjects;
 

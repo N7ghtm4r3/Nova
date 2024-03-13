@@ -6,6 +6,9 @@ import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseTagR
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleasesRepository;
 import com.tecknobit.nova.records.release.Release;
 import com.tecknobit.nova.records.release.Release.ReleaseStatus;
+import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
+import com.tecknobit.nova.records.release.events.RejectedReleaseEvent;
+import com.tecknobit.nova.records.release.events.ReleaseEvent;
 import com.tecknobit.nova.records.release.events.ReleaseEvent.ReleaseTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,6 +142,22 @@ public class ReleasesHelper implements ResourcesManager {
                 status.name()
         );
         return eventDate;
+    }
+
+    // TO-DO: DELETE ALSO THE REPORTS AND CREATE ALSO THE LOGIC TO CREATE THEM
+    public void deleteRelease(Release release) {
+        for (ReleaseEvent event : release.getReleaseEvents()) {
+            String eventId = event.getId();
+            if(event instanceof AssetUploadingEvent) {
+                for (AssetUploadingEvent.AssetUploaded asset : ((AssetUploadingEvent) event).getAssetsUploaded())
+                    deleteAssetResource(asset.getId());
+                releaseEventsRepository.deleteAssetUploadingReleaseEvent(eventId);
+            } else if(event instanceof RejectedReleaseEvent)
+                releaseEventsRepository.deleteRejectedReleaseEvent(eventId);
+            else
+                releaseEventsRepository.deleteReleaseEvent(eventId);
+        }
+        releasesRepository.deleteRelease(release.getId());
     }
 
 }

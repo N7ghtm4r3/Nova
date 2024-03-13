@@ -323,6 +323,30 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    @DeleteMapping(
+            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = DELETE)
+    public String deleteRelease(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+            Release release = getReleaseIfAuthorized(releaseId);
+            if(release != null) {
+                releasesHelper.deleteRelease(release);
+                return successResponse();
+            } else
+                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
     private Release getReleaseIfAuthorized(String releaseId) {
         Release release = releasesHelper.getRelease(releaseId);
         if(release != null && currentProject.hasRelease(releaseId))

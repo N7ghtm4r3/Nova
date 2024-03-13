@@ -81,13 +81,15 @@ public class Project extends NovaItem {
 
     @OneToMany(
             mappedBy = PROJECT_KEY,
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private final List<Release> releases;
 
     @OneToMany(
             mappedBy = PROJECT_KEY,
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private final List<JoiningQRCode> joiningQRCodes;
 

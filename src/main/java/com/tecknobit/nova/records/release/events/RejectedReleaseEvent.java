@@ -24,7 +24,8 @@ public class RejectedReleaseEvent extends ReleaseStandardEvent {
 
     @OneToMany(
             mappedBy = REJECTED_RELEASE_EVENT_KEY,
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private final List<RejectedTag> tags;
 

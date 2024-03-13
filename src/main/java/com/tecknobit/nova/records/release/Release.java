@@ -9,8 +9,6 @@ import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
 import com.tecknobit.nova.records.release.events.RejectedReleaseEvent;
 import com.tecknobit.nova.records.release.events.ReleaseEvent;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -87,7 +85,6 @@ public class Release extends NovaItem {
             "hibernateLazyInitializer",
             "handler"
     })
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private final Project project;
 
     @Column(name = RELEASE_VERSION_KEY)

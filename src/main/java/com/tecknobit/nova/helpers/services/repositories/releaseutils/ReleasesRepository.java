@@ -17,16 +17,6 @@ import static com.tecknobit.nova.records.release.Release.*;
 @Repository
 public interface ReleasesRepository extends JpaRepository<Release, String> {
 
-    /*@Query(
-            value = "SELECT * FROM " + RELEASES_KEY
-                    + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY
-                    + " ORDER BY " + ,
-            nativeQuery = true
-    )
-    Release getRelease(
-            @Param(IDENTIFIER_KEY) String releaseId
-    );*/
-
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -78,6 +68,16 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
     void updateReleaseStatus(
             @Param(IDENTIFIER_KEY) String releaseId,
             @Param(RELEASE_STATUS_KEY) String status
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + RELEASES_KEY + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deleteRelease(
+        @Param(IDENTIFIER_KEY) String releaseId
     );
 
 }

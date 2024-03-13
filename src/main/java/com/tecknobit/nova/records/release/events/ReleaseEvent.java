@@ -7,8 +7,6 @@ import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.nova.records.NovaItem;
 import com.tecknobit.nova.records.release.Release;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER_KEY;
 
@@ -69,7 +67,6 @@ public abstract class ReleaseEvent extends NovaItem {
             "hibernateLazyInitializer",
             "handler"
     })
-    @OnDelete(action = OnDeleteAction.CASCADE)
     protected final Release release;
 
     @Column(name = RELEASE_EVENT_DATE_KEY)

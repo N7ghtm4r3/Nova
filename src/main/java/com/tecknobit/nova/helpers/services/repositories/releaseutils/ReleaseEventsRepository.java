@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.release.Release.*;
 import static com.tecknobit.nova.records.release.Release.RELEASE_EVENTS_KEY;
+import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.*;
 import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
 import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.ASSET_URL_KEY;
@@ -131,6 +131,36 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(RELEASE_EVENT_DATE_KEY) long releaseEventDate,
             @Param(RELEASE_IDENTIFIER_KEY) String releaseId,
             @Param(RELEASE_EVENT_STATUS_KEY) String status
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + ASSET_UPLOADING_EVENTS_KEY + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deleteAssetUploadingReleaseEvent(
+            @Param(IDENTIFIER_KEY) String eventId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + REJECTED_RELEASE_EVENTS_KEY + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deleteRejectedReleaseEvent(
+            @Param(IDENTIFIER_KEY) String eventId
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + RELEASE_EVENTS_KEY + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deleteReleaseEvent(
+            @Param(IDENTIFIER_KEY) String eventId
     );
 
 }

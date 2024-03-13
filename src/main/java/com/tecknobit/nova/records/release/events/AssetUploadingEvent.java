@@ -27,6 +27,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
     public static final String COMMENTED_KEY = "commented";
 
     @OneToMany(
+            fetch = FetchType.EAGER,
             mappedBy = ASSET_UPLOADING_EVENT_KEY,
             cascade = CascadeType.ALL
     )
