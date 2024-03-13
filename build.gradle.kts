@@ -25,6 +25,7 @@ dependencies {
     implementation("com.github.N7ghtm4r3:APIManager:2.2.1")
     implementation("org.json:json:20230227")
     implementation("commons-validator:commons-validator:1.7")
+    implementation("com.itextpdf:itext-core:8.0.2")
 }
 
 tasks {

@@ -146,6 +146,7 @@ public class ReleasesHelper implements ResourcesManager {
 
     // TO-DO: DELETE ALSO THE REPORTS AND CREATE ALSO THE LOGIC TO CREATE THEM
     public void deleteRelease(Release release) {
+        String releaseId = release.getId();
         for (ReleaseEvent event : release.getReleaseEvents()) {
             String eventId = event.getId();
             if(event instanceof AssetUploadingEvent) {
@@ -157,7 +158,8 @@ public class ReleasesHelper implements ResourcesManager {
             else
                 releaseEventsRepository.deleteReleaseEvent(eventId);
         }
-        releasesRepository.deleteRelease(release.getId());
+        deleteReportResource(releaseId);
+        releasesRepository.deleteRelease(releaseId);
     }
 
 }

@@ -46,6 +46,8 @@ public class Release extends NovaItem {
 
     public static final String APPROBATION_DATE_KEY = "approbation_date";
 
+    public static final String RELEASE_REPORT_PATH = "releaseReport";
+
     public enum ReleaseStatus {
 
         New("#e88f13"),
@@ -196,11 +198,13 @@ public class Release extends NovaItem {
     }
 
     public boolean isLastEvent(ReleaseEvent event) {
-        long inputTimestamp = event.getReleaseEventTimestamp();
-        for (ReleaseEvent checkEvent : releaseEvents)
-            if(inputTimestamp < checkEvent.getReleaseEventTimestamp())
-                return false;
-        return true;
+        return event.getReleaseEventTimestamp() == getLastEvent();
+    }
+
+    public long getLastEvent() {
+        if(releaseEvents.isEmpty())
+            return 0L;
+        return releaseEvents.get(releaseEvents.size() - 1).getReleaseEventTimestamp();
     }
 
 }

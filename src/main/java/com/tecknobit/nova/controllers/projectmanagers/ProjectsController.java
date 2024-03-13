@@ -277,7 +277,7 @@ public class ProjectsController extends ProjectManager {
             @RequestHeader(TOKEN_KEY) String token
     ) {
         if(isMe(id, token) && isProjectAuthor(id, projectId)) {
-            projectsHelper.deleteProject(projectId);
+            projectsHelper.deleteProject(currentProject);
             return successResponse();
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);

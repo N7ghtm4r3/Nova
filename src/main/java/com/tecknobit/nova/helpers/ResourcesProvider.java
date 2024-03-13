@@ -13,13 +13,17 @@ public class ResourcesProvider {
 
     public static final String RESOURCES_PATH = "resources/";
 
-    public static final String[] RESOURCES_DIRECTORIES = {"profiles", "logos", "assets"};
+    public static final String[] RESOURCES_DIRECTORIES = {"profiles", "logos", "assets", "reports"};
 
     public static final String PROFILES_DIRECTORY = RESOURCES_DIRECTORIES[0];
 
     public static final String LOGOS_DIRECTORY = RESOURCES_DIRECTORIES[1];
 
     public static final String ASSETS_DIRECTORY = RESOURCES_DIRECTORIES[2];
+
+    public static final String REPORTS_DIRECTORY = RESOURCES_DIRECTORIES[3];
+
+    public static final String RESOURCES_REPORTS_PATH = RESOURCES_PATH + REPORTS_DIRECTORY + "/";
 
     private ResourcesProvider() {
     }

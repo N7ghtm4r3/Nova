@@ -28,6 +28,11 @@ public interface ResourcesManager {
         return createResource(resource, ASSETS_DIRECTORY, resourceId);
     }
 
+    @Wrapper
+    default String createReportResource(MultipartFile resource, String resourceId) {
+        return createResource(resource, REPORTS_DIRECTORY, resourceId);
+    }
+
     private String createResource(MultipartFile resource, String resourcesDirectory, String resourceId) {
         return resourcesDirectory + "/" + resourceId + getResourceExtension(resource);
     }
@@ -57,6 +62,11 @@ public interface ResourcesManager {
     @Wrapper
     default boolean deleteAssetResource(String assetId) {
         return deleteResource(ASSETS_DIRECTORY, assetId);
+    }
+
+    @Wrapper
+    default boolean deleteReportResource(String reportId) {
+        return deleteResource(REPORTS_DIRECTORY, reportId);
     }
 
     private boolean deleteResource(String resourcesDirectory, String resourceId) {

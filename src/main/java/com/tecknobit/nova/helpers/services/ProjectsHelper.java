@@ -4,6 +4,7 @@ import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRC
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
 import com.tecknobit.nova.records.project.JoiningQRCode;
 import com.tecknobit.nova.records.project.Project;
+import com.tecknobit.nova.records.release.Release;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class ProjectsHelper implements ResourcesManager {
 
     @Autowired
     private JoiningQRCodeRepository joiningQRCodeRepository;
+
+    @Autowired
+    private ReleasesHelper releasesHelper;
 
     public HashMap<String, List<Project>> getProjects(String userId) {
         HashMap<String, List<Project>> projects = new HashMap<>();
@@ -95,7 +99,10 @@ public class ProjectsHelper implements ResourcesManager {
         projectsRepository.removeMember(projectId, memberId);
     }
 
-    public void deleteProject(String projectId) {
+    public void deleteProject(Project project) {
+        String projectId = project.getId();
+        for (Release release : project.getReleases())
+            releasesHelper.deleteRelease(release);
         projectsRepository.removeAllMembers(projectId);
         projectsRepository.deleteProject(projectId);
         deleteLogoResource(projectId);
