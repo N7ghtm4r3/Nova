@@ -113,13 +113,13 @@ public class ReleasesHelper implements ResourcesManager {
     }
 
     @Wrapper
-    public void setBetaStatus(String releaseId) {
-        setReleaseStatus(releaseId, Beta);
+    public void setAlphaStatus(String releaseId) {
+        setReleaseStatus(releaseId, Alpha);
     }
 
     @Wrapper
-    public void setAlphaStatus(String releaseId) {
-        setReleaseStatus(releaseId, Alpha);
+    public void setBetaStatus(String releaseId) {
+        setReleaseStatus(releaseId, Beta);
     }
 
     @Wrapper
@@ -144,7 +144,6 @@ public class ReleasesHelper implements ResourcesManager {
         return eventDate;
     }
 
-    // TO-DO: DELETE ALSO THE REPORTS AND CREATE ALSO THE LOGIC TO CREATE THEM
     public void deleteRelease(Release release) {
         String releaseId = release.getId();
         for (ReleaseEvent event : release.getReleaseEvents()) {

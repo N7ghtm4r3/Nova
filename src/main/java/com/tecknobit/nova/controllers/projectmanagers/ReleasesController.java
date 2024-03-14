@@ -140,7 +140,7 @@ public class ReleasesController extends ProjectManager {
             Release release = getReleaseIfAuthorized(releaseId);
             if(release != null) {
                 switch (release.getStatus()) {
-                    case New, Rejected, Beta, Alpha -> {
+                    case New, Rejected, Alpha, Beta -> {
                         try {
                             if(releasesHelper.uploadAssets(releaseId, assets))
                                 return successResponse();
@@ -292,25 +292,25 @@ public class ReleasesController extends ProjectManager {
                 boolean allowedToPromote;
                 ReleaseStatus currentReleaseStatus = release.getStatus();
                 switch (currentReleaseStatus) {
-                    case Approved, Beta, Alpha -> allowedToPromote = true;
+                    case Approved, Alpha, Beta  -> allowedToPromote = true;
                     default -> allowedToPromote = false;
                 }
                 if(allowedToPromote && sReleaseStatus != null) {
                     try {
                         ReleaseStatus releaseStatus = ReleaseStatus.valueOf(sReleaseStatus);
                         switch (releaseStatus) {
-                            case Beta -> {
-                                if(currentReleaseStatus != Approved)
-                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                                releasesHelper.setBetaStatus(releaseId);
-                            }
                             case Alpha -> {
-                                if(currentReleaseStatus == Alpha)
+                                if(currentReleaseStatus != Approved)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
                                 releasesHelper.setAlphaStatus(releaseId);
                             }
-                            case Latest -> {
+                            case Beta -> {
                                 if(currentReleaseStatus == Beta)
+                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                                releasesHelper.setBetaStatus(releaseId);
+                            }
+                            case Latest -> {
+                                if(currentReleaseStatus == Alpha)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
                                 releasesHelper.setLatestStatus(releaseId);
                             }
@@ -352,7 +352,6 @@ public class ReleasesController extends ProjectManager {
                                 .put(RELEASE_REPORT_PATH, reportsProvider.getReleaseReport(release))
                         );
                     } catch (Exception e) {
-                        e.printStackTrace();
                         return failedResponse(WRONG_PROCEDURE_MESSAGE);
                     }
                 } else

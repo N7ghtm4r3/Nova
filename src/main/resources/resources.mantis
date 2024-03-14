@@ -1,0 +1,39 @@
+{
+    "en": {
+        "new_asset_uploaded_key": "New asset uploaded",
+        "asset_has_been_approved_key": "Asset has been approved",
+        "beta_timeline_message_key": "Asset has been promoted to Beta version",
+        "latest_timeline_message_key": "Release promoted as latest!",
+        "alpha_timeline_message_key": "Asset has been promoted to Alpha version",
+        "new_asset_has_been_uploaded_key": "New asset has been uploaded"
+    },
+    "ignored_resources": {
+        " width=\\125\\ ": 1710446111641,
+        "<hr>": 1710446106229,
+        "**<span style=\\font-size:20px;\\>v. ": 1710446102253,
+        "<img src=\\file:": 1710446110589,
+        "<span style=\\color:": 1710446089230,
+        "<\/span>**\\n\\n": 1710446118886,
+        "<br>": 1710446095648,
+        "\\n\\n": 1710446104003,
+        "/": 1710446955328,
+        "\n                            > [!warning] \\s\n                            > note: the service will run using the *http* protocol as default, it is recommended to implement an *ssl* or *tls* certificate to secure communication on your infrastructure.\n                            >\n                            > **wikis**\n                            >\\s\n                            > to create a self-signed certificate you can look <a href=https://tecadmin.net/step-by-step-guide-to-creating-self-signed-ssl-certificates/>here<\/a>\n                            >\n                            > to implement a certificate in spring you can look <a href=https://www.thomasvitale.com/https-spring-boot-ssl-certificate/>here<\/a>\n                            >\n                            > if you encounter any problems with the creation of the keystore you can look <a href=https://stackoverflow.com/questions/906402/how-to-import-an-existing-x-509-certificate-and-private-key-in-java-keystore-to>here<\/a> to get more information, or\n                            > use the following command to add the **private key** to the keystore:\n                            > ```xml\n                            > openssl pkcs12 -export -in your_certificate_file.crt -inkey your_private_key.key -out your_out_pkcs12_file.p12 -name your_alias_name -cafile your_certificate_file.crt -caname root\n                            > ```": 1710447898806,
+        "\\n": 1710446114874,
+        ".pdf": 1710446961212,
+        "<\/span>": 1710446091690,
+        "> [!warning]  \\n": 1710447880294,
+        "\\": 1710446121797,
+        ";\\>": 1710446093689,
+        "# ": 1710446108247,
+        " style=\\border-radius:25%;\\/>\\n\\n": 1710446112697,
+        "_": 1710446950513
+    },
+    "it": {
+        "new_asset_uploaded_key": "Nuovo asset caricato",
+        "asset_has_been_approved_key": "L'asset è stato approvato",
+        "beta_timeline_message_key": "L'asset è stato promosso alla versione Beta",
+        "latest_timeline_message_key": "Release promosso come ultimo!",
+        "alpha_timeline_message_key": "L'asset è stato promosso alla versione Alpha",
+        "new_asset_has_been_uploaded_key": "Un nuovo asset è stato caricato"
+    }
+}
