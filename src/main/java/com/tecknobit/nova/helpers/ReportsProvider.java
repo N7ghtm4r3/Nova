@@ -22,8 +22,6 @@ import java.util.Objects;
 import static com.tecknobit.apimanager.apis.ResourcesUtils.getResourceContent;
 import static com.tecknobit.apimanager.trading.TradingTools.roundValue;
 import static com.tecknobit.nova.helpers.ResourcesProvider.*;
-import static com.tecknobit.nova.records.release.Release.ReleaseStatus.Latest;
-import static com.tecknobit.nova.records.release.Release.ReleaseStatus.Verifying;
 
 public class ReportsProvider {
 
@@ -127,18 +125,12 @@ public class ReportsProvider {
 
     private void insertReleaseEvents() {
         StringBuilder report = new StringBuilder();
-        int position = 0;
         for (ReleaseEvent event : currentRelease.getReleaseEvents()) {
+            report.append("<div class=\"container\">");
+            report.append("<div class=\"content\">");
             ReleaseStatus status = ((ReleaseStandardEvent) event).getStatus();
-            if(position == 0) {
-                report.append(startPointer(event));
-            } else {
-                if(status.equals(Latest))
-                    report.append(endPointer());
-                else
-                    report.append(navPointer(status));
-            }
-            position++;
+            report.append(releaseStatusBadge(status));
+            report.append(event.getReleaseEventDate()).append(BREAK_LINE);
             switch (status) {
                 case Rejected -> {
                     RejectedReleaseEvent rejectedReleaseEvent = (RejectedReleaseEvent) event;
@@ -171,6 +163,9 @@ public class ReportsProvider {
                 }
                 default -> report.append(getStatusComment(status)).append(BREAK_LINE);
             }
+            report.append("</div>");
+            report.append("<hr>");
+            report.append("</div>");
         }
         reportTemplate = reportTemplate
                 .replaceAll(RELEASE_EVENTS_TAG, report.toString());
@@ -184,52 +179,6 @@ public class ReportsProvider {
                 status.name() +
                 "</span></b>" +
                 BREAK_LINE;
-    }
-
-    private String startPointer(ReleaseEvent event) {
-        return "<div>" +
-                pointer("start", Verifying.name()) +
-                event.getReleaseEventDate() +
-                a(event) +
-                "</div>";
-    }
-
-    private String navPointer(ReleaseStatus status) {
-        String statusName = status.name();
-        return "<div class=\"nav-" + statusName + "\">" +
-                "<div class=\"text-content-nav\">" +
-                "    <p>" + statusName + "</p>" +
-                "</div>" +
-                "</div>";
-    }
-
-    private String a(ReleaseEvent event) {
-        StringBuilder report = new StringBuilder();
-        AssetUploadingEvent assetUploadingEvent = ((AssetUploadingEvent) event);
-        List<AssetUploaded> assets = assetUploadingEvent.getAssetsUploaded();
-        for(int j = 0; j < assets.size(); j++) {
-            AssetUploaded asset = assets.get(j);
-            double spaceOccupied = new File(RESOURCES_PATH + asset.getUrl()).length();
-            report.append("- Asset #")
-                    .append(j + 1)
-                    .append(" ")
-                    .append(roundValue(((spaceOccupied) / (1024 * 1024)), 2))
-                    .append(" MB")
-                    .append(BREAK_LINE);
-        }
-        return report.toString();
-    }
-
-    private String endPointer() {
-        return pointer("end", "Latest");
-    }
-
-    private String pointer(String sector, String text) {
-        return "<div class=\"" + sector + "\">" +
-                "<div class=\"text-content-"+ sector +" \">" +
-                "    <p>" + text + "</p>" +
-                "  </div>" +
-                "</div>";
     }
 
     private String getStatusComment(ReleaseStatus status) {
