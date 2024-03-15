@@ -31,6 +31,8 @@ public class ReportsProvider {
 
     public static final String RELEASE_VERSION_TAG = "<release_version>";
 
+    public static final String RELEASE_CREATION_DATE_TAG = "<release_creation_date>";
+
     public static final String RELEASE_STATUS_TAG = "<release_status>";
 
     public static final String RELEASE_NOTES_TAG = "<release_notes>";
@@ -115,6 +117,8 @@ public class ReportsProvider {
         reportTemplate = insertLogo(project)
                 .replaceAll(PROJECT_NAME_TAG, project.getName())
                 .replaceAll(RELEASE_VERSION_TAG, "v. " + currentRelease.getReleaseVersion())
+                .replaceAll(RELEASE_CREATION_DATE_TAG, mantis.getResource("creation_date_key")
+                        + " " + currentRelease.getCreationDate())
                 .replaceAll(RELEASE_STATUS_TAG, releaseStatusBadge(currentRelease.getStatus()))
                 .replaceAll(RELEASE_NOTES_TAG, currentRelease.getReleaseNotes());
     }

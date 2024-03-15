@@ -18,6 +18,8 @@
 
 <span style="font-size:20px"><release_version></span> <release_status>
 
+<release_creation_date>
+
 <release_notes>
 
 <hr>
