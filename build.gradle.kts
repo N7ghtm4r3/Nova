@@ -11,6 +11,8 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+    //TO-DO: TO REMOVE FOR TESTING PURPOSES ONLY
+    mavenLocal()
     maven("https://jitpack.io")
     maven("https://repo.clojars.org")
 }
@@ -25,9 +27,10 @@ dependencies {
     implementation("mysql:mysql-connector-java:8.0.33")
     implementation("com.github.N7ghtm4r3:APIManager:2.2.2")
     implementation("org.json:json:20230227")
-    implementation("commons-validator:commons-validator:1.7")
     implementation("com.vladsch.flexmark:flexmark-all:0.64.8")
     implementation("com.github.N7ghtm4r3:Mantis:1.0.0")
+    //TO-DO: TO REMOVE FOR TESTING PURPOSES ONLY
+    implementation("com.tecknobit.novacore:Nova-core:1.0.0")
 }
 
 tasks {

@@ -1,4 +1,4 @@
-package com.tecknobit.nova.helpers;
+package com.tecknobit.novacore;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -14,6 +14,10 @@ public class InputValidator {
 
     public static final String WRONG_PASSWORD_MESSAGE = "Password is not valid";
 
+    public static final String WRONG_LANGUAGE_MESSAGE = "Language is not supported";
+
+    public static final String DEFAULT_LANGUAGE = "ENGLISH";
+
     public static final String WRONG_MAILING_LIST_MESSAGE = "Mailing list is not valid";
 
     public static final String WRONG_RELEASE_VERSION_MESSAGE = "The version for the release is not valid";
@@ -27,6 +31,29 @@ public class InputValidator {
     public static final String WRONG_TAG_COMMENT_MESSAGE = "The comment for the tag is not valid";
 
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
+
+    public static final List<String> LANGUAGES_SUPPORTED = List.of(
+            "RUSSIAN",
+            "ENGLISH",
+            "ARABIC",
+            "CHINESE",
+            "CZECH",
+            "DANISH",
+            "DUTCH",
+            "FRENCH",
+            "GERMAN",
+            "GREEK",
+            "HINDI",
+            "ITALIAN",
+            "JAPANESE",
+            "KOREAN",
+            "PORTUGUESE",
+            "SLOVAK",
+            "SPANISH",
+            "SWEDISH",
+            "TURKISH",
+            "UKRAINIAN"
+    );
 
     private InputValidator() {
     }
@@ -45,6 +72,10 @@ public class InputValidator {
 
     public static boolean isPasswordValid(String password) {
         return isInputValid(password);
+    }
+
+    public static boolean isLanguageValid(String language) {
+        return language != null && LANGUAGES_SUPPORTED.contains(language);
     }
 
     public static boolean isProjectNameValid(String name) {

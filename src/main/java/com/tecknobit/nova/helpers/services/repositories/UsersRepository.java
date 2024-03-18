@@ -59,4 +59,16 @@ public interface UsersRepository extends JpaRepository<User, String> {
             @Param(IDENTIFIER_KEY) String id
     );
 
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + USERS_KEY + " SET " + LANGUAGE_KEY + "=:" + LANGUAGE_KEY + " WHERE "
+                    + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void changeLanguage(
+            @Param(LANGUAGE_KEY) String newLanguage,
+            @Param(IDENTIFIER_KEY) String id
+    );
+
 }

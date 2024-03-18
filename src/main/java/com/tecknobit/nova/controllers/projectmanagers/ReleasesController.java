@@ -21,7 +21,6 @@ import java.util.Map;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
-import static com.tecknobit.nova.helpers.InputValidator.*;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.User.PROJECTS_KEY;
 import static com.tecknobit.nova.records.User.TOKEN_KEY;
@@ -36,6 +35,7 @@ import static com.tecknobit.nova.records.release.events.RejectedTag.COMMENT_KEY;
 import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_TAG_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
+import static com.tecknobit.novacore.InputValidator.*;
 
 @RestController
 @RequestMapping(BASE_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"

@@ -43,6 +43,8 @@ public class User extends NovaItem {
 
     public static final String PROFILE_PIC_URL_KEY = "profile_pic_url";
 
+    public static final String LANGUAGE_KEY = "language";
+
     @Column(name = NAME_KEY)
     private final String name;
 
@@ -85,16 +87,19 @@ public class User extends NovaItem {
     )
     private final List<Project> projects;
 
+    @Column(name = LANGUAGE_KEY)
+    private final String language;
+
     public User() {
-        this(null, null, null, null, null, null, null, List.of(), List.of());
+        this(null, null, null, null, null, null, null, List.of(), List.of(), null);
     }
 
-    public User(String id, String token, String name, String surname, String email, String password) {
-        this(id, name, surname, email, null, token, password, List.of(), List.of());
+    public User(String id, String token, String name, String surname, String email, String password, String language) {
+        this(id, name, surname, email, null, token, password, List.of(), List.of(), language);
     }
 
     public User(String id, String name, String surname, String email, String profilePicUrl, String token,
-                String password, List<Project> authoredProjects, List<Project> projects) {
+                String password, List<Project> authoredProjects, List<Project> projects, String language) {
         super(id);
         this.name = name;
         this.surname = surname;
@@ -104,6 +109,7 @@ public class User extends NovaItem {
         this.password = password;
         this.authoredProjects = authoredProjects;
         this.projects = projects;
+        this.language = language;
     }
 
     public String getName() {
@@ -136,6 +142,10 @@ public class User extends NovaItem {
 
     public List<Project> getProjects() {
         return projects;
+    }
+
+    public String getLanguage() {
+        return language;
     }
 
 }

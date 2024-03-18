@@ -14,8 +14,8 @@ import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.Launcher.protector;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
-import static com.tecknobit.nova.helpers.InputValidator.*;
 import static com.tecknobit.nova.records.User.*;
+import static com.tecknobit.novacore.InputValidator.*;
 
 @RestController
 @RequestMapping(path = BASE_ENDPOINT + USERS_KEY)
@@ -30,6 +30,8 @@ public class UsersController extends NovaController {
     public static final String CHANGE_EMAIL_ENDPOINT = "/changeEmail";
 
     public static final String CHANGE_PASSWORD_ENDPOINT = "/changePassword";
+
+    public static final String CHANGE_LANGUAGE_ENDPOINT = "/changeLanguage";
 
     private final UsersHelper usersHelper;
 
@@ -67,48 +69,54 @@ public class UsersController extends NovaController {
         loadJsonHelper(payload);
         String email = jsonHelper.getString(EMAIL_KEY);
         String password = jsonHelper.getString(PASSWORD_KEY);
+        String language = jsonHelper.getString(LANGUAGE_KEY, DEFAULT_LANGUAGE);
         if(isEmailValid(email)) {
             if(isPasswordValid(password)) {
-                String id;
-                String token;
-                String profilePicUrl;
-                JSONObject response = new JSONObject();
-                if(personalData.length == 2) {
-                    id = generateIdentifier();
-                    token = generateIdentifier();
-                    profilePicUrl = DEFAULT_PROFILE_PIC;
-                    try {
-                        usersHelper.signUpUser(
-                                id,
-                                token,
-                                personalData[0],
-                                personalData[1],
-                                email.toLowerCase(),
-                                password
-                        );
-                    } catch (Exception e) {
-                        return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-                    }
-                } else {
-                    try {
-                        User user = usersHelper.signInUser(email.toLowerCase(), password);
-                        if(user != null) {
-                            id = user.getId();
-                            token = user.getToken();
-                            profilePicUrl = user.getProfilePicUrl();
-                            response.put(NAME_KEY, user.getName());
-                            response.put(SURNAME_KEY, user.getSurname());
-                        } else
+                if(isLanguageValid(language)) {
+                    String id;
+                    String token;
+                    String profilePicUrl;
+                    JSONObject response = new JSONObject();
+                    if(personalData.length == 2) {
+                        id = generateIdentifier();
+                        token = generateIdentifier();
+                        profilePicUrl = DEFAULT_PROFILE_PIC;
+                        try {
+                            usersHelper.signUpUser(
+                                    id,
+                                    token,
+                                    personalData[0],
+                                    personalData[1],
+                                    email.toLowerCase(),
+                                    password,
+                                    language
+                            );
+                        } catch (Exception e) {
                             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-                    } catch (Exception e) {
-                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                        }
+                    } else {
+                        try {
+                            User user = usersHelper.signInUser(email.toLowerCase(), password);
+                            if(user != null) {
+                                id = user.getId();
+                                token = user.getToken();
+                                profilePicUrl = user.getProfilePicUrl();
+                                response.put(NAME_KEY, user.getName());
+                                response.put(SURNAME_KEY, user.getSurname());
+                                response.put(LANGUAGE_KEY, user.getLanguage());
+                            } else
+                                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                        } catch (Exception e) {
+                            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                        }
                     }
-                }
-                return successResponse(response
-                        .put(IDENTIFIER_KEY, id)
-                        .put(TOKEN_KEY, token)
-                        .put(PROFILE_PIC_URL_KEY, profilePicUrl)
-                );
+                    return successResponse(response
+                            .put(IDENTIFIER_KEY, id)
+                            .put(TOKEN_KEY, token)
+                            .put(PROFILE_PIC_URL_KEY, profilePicUrl)
+                    );
+                } else
+                    return failedResponse(WRONG_LANGUAGE_MESSAGE);
             } else
                 return failedResponse(WRONG_PASSWORD_MESSAGE);
         } else
@@ -134,7 +142,6 @@ public class UsersController extends NovaController {
                     String profilePicUrl = usersHelper.changeProfilePic(profilePic, id);
                     response.put(PROFILE_PIC_URL_KEY, profilePicUrl);
                 } catch (Exception e) {
-                    e.printStackTrace();
                     response.put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC);
                 }
                 return successResponse(response);
@@ -196,6 +203,34 @@ public class UsersController extends NovaController {
                 }
             } else
                 return failedResponse(WRONG_PASSWORD_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_LANGUAGE_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}/changeLanguage", method = PATCH)
+    public String changeLanguage(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token)) {
+            loadJsonHelper(payload);
+            String language = jsonHelper.getString(LANGUAGE_KEY);
+            if(isLanguageValid(language)) {
+                try {
+                    usersHelper.changeLanguage(language, id);
+                    return successResponse();
+                } catch (Exception e) {
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                }
+            } else
+                return failedResponse(WRONG_LANGUAGE_MESSAGE);
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }

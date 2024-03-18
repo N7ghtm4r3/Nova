@@ -21,12 +21,12 @@ import java.util.Map;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
-import static com.tecknobit.nova.helpers.InputValidator.*;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.User.*;
 import static com.tecknobit.nova.records.project.JoiningQRCode.EXPIRED_JOINING_QRCODE_MESSAGE;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.novacore.InputValidator.*;
 
 @RestController
 @RequestMapping(BASE_ENDPOINT)
@@ -166,6 +166,7 @@ public class ProjectsController extends ProjectManager {
                                 String name = jsonHelper.getString(NAME_KEY);
                                 String surname = jsonHelper.getString(SURNAME_KEY);
                                 String password = jsonHelper.getString(PASSWORD_KEY);
+                                String language = jsonHelper.getString(LANGUAGE_KEY, DEFAULT_LANGUAGE);
                                 if(isNameValid(name)) {
                                     if(isSurnameValid(surname)) {
                                         if(isPasswordValid(password)) {
@@ -178,7 +179,8 @@ public class ProjectsController extends ProjectManager {
                                                         name,
                                                         surname,
                                                         email,
-                                                        password
+                                                        password,
+                                                        language
                                                 );
                                                 response.put(IDENTIFIER_KEY, userId)
                                                         .put(TOKEN_KEY, token)

@@ -18,15 +18,16 @@ public class UsersHelper implements ResourcesManager {
     @Autowired
     private UsersRepository usersRepository;
 
-    public void signUpUser(String id, String token, String name, String surname, String email,
-                           String password) throws NoSuchAlgorithmException {
+    public void signUpUser(String id, String token, String name, String surname, String email, String password,
+                           String language) throws NoSuchAlgorithmException {
         usersRepository.save(new User(
                 id,
                 token,
                 name,
                 surname,
                 email,
-                hash(password)
+                hash(password),
+                language
         ));
     }
 
@@ -50,6 +51,10 @@ public class UsersHelper implements ResourcesManager {
 
     public void changePassword(String newPassword, String userId) throws NoSuchAlgorithmException {
         usersRepository.changePassword(hash(newPassword), userId);
+    }
+
+    public void changeLanguage(String newLanguage, String userId) {
+        usersRepository.changeLanguage(newLanguage, userId);
     }
 
     public void deleteUser(String id) {
