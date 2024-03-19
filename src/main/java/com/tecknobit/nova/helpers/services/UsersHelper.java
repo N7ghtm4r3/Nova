@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.tecknobit.apimanager.apis.APIRequest.SHA256_ALGORITHM;
+import static com.tecknobit.nova.records.User.Role.Vendor;
 
 @Service
 public class UsersHelper implements ResourcesManager {
@@ -57,6 +58,10 @@ public class UsersHelper implements ResourcesManager {
 
     public void changeLanguage(String newLanguage, String userId) {
         usersRepository.changeLanguage(newLanguage, userId);
+    }
+
+    public void changeUserRole(String userId) {
+        usersRepository.changeMemberRole(Vendor.name(), userId);
     }
 
     public void deleteUser(String id) {

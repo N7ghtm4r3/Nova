@@ -36,6 +36,8 @@ public class ProjectsController extends ProjectManager {
 
     public static final String JOIN_ENDPOINT = "/join";
 
+    public static final String CHANGE_MEMBER_ROLE_ENDPOINT = "/changeMemberRole";
+
     public static final String REMOVE_MEMBER_ENDPOINT = "/removeMember";
 
     public static final String LEAVE_ENDPOINT = "/leave";
@@ -213,6 +215,36 @@ public class ProjectsController extends ProjectManager {
             }
         } else
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
+    }
+
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + CHANGE_MEMBER_ROLE_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/changeMemberRole", method = PATCH)
+    public String changeMemberRole(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+            loadJsonHelper(payload);
+            String memberId = jsonHelper.getString(MEMBER_IDENTIFIER_KEY);
+            if(currentProject != null) {
+                User member = currentProject.getMember(memberId);
+                System.out.println(member);
+                if(member != null && member.isCustomer()) {
+                    usersHelper.changeUserRole(memberId);
+                    return successResponse();
+                } else
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            } else
+                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
     @PatchMapping(

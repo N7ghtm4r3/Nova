@@ -149,10 +149,21 @@ public class Project extends NovaItem {
     }
 
     public boolean hasMemberId(String memberId) {
-        for (User member : projectMembers)
-            if(member.getId().equals(memberId))
-                return true;
+        if(memberId != null) {
+            for (User member : projectMembers)
+                if(member.getId().equals(memberId))
+                    return true;
+        }
         return false;
+    }
+
+    public User getMember(String memberId) {
+        if(memberId != null) {
+            for (User projectMember : projectMembers)
+                if(projectMember.getId().equals(memberId))
+                    return projectMember;
+        }
+        return null;
     }
 
     public boolean hasNotMemberEmail(String memberEmail) {

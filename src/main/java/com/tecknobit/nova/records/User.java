@@ -169,4 +169,12 @@ public class User extends NovaItem {
         return role;
     }
 
+    public boolean isVendor() {
+        return role == Role.Vendor;
+    }
+
+    public boolean isCustomer() {
+        return role == Role.Customer;
+    }
+
 }

@@ -5,9 +5,6 @@ import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.records.project.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.tecknobit.nova.records.User.Role.Customer;
-import static com.tecknobit.nova.records.User.Role.Vendor;
-
 public abstract class ProjectManager extends NovaController {
 
     protected final ProjectsHelper projectsHelper;
@@ -26,13 +23,13 @@ public abstract class ProjectManager extends NovaController {
 
     protected boolean isAuthorizedUser(String userId, String projectId) {
         Project project = projectsHelper.getProject(userId, projectId);
-        return isProjectAuthor(project, userId) || me.getRole() == Vendor;
+        return isProjectAuthor(project, userId) || me.isVendor();
     }
 
     protected boolean isUserQualified(String userId, String projectId) {
         Project project = projectsHelper.getProject(userId, projectId);
         currentProject = project;
-        return ((project != null)) && me.getRole() == Customer;
+        return ((project != null)) && me.isCustomer();
     }
 
     protected boolean isProjectAuthor(String userId, String projectId) {
