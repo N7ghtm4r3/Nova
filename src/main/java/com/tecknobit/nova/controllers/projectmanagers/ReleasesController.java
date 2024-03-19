@@ -312,7 +312,7 @@ public class ReleasesController extends ProjectManager {
                             case Latest -> {
                                 if(currentReleaseStatus == Alpha)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                                releasesHelper.setLatestStatus(releaseId);
+                                releasesHelper.setLatestStatus(projectId, releaseId);
                             }
                             default -> {
                                 return failedResponse(WRONG_PROCEDURE_MESSAGE);

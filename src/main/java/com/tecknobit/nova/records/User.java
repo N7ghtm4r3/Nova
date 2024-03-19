@@ -8,6 +8,7 @@ import java.util.List;
 
 import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
+import static jakarta.persistence.EnumType.STRING;
 
 @Entity
 @Table(name = User.USERS_KEY)
@@ -44,6 +45,16 @@ public class User extends NovaItem {
     public static final String PROFILE_PIC_URL_KEY = "profile_pic_url";
 
     public static final String LANGUAGE_KEY = "language";
+
+    public static final String ROLE_KEY = "role";
+
+    public enum Role {
+
+        Vendor,
+
+        Customer
+
+    }
 
     @Column(name = NAME_KEY)
     private final String name;
@@ -90,16 +101,21 @@ public class User extends NovaItem {
     @Column(name = LANGUAGE_KEY)
     private final String language;
 
+    @Enumerated(value = STRING)
+    @Column(name = ROLE_KEY)
+    private final Role role;
+
     public User() {
-        this(null, null, null, null, null, null, null, List.of(), List.of(), null);
+        this(null, null, null, null, null, null, null, List.of(), List.of(), null, null);
     }
 
-    public User(String id, String token, String name, String surname, String email, String password, String language) {
-        this(id, name, surname, email, null, token, password, List.of(), List.of(), language);
+    public User(String id, String token, String name, String surname, String email, String password, String language,
+                Role role) {
+        this(id, name, surname, email, null, token, password, List.of(), List.of(), language, role);
     }
 
-    public User(String id, String name, String surname, String email, String profilePicUrl, String token,
-                String password, List<Project> authoredProjects, List<Project> projects, String language) {
+    public User(String id, String name, String surname, String email, String profilePicUrl, String token, String password,
+                List<Project> authoredProjects, List<Project> projects, String language, Role role) {
         super(id);
         this.name = name;
         this.surname = surname;
@@ -110,6 +126,7 @@ public class User extends NovaItem {
         this.authoredProjects = authoredProjects;
         this.projects = projects;
         this.language = language;
+        this.role = role;
     }
 
     public String getName() {
@@ -146,6 +163,10 @@ public class User extends NovaItem {
 
     public String getLanguage() {
         return language;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
 }

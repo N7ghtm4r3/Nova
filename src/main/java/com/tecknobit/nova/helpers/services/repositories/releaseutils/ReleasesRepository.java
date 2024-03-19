@@ -61,6 +61,19 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
     @Transactional
     @Query(
             value = "UPDATE " + RELEASES_KEY + " SET "
+                    + RELEASE_STATUS_KEY + "='Finished'"
+                    + " WHERE " + RELEASE_STATUS_KEY + "='Latest' AND "
+                    + PROJECT_KEY + "=:" + PROJECT_KEY,
+            nativeQuery = true
+    )
+    void setAsFinished(
+            @Param(PROJECT_KEY) String project
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + RELEASES_KEY + " SET "
                     + RELEASE_STATUS_KEY + "=:" + RELEASE_STATUS_KEY
                     + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true

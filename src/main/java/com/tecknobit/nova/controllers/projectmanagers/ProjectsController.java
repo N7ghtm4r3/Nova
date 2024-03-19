@@ -180,7 +180,8 @@ public class ProjectsController extends ProjectManager {
                                                         surname,
                                                         email,
                                                         password,
-                                                        language
+                                                        language,
+                                                        Role.Customer
                                                 );
                                                 response.put(IDENTIFIER_KEY, userId)
                                                         .put(TOKEN_KEY, token)

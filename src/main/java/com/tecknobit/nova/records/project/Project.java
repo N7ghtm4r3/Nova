@@ -148,13 +148,6 @@ public class Project extends NovaItem {
         return joiningQRCodes;
     }
 
-    public boolean memberIsClient(String memberId) {
-        for (User member : projectMembers)
-            if(member.getId().equals(memberId))
-                return true;//TO-DO: MAKE THE REAL WORKFLOW TO CHECK IF IS A CLIENT;
-        return true; //TO-DO: RETURN FALSE
-    }
-
     public boolean hasMemberId(String memberId) {
         for (User member : projectMembers)
             if(member.getId().equals(memberId))

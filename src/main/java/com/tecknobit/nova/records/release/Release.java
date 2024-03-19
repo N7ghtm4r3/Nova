@@ -62,7 +62,9 @@ public class Release extends NovaItem {
 
         Beta("#d073b8"),
 
-        Latest("#3A98C7");
+        Latest("#3A98C7"),
+
+        Finished("#d7e0da");
 
         private final String color;
 

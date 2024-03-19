@@ -72,9 +72,8 @@ public class ReleasesHelper implements ResourcesManager {
     }
 
     public void approveAsset(String releaseId, String eventId) {
-        long eventDate = insertReleaseEvent(releaseId, Approved);
         setApprovedStatus(releaseId);
-        releasesRepository.approveAsset(releaseId, eventDate);
+        releasesRepository.approveAsset(releaseId, System.currentTimeMillis());
         releaseEventsRepository.setUploadingCommented(eventId);
     }
 
@@ -123,25 +122,21 @@ public class ReleasesHelper implements ResourcesManager {
     }
 
     @Wrapper
-    public void setLatestStatus(String releaseId) {
+    public void setLatestStatus(String projectId, String releaseId) {
+        releasesRepository.setAsFinished(projectId);
         setReleaseStatus(releaseId, Latest);
     }
 
     private void setReleaseStatus(String releaseId, ReleaseStatus status) {
         releasesRepository.updateReleaseStatus(releaseId, status.name());
-        if(status != Verifying && status != Rejected)
-            insertReleaseEvent(releaseId, status);
-    }
-
-    private long insertReleaseEvent(String releaseId, ReleaseStatus status) {
-        long eventDate = System.currentTimeMillis();
-        releaseEventsRepository.insertReleaseEvent(
-                generateIdentifier(),
-                eventDate,
-                releaseId,
-                status.name()
-        );
-        return eventDate;
+        if(status != Verifying && status != Rejected) {
+            releaseEventsRepository.insertReleaseEvent(
+                    generateIdentifier(),
+                    System.currentTimeMillis(),
+                    releaseId,
+                    status.name()
+            );
+        }
     }
 
     public void deleteRelease(Release release) {

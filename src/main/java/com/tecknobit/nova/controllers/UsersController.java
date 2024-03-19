@@ -89,7 +89,8 @@ public class UsersController extends NovaController {
                                     personalData[1],
                                     email.toLowerCase(),
                                     password,
-                                    language
+                                    language,
+                                    Role.Vendor
                             );
                         } catch (Exception e) {
                             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);

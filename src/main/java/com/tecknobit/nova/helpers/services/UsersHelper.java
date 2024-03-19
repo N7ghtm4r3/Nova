@@ -3,6 +3,7 @@ package com.tecknobit.nova.helpers.services;
 import com.tecknobit.apimanager.apis.APIRequest;
 import com.tecknobit.nova.helpers.services.repositories.UsersRepository;
 import com.tecknobit.nova.records.User;
+import com.tecknobit.nova.records.User.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,7 @@ public class UsersHelper implements ResourcesManager {
     private UsersRepository usersRepository;
 
     public void signUpUser(String id, String token, String name, String surname, String email, String password,
-                           String language) throws NoSuchAlgorithmException {
+                           String language, Role role) throws NoSuchAlgorithmException {
         usersRepository.save(new User(
                 id,
                 token,
@@ -27,7 +28,8 @@ public class UsersHelper implements ResourcesManager {
                 surname,
                 email,
                 hash(password),
-                language
+                language,
+                role
         ));
     }
 
