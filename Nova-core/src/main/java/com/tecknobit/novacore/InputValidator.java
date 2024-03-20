@@ -1,6 +1,7 @@
 package com.tecknobit.novacore;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.commons.validator.routines.UrlValidator;
 
 import java.util.List;
 
@@ -52,6 +53,8 @@ public class InputValidator {
 
     private static final EmailValidator emailValidator = EmailValidator.getInstance();
 
+    private static final UrlValidator urlValidator = UrlValidator.getInstance();
+
     public static final List<String> LANGUAGES_SUPPORTED = List.of(
             "RUSSIAN",
             "ENGLISH",
@@ -78,6 +81,14 @@ public class InputValidator {
     private InputValidator() {
     }
 
+    public static boolean isHostValid(String host) {
+        return urlValidator.isValid(host);
+    }
+
+    public static boolean isServerSecretValid(String serverSecret) {
+        return isInputValid(serverSecret);
+    }
+
     public static boolean isNameValid(String name) {
         return isInputValid(name) && name.length() <= NAME_MAX_LENGTH;
     }
@@ -87,7 +98,7 @@ public class InputValidator {
     }
 
     public static boolean isEmailValid(String email) {
-        return isInputValid(email) && emailValidator.isValid(email) && email.length() <= EMAIL_MAX_LENGTH;
+        return emailValidator.isValid(email) && email.length() <= EMAIL_MAX_LENGTH;
     }
 
     public static boolean isPasswordValid(String password) {
@@ -101,6 +112,11 @@ public class InputValidator {
 
     public static boolean isProjectNameValid(String name) {
         return isInputValid(name) && name.length() <= PROJECT_NAME_MAX_LENGTH;
+    }
+
+    public static boolean isMailingListValid(String mailingList) {
+        mailingList = mailingList.replaceAll(" ", "");
+        return isMailingListValid(List.of(mailingList.split(",")));
     }
 
     public static boolean isMailingListValid(List<String> mailingList) {

@@ -59,9 +59,9 @@ public class ProjectsHelper implements ResourcesManager {
         return projectsRepository.getProject(projectId, userId);
     }
 
-    public void createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails) {
+    public void createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role) {
         joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), projectId,
-                formatAllowedEmails(membersEmails));
+                formatAllowedEmails(membersEmails), role.name());
     }
 
     public JoiningQRCode getJoiningQrcode(String QRCodeId) {
@@ -78,6 +78,10 @@ public class ProjectsHelper implements ResourcesManager {
             else
                 joiningQRCodeRepository.updateJoiningQRCode(QRCodeId, formatAllowedEmails(membersEmails));
         }
+    }
+
+    public void removeWrongEmailMember(JoiningQRCode joiningQRCode, String email) {
+        removeMemberFromMailingList(joiningQRCode, email);
     }
 
     public void joinMember(JoiningQRCode joiningQRCode, String email, String memberId) {

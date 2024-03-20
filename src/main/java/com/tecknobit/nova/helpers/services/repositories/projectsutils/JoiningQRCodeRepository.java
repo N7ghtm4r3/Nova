@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.nova.records.User.ROLE_KEY;
 import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_TABLE;
@@ -27,11 +28,13 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
                     + IDENTIFIER_KEY + ","
                     + CREATION_DATE_KEY + ","
                     + PROJECT_IDENTIFIER_KEY + ","
-                    + PROJECT_MEMBERS_TABLE + ")"
+                    + PROJECT_MEMBERS_TABLE + ","
+                    + ROLE_KEY + ")"
                     + " VALUES ("
                     + ":" + IDENTIFIER_KEY + ","
                     + ":" + CREATION_DATE_KEY + ","
                     + ":" + PROJECT_IDENTIFIER_KEY + ","
+                    + ":" + ROLE_KEY + ","
                     + ":" + PROJECT_MEMBERS_TABLE
                     + ")",
             nativeQuery = true
@@ -40,6 +43,7 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
             @Param(IDENTIFIER_KEY) String joiningQRCodeId,
             @Param(CREATION_DATE_KEY) long creationDate,
             @Param(PROJECT_IDENTIFIER_KEY) String projectId,
+            @Param(ROLE_KEY) String role,
             @Param(PROJECT_MEMBERS_TABLE) String projectMembers
     );
 

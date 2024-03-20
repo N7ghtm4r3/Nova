@@ -71,16 +71,4 @@ public interface UsersRepository extends JpaRepository<User, String> {
             @Param(IDENTIFIER_KEY) String id
     );
 
-    @Modifying(clearAutomatically = true)
-    @Transactional
-    @Query(
-            value = "UPDATE " + USERS_KEY + " SET " + ROLE_KEY + "=:" + ROLE_KEY + " WHERE "
-                    + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
-            nativeQuery = true
-    )
-    void changeMemberRole(
-            @Param(ROLE_KEY) String role,
-            @Param(IDENTIFIER_KEY) String id
-    );
-
 }

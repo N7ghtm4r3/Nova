@@ -2,6 +2,7 @@ package com.tecknobit.nova.records.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.nova.records.NovaItem;
+import com.tecknobit.nova.records.User.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.tecknobit.nova.records.User.ROLE_KEY;
 import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
@@ -39,15 +41,20 @@ public class JoiningQRCode extends NovaItem {
     @Column(name = CREATION_DATE_KEY)
     private final long creationDate;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = ROLE_KEY)
+    private final Role role;
+
     public JoiningQRCode() {
-        this(null, null, "", -1);
+        this(null, null, "", -1, null);
     }
 
-    public JoiningQRCode(String QRCodeId, Project project, String membersEmails, long creationDate) {
+    public JoiningQRCode(String QRCodeId, Project project, String membersEmails, long creationDate, Role role) {
         super(QRCodeId);
         this.project = project;
         this.membersEmails = membersEmails;
         this.creationDate = creationDate;
+        this.role = role;
     }
 
     public Project getProject() {
@@ -56,6 +63,10 @@ public class JoiningQRCode extends NovaItem {
 
     public String getMembersEmails() {
         return membersEmails;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     @JsonIgnore

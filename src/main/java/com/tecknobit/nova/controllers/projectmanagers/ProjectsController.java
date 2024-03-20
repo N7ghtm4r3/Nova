@@ -36,8 +36,6 @@ public class ProjectsController extends ProjectManager {
 
     public static final String JOIN_ENDPOINT = "/join";
 
-    public static final String CHANGE_MEMBER_ROLE_ENDPOINT = "/changeMemberRole";
-
     public static final String REMOVE_MEMBER_ENDPOINT = "/removeMember";
 
     public static final String LEAVE_ENDPOINT = "/leave";
@@ -133,11 +131,14 @@ public class ProjectsController extends ProjectManager {
             loadJsonHelper(payload);
             List<String> membersEmails = JsonHelper.toList(jsonHelper.getJSONArray(PROJECT_MEMBERS_KEY, new JSONArray()));
             if(isMailingListValid(membersEmails)) {
-                String QRCodeId = generateIdentifier();
-                projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails);
-                return successResponse(new JSONObject()
-                        .put(IDENTIFIER_KEY, QRCodeId)
-                );
+                try {
+                    Role role = Role.valueOf(jsonHelper.getString(ROLE_KEY));
+                    String QRCodeId = generateIdentifier();
+                    projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role);
+                    return successResponse(new JSONObject().put(IDENTIFIER_KEY, QRCodeId));
+                } catch (Exception e) {
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                }
             } else
                 return failedResponse(WRONG_MAILING_LIST_MESSAGE);
         } else
@@ -183,7 +184,7 @@ public class ProjectsController extends ProjectManager {
                                                         email,
                                                         password,
                                                         language,
-                                                        Role.Customer
+                                                        joiningQRCode.getRole()
                                                 );
                                                 response.put(IDENTIFIER_KEY, userId)
                                                         .put(TOKEN_KEY, token)
@@ -197,8 +198,13 @@ public class ProjectsController extends ProjectManager {
                                         return failedResponse(WRONG_SURNAME_MESSAGE);
                                 } else
                                     return failedResponse(WRONG_NAME_MESSAGE);
-                            } else
+                            } else {
+                                if(user.getRole() != joiningQRCode.getRole()) {
+                                    projectsHelper.removeWrongEmailMember(joiningQRCode, user.getEmail());
+                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                                }
                                 userId = user.getId();
+                            }
                             projectsHelper.joinMember(joiningQRCode, email, userId);
                             return successResponse(response);
                         } else
@@ -215,36 +221,6 @@ public class ProjectsController extends ProjectManager {
             }
         } else
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
-    }
-
-    @PatchMapping(
-            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + CHANGE_MEMBER_ROLE_ENDPOINT,
-            headers = {
-                    TOKEN_KEY
-            }
-    )
-    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/changeMemberRole", method = PATCH)
-    public String changeMemberRole(
-            @PathVariable(IDENTIFIER_KEY) String id,
-            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
-            @RequestHeader(TOKEN_KEY) String token,
-            @RequestBody Map<String, String> payload
-    ) {
-        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
-            loadJsonHelper(payload);
-            String memberId = jsonHelper.getString(MEMBER_IDENTIFIER_KEY);
-            if(currentProject != null) {
-                User member = currentProject.getMember(memberId);
-                System.out.println(member);
-                if(member != null && member.isCustomer()) {
-                    usersHelper.changeUserRole(memberId);
-                    return successResponse();
-                } else
-                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
-            } else
-                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-        } else
-            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
     @PatchMapping(
