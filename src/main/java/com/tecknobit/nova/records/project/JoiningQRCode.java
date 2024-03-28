@@ -27,6 +27,10 @@ public class JoiningQRCode extends NovaItem {
 
     public static final String JOINING_QRCODES_TABLE = "joining_qrcodes";
 
+    public static final String JOIN_CODE_KEY = "join_code";
+
+    public static final String CREATE_JOIN_CODE_KEY = "createJoinCode";
+
     @ManyToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
@@ -45,16 +49,26 @@ public class JoiningQRCode extends NovaItem {
     @Column(name = ROLE_KEY)
     private final Role role;
 
+    @Column(
+            name = JOIN_CODE_KEY,
+            columnDefinition = "VARCHAR(6) DEFAULT NULL",
+            insertable = false,
+            unique = true
+    )
+    private final String joinCode;
+
     public JoiningQRCode() {
-        this(null, null, "", -1, null);
+        this(null, null, "", -1, null, null);
     }
 
-    public JoiningQRCode(String QRCodeId, Project project, String membersEmails, long creationDate, Role role) {
+    public JoiningQRCode(String QRCodeId, Project project, String membersEmails, long creationDate, Role role,
+                         String joinCode) {
         super(QRCodeId);
         this.project = project;
         this.membersEmails = membersEmails;
         this.creationDate = creationDate;
         this.role = role;
+        this.joinCode = joinCode;
     }
 
     public Project getProject() {
@@ -79,6 +93,10 @@ public class JoiningQRCode extends NovaItem {
 
     public long getCreationDate() {
         return creationDate;
+    }
+
+    public String getJoinCode() {
+        return joinCode;
     }
 
     public boolean isValid() {

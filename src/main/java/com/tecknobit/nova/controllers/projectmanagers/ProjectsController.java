@@ -23,7 +23,7 @@ import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.User.*;
-import static com.tecknobit.nova.records.project.JoiningQRCode.EXPIRED_JOINING_QRCODE_MESSAGE;
+import static com.tecknobit.nova.records.project.JoiningQRCode.*;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.novacore.InputValidator.*;
@@ -134,8 +134,13 @@ public class ProjectsController extends ProjectManager {
                 try {
                     Role role = Role.valueOf(jsonHelper.getString(ROLE_KEY));
                     String QRCodeId = generateIdentifier();
-                    projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role);
-                    return successResponse(new JSONObject().put(IDENTIFIER_KEY, QRCodeId));
+                    String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role,
+                            jsonHelper.getBoolean(CREATE_JOIN_CODE_KEY, false));
+                    JSONObject response = new JSONObject()
+                            .put(IDENTIFIER_KEY, QRCodeId);
+                    if(joinCode != null)
+                        response.put(JOIN_CODE_KEY, joinCode);
+                    return successResponse(response);
                 } catch (Exception e) {
                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
                 }
@@ -153,8 +158,14 @@ public class ProjectsController extends ProjectManager {
             @RequestBody Map<String, String> payload
     ) {
         loadJsonHelper(payload);
-        String QRCodeId = jsonHelper.getString(IDENTIFIER_KEY, "-1");
-        JoiningQRCode joiningQRCode = projectsHelper.getJoiningQrcode(QRCodeId);
+        JoiningQRCode joiningQRCode;
+        String QRCodeId = jsonHelper.getString(IDENTIFIER_KEY, null);
+        if(QRCodeId != null)
+            joiningQRCode = projectsHelper.getJoiningQrcode(QRCodeId);
+        else {
+            String joinCode = jsonHelper.getString(JOIN_CODE_KEY, "-1");
+            joiningQRCode = projectsHelper.getJoiningQrcodeByJoinCode(joinCode);
+        }
         if(joiningQRCode != null) {
             if(joiningQRCode.isValid()) {
                 String email = jsonHelper.getString(EMAIL_KEY, "").toLowerCase();

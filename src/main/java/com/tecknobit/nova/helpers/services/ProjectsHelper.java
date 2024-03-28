@@ -19,6 +19,7 @@ import static com.tecknobit.nova.records.User.*;
 import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
 import static com.tecknobit.nova.records.project.Project.LOGO_URL_KEY;
 import static java.lang.System.currentTimeMillis;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 @Service
 public class ProjectsHelper implements ResourcesManager {
@@ -59,13 +60,22 @@ public class ProjectsHelper implements ResourcesManager {
         return projectsRepository.getProject(projectId, userId);
     }
 
-    public void createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role) {
-        joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), projectId,
+    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role,
+                                    boolean createJoinQRCode) {
+        String joinCode = null;
+        if(createJoinQRCode)
+            joinCode = randomAlphanumeric(6).toUpperCase();
+        joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), joinCode, projectId,
                 formatAllowedEmails(membersEmails), role.name());
+        return joinCode;
     }
 
     public JoiningQRCode getJoiningQrcode(String QRCodeId) {
         return joiningQRCodeRepository.getJoiningQRCode(QRCodeId);
+    }
+
+    public JoiningQRCode getJoiningQrcodeByJoinCode(String joinCode) {
+        return joiningQRCodeRepository.getJoiningQRCodeByJoinCode(joinCode);
     }
 
     public void removeMemberFromMailingList(JoiningQRCode joiningQRCode, String email) {

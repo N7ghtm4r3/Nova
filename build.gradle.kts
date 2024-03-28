@@ -29,6 +29,7 @@ dependencies {
     implementation("org.json:json:20230227")
     implementation("com.vladsch.flexmark:flexmark-all:0.64.8")
     implementation("com.github.N7ghtm4r3:Mantis:1.0.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
     //TO-DO: TO REMOVE FOR TESTING PURPOSES ONLY
     implementation("com.tecknobit.novacore:Nova-core:1.0.0")
 }

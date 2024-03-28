@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.User.ROLE_KEY;
 import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
+import static com.tecknobit.nova.records.project.JoiningQRCode.JOIN_CODE_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_TABLE;
 import static com.tecknobit.nova.records.release.Release.CREATION_DATE_KEY;
@@ -27,12 +28,14 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
                     " ("
                     + IDENTIFIER_KEY + ","
                     + CREATION_DATE_KEY + ","
+                    + JOIN_CODE_KEY + ","
                     + PROJECT_IDENTIFIER_KEY + ","
                     + PROJECT_MEMBERS_TABLE + ","
                     + ROLE_KEY + ")"
                     + " VALUES ("
                     + ":" + IDENTIFIER_KEY + ","
                     + ":" + CREATION_DATE_KEY + ","
+                    + ":" + JOIN_CODE_KEY + ","
                     + ":" + PROJECT_IDENTIFIER_KEY + ","
                     + ":" + ROLE_KEY + ","
                     + ":" + PROJECT_MEMBERS_TABLE
@@ -42,6 +45,7 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
     void insertJoiningQRCode(
             @Param(IDENTIFIER_KEY) String joiningQRCodeId,
             @Param(CREATION_DATE_KEY) long creationDate,
+            @Param(JOIN_CODE_KEY) String joinCode,
             @Param(PROJECT_IDENTIFIER_KEY) String projectId,
             @Param(ROLE_KEY) String role,
             @Param(PROJECT_MEMBERS_TABLE) String projectMembers
@@ -53,6 +57,14 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
     )
     JoiningQRCode getJoiningQRCode(
             @Param(IDENTIFIER_KEY) String joiningQRCodeId
+    );
+
+    @Query(
+            value = "SELECT * FROM " + JOINING_QRCODES_TABLE + " WHERE " + JOIN_CODE_KEY + "=:" + JOIN_CODE_KEY,
+            nativeQuery = true
+    )
+    JoiningQRCode getJoiningQRCodeByJoinCode(
+            @Param(JOIN_CODE_KEY) String joinCode
     );
 
     @Modifying(clearAutomatically = true)
