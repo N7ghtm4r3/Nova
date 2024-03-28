@@ -13,24 +13,31 @@ import java.util.Map;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.Launcher.protector;
-import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
-import static com.tecknobit.novacore.records.User.*;
 import static com.tecknobit.novacore.InputValidator.*;
+import static com.tecknobit.novacore.helpers.Requester.BASE_ENDPOINT;
+import static com.tecknobit.novacore.records.User.*;
 
 @RestController
+//TODO: USE FROM CORE LIBRARY
 @RequestMapping(path = BASE_ENDPOINT + USERS_KEY)
 public class UsersController extends NovaController {
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String SIGN_UP_ENDPOINT = "/signUp";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String SIGN_IN_ENDPOINT = "/signIn";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String CHANGE_PROFILE_PIC_ENDPOINT = "/changeProfilePic";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String CHANGE_EMAIL_ENDPOINT = "/changeEmail";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String CHANGE_PASSWORD_ENDPOINT = "/changePassword";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String CHANGE_LANGUAGE_ENDPOINT = "/changeLanguage";
 
     private final UsersHelper usersHelper;

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
-import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
+import static com.tecknobit.novacore.helpers.Requester.BASE_ENDPOINT;
 import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.*;

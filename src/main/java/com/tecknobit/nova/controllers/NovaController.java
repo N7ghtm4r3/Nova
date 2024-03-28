@@ -19,13 +19,6 @@ import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardRespon
 @Structure
 public abstract class NovaController {
 
-    /**
-     * {@code BASE_ENDPOINT} the base endpoint for the backend service
-     */
-    public static final String BASE_ENDPOINT = "/api/v1/";
-
-    public static final String LIST_ENDPOINT = "list";
-
     public static final String WRONG_PROCEDURE_MESSAGE = "Wrong procedure";
 
     /**
@@ -36,8 +29,10 @@ public abstract class NovaController {
 
     public static final String RESPONSE_SUCCESSFUL_MESSAGE = "Operation executed successfully";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String RESPONSE_STATUS_KEY = "status";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String RESPONSE_MESSAGE_KEY = "response";
 
     @Autowired
@@ -87,7 +82,7 @@ public abstract class NovaController {
 
     private String plainResponse(StandardResponseCode responseCode, String message) {
         return new JSONObject()
-                .put(RESPONSE_STATUS_KEY, responseCode.getCode())
+                .put(RESPONSE_STATUS_KEY, responseCode)
                 .put(RESPONSE_MESSAGE_KEY, message).toString();
     }
 
