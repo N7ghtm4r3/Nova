@@ -20,6 +20,15 @@ public class Endpoints {
 
     public static final String CHANGE_LANGUAGE_ENDPOINT = "/changeLanguage";
 
+    /**PROJECTS ENDPOINTS**/
+    public static final String ADD_MEMBERS_ENDPOINT = "/addMembers";
+
+    public static final String JOIN_ENDPOINT = "/join";
+
+    public static final String REMOVE_MEMBER_ENDPOINT = "/removeMember";
+
+    public static final String LEAVE_ENDPOINT = "/leave";
+
     private Endpoints() {
     }
 

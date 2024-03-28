@@ -31,8 +31,6 @@ open class Requester (
 
     protected val mustValidateCertificates = host.startsWith("https")
 
-    protected lateinit var lastResponse: JSONObject
-
     init {
         changeHost(host + BASE_ENDPOINT)
         setUserCredentials(userId, userToken)
@@ -44,10 +42,8 @@ open class Requester (
     ) {
         this.userId = userId
         this.userToken = userToken
-        if(userId != null) {
-            headers.addHeader(IDENTIFIER_KEY, userId)
+        if(userToken != null)
             headers.addHeader(TOKEN_KEY, userToken)
-        }
     }
 
     fun changeHost(
@@ -90,12 +86,91 @@ open class Requester (
         )
     }
 
-    /*@Wrapper
+    fun changeProfilePic() {
+        TODO("TO IMPLEMENT LATER")
+    }
+
+    fun changeEmail(
+        newEmail: String
+    ): JSONObject {
+        val payload = Params()
+        payload.addParam(EMAIL_KEY, newEmail)
+        return execPatch(
+            endpoint = assembleUsersEndpointPath(CHANGE_EMAIL_ENDPOINT),
+            payload = payload
+        )
+    }
+
+    fun changePassword(
+        newPassword: String
+    ): JSONObject {
+        val payload = Params()
+        payload.addParam(PASSWORD_KEY, newPassword)
+        return execPatch(
+            endpoint = assembleUsersEndpointPath(CHANGE_PASSWORD_ENDPOINT),
+            payload = payload
+        )
+    }
+
+    fun changeLanguage(
+        newLanguage: String
+    ): JSONObject {
+        val payload = Params()
+        payload.addParam(LANGUAGE_KEY, newLanguage)
+        return execPatch(
+            endpoint = assembleUsersEndpointPath(CHANGE_LANGUAGE_ENDPOINT),
+            payload = payload
+        )
+    }
+
+    fun deleteAccount(): JSONObject {
+        return execDelete(
+            endpoint = assembleUsersEndpointPath()
+        )
+    }
+
+    private fun assembleUsersEndpointPath(
+        endpoint: String = ""
+    ): String {
+        return "$USERS_KEY/$userId$endpoint"
+    }
+
+    fun listProjects() : JSONObject {
+        return execGet(
+            endpoint = assembleProjectsEndpointPath()
+        )
+    }
+
+    fun addProject() {
+        TODO("TO IMPLEMENT LATER")
+    }
+
+    fun getProject(
+        projectId: String
+    ) : JSONObject {
+        return execGet(
+            endpoint = assembleProjectsEndpointPath(projectId)
+        )
+    }
+
+    private fun assembleProjectsEndpointPath(
+        endpoint: String = ""
+    ): String {
+        var vEndpoint: String = endpoint
+        if(endpoint.isNotEmpty() && !endpoint.startsWith("/"))
+            vEndpoint = "/$endpoint"
+        return "$userId/$PROJECTS_KEY$vEndpoint"
+    }
+
+    @Wrapper
     private fun execGet(
         endpoint: String
     ) : JSONObject {
-
-    }*/
+        return execRequest(
+            method = RequestMethod.GET,
+            endpoint = endpoint
+        )
+    }
 
     @Wrapper
     private fun execPost(
@@ -116,14 +191,18 @@ open class Requester (
         payload: Params
     ) : JSONObject {
 
-    }
+    }*/
 
     @Wrapper
     private fun execPatch(
         endpoint: String,
         payload: Params
     ) : JSONObject {
-
+        return execRequest(
+            method = RequestMethod.PATCH,
+            endpoint = endpoint,
+            payload = payload
+        )
     }
 
     @Wrapper
@@ -131,8 +210,12 @@ open class Requester (
         endpoint: String,
         payload: Params? = null
     ) : JSONObject {
-
-    }*/
+        return execRequest(
+            method = RequestMethod.DELETE,
+            endpoint = endpoint,
+            payload = payload
+        )
+    }
 
     protected fun execRequest(
         method: RequestMethod,
@@ -140,11 +223,13 @@ open class Requester (
         payload: Params? = null
     ) : JSONObject {
         var response: String? = null
+        val jResponse: JSONObject
         if(mustValidateCertificates)
             apiRequest.validateSelfSignedCertificate()
         runBlocking {
             async {
                 val requestUrl = host + endpoint
+                println(requestUrl)
                 if(payload != null) {
                     apiRequest.sendJSONPayloadedAPIRequest(
                         requestUrl,
@@ -161,9 +246,9 @@ open class Requester (
                 }
                 response = apiRequest.response
             }.await()
-            lastResponse = JSONObject(response)
+            jResponse = JSONObject(response)
         }
-        return lastResponse
+        return jResponse
     }
 
     fun manageResponse(
