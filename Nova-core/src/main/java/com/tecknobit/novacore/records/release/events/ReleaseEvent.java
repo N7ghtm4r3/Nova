@@ -1,14 +1,14 @@
-package com.tecknobit.nova.records.release.events;
+package com.tecknobit.novacore.records.release.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
-import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.release.Release;
+import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 
-import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.release.Release.RELEASE_IDENTIFIER_KEY;
 
 @Entity
 @Structure

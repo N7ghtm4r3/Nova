@@ -1,6 +1,6 @@
 package com.tecknobit.nova.helpers.services.repositories.projectsutils;
 
-import com.tecknobit.nova.records.project.JoiningQRCode;
+import com.tecknobit.novacore.records.project.JoiningQRCode;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,13 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.User.ROLE_KEY;
-import static com.tecknobit.nova.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
-import static com.tecknobit.nova.records.project.JoiningQRCode.JOIN_CODE_KEY;
-import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_TABLE;
-import static com.tecknobit.nova.records.release.Release.CREATION_DATE_KEY;
+import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.User.ROLE_KEY;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_TABLE;
+import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;
 
 @Service
 @Repository

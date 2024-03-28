@@ -1,6 +1,6 @@
 package com.tecknobit.nova.helpers.services.repositories.projectsutils;
 
-import com.tecknobit.nova.records.project.Project;
+import com.tecknobit.novacore.records.project.Project;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.User.*;
-import static com.tecknobit.nova.records.project.Project.*;
+import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.project.Project.*;
 
 @Service
 @Repository

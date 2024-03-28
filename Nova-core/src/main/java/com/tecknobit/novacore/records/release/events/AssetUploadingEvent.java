@@ -1,21 +1,20 @@
-package com.tecknobit.nova.records.release.events;
+package com.tecknobit.novacore.records.release.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.release.Release;
+import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.release.Release.ReleaseStatus.Verifying;
-import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.ASSET_UPLOADING_EVENTS_KEY;
-import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.*;
+import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.Verifying;
+import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
 
 @Entity
-@Table(name = ASSET_UPLOADING_EVENTS_KEY)
+@Table(name = AssetUploadingEvent.ASSET_UPLOADING_EVENTS_KEY)
 public class AssetUploadingEvent extends ReleaseStandardEvent {
 
     public static final String ASSET_UPLOADING_EVENT_KEY = "assetUploadingEvent";

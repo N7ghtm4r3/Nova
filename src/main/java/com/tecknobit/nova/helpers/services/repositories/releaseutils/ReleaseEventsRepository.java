@@ -1,6 +1,6 @@
 package com.tecknobit.nova.helpers.services.repositories.releaseutils;
 
-import com.tecknobit.nova.records.release.events.ReleaseEvent;
+import com.tecknobit.novacore.records.release.events.ReleaseEvent;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,16 +9,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.release.Release.RELEASE_EVENTS_KEY;
-import static com.tecknobit.nova.records.release.Release.RELEASE_IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.*;
-import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
-import static com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded.ASSET_URL_KEY;
-import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REASONS_KEY;
-import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REJECTED_RELEASE_EVENTS_KEY;
-import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
-import static com.tecknobit.nova.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
+import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.release.Release.RELEASE_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.*;
+import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
+import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSET_URL_KEY;
+import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REASONS_KEY;
+import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REJECTED_RELEASE_EVENTS_KEY;
+import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
+import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
 
 @Service
 @Repository

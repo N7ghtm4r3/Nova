@@ -1,13 +1,13 @@
-package com.tecknobit.nova.records;
+package com.tecknobit.novacore.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tecknobit.nova.records.project.Project;
+import com.tecknobit.novacore.records.project.Project;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
-import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 import static jakarta.persistence.EnumType.STRING;
 
 @Entity

@@ -1,6 +1,6 @@
 package com.tecknobit.nova.helpers.services.repositories;
 
-import com.tecknobit.nova.records.User;
+import com.tecknobit.novacore.records.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import static com.tecknobit.nova.records.User.*;
+import static com.tecknobit.novacore.records.User.*;
 
 @Service
 @Repository

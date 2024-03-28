@@ -1,14 +1,12 @@
-package com.tecknobit.nova.records.release.events;
+package com.tecknobit.novacore.records.release.events;
 
-import com.tecknobit.nova.records.release.Release;
+import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.REJECTED_RELEASE_EVENTS_KEY;
-
 @Entity
-@Table(name = REJECTED_RELEASE_EVENTS_KEY)
+@Table(name = RejectedReleaseEvent.REJECTED_RELEASE_EVENTS_KEY)
 public class RejectedReleaseEvent extends ReleaseStandardEvent {
 
     public static final String REJECTED_RELEASE_EVENTS_KEY = "rejected_release_events";

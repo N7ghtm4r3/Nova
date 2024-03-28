@@ -2,7 +2,7 @@ package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.nova.controllers.NovaController;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
-import com.tecknobit.nova.records.project.Project;
+import com.tecknobit.novacore.records.project.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class ProjectManager extends NovaController {

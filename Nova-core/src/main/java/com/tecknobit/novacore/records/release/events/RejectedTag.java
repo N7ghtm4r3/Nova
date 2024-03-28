@@ -1,19 +1,18 @@
-package com.tecknobit.nova.records.release.events;
+package com.tecknobit.novacore.records.release.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.release.events.ReleaseEvent.ReleaseTag;
+import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import static com.tecknobit.nova.records.release.events.RejectedReleaseEvent.TAGS_KEY;
-import static com.tecknobit.nova.records.release.events.RejectedTag.REJECTED_TAGS_KEY;
-import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
+import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY;
+import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
 
 @Entity
-@Table(name = REJECTED_TAGS_KEY)
+@Table(name = RejectedTag.REJECTED_TAGS_KEY)
 public final class RejectedTag extends NovaItem {
 
     public static final String REJECTED_TAGS_KEY = "rejected_tags";

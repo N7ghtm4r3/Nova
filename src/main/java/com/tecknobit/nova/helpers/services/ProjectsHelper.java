@@ -2,9 +2,10 @@ package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
-import com.tecknobit.nova.records.project.JoiningQRCode;
-import com.tecknobit.nova.records.project.Project;
-import com.tecknobit.nova.records.release.Release;
+import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.project.JoiningQRCode;
+import com.tecknobit.novacore.records.project.Project;
+import com.tecknobit.novacore.records.release.Release;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.tecknobit.nova.records.User.*;
-import static com.tecknobit.nova.records.project.Project.AUTHOR_KEY;
-import static com.tecknobit.nova.records.project.Project.LOGO_URL_KEY;
+import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;
+import static com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY;
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
@@ -60,7 +62,7 @@ public class ProjectsHelper implements ResourcesManager {
         return projectsRepository.getProject(projectId, userId);
     }
 
-    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role,
+    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, User.Role role,
                                     boolean createJoinQRCode) {
         String joinCode = null;
         if(createJoinQRCode)

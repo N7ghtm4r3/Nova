@@ -1,11 +1,11 @@
 package com.tecknobit.nova.helpers;
 
 import com.tecknobit.mantis.Mantis;
-import com.tecknobit.nova.records.project.Project;
-import com.tecknobit.nova.records.release.Release;
-import com.tecknobit.nova.records.release.Release.ReleaseStatus;
-import com.tecknobit.nova.records.release.events.*;
-import com.tecknobit.nova.records.release.events.AssetUploadingEvent.AssetUploaded;
+import com.tecknobit.novacore.records.project.Project;
+import com.tecknobit.novacore.records.release.Release;
+import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
+import com.tecknobit.novacore.records.release.events.*;
+import com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;

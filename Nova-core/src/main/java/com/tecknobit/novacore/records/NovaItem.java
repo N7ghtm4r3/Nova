@@ -1,4 +1,4 @@
-package com.tecknobit.nova.records;
+package com.tecknobit.novacore.records;
 
 import com.tecknobit.apimanager.annotations.Structure;
 import jakarta.persistence.*;

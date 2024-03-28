@@ -5,7 +5,7 @@ import com.tecknobit.apimanager.apis.sockets.SocketManager;
 import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.nova.helpers.services.repositories.UsersRepository;
-import com.tecknobit.nova.records.User;
+import com.tecknobit.novacore.records.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 

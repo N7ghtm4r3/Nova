@@ -5,6 +5,7 @@ import com.tecknobit.apimanager.exceptions.SaveData;
 import com.tecknobit.nova.helpers.ResourcesProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,8 @@ import static com.tecknobit.nova.helpers.ResourcesProvider.*;
         @PropertySource(value = "classpath:" + DEFAULT_CONFIGURATION_FILE_PATH),
         @PropertySource(value = "file:" + CUSTOM_CONFIGURATION_FILE_PATH, ignoreResourceNotFound = true)
 })
-@EnableJpaRepositories("com.tecknobit.nova.helpers.services.repositories")
+@EnableJpaRepositories("com.tecknobit.*")
+@EntityScan("com.tecknobit.*")
 public class Launcher {
 
     public static final ServerProtector protector = new ServerProtector("tecknobit/nova/backend",

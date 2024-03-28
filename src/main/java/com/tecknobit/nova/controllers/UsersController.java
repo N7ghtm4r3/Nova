@@ -2,7 +2,7 @@ package com.tecknobit.nova.controllers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.nova.helpers.services.UsersHelper;
-import com.tecknobit.nova.records.User;
+import com.tecknobit.novacore.records.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.Launcher.protector;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
-import static com.tecknobit.nova.records.User.*;
+import static com.tecknobit.novacore.records.User.*;
 import static com.tecknobit.novacore.InputValidator.*;
 
 @RestController

@@ -5,9 +5,9 @@ import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ProjectsHelper.ProjectPayload;
 import com.tecknobit.nova.helpers.services.UsersHelper;
-import com.tecknobit.nova.records.User;
-import com.tecknobit.nova.records.project.JoiningQRCode;
-import com.tecknobit.nova.records.project.Project;
+import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.project.JoiningQRCode;
+import com.tecknobit.novacore.records.project.Project;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +21,12 @@ import java.util.Map;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.controllers.NovaController.BASE_ENDPOINT;
-import static com.tecknobit.nova.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.User.*;
-import static com.tecknobit.nova.records.project.JoiningQRCode.*;
-import static com.tecknobit.nova.records.project.Project.PROJECT_IDENTIFIER_KEY;
-import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.novacore.InputValidator.*;
+import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 
 @RestController
 @RequestMapping(BASE_ENDPOINT)
@@ -132,7 +132,7 @@ public class ProjectsController extends ProjectManager {
             List<String> membersEmails = JsonHelper.toList(jsonHelper.getJSONArray(PROJECT_MEMBERS_KEY, new JSONArray()));
             if(isMailingListValid(membersEmails)) {
                 try {
-                    Role role = Role.valueOf(jsonHelper.getString(ROLE_KEY));
+                    User.Role role = User.Role.valueOf(jsonHelper.getString(ROLE_KEY));
                     String QRCodeId = generateIdentifier();
                     String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role,
                             jsonHelper.getBoolean(CREATE_JOIN_CODE_KEY, false));

@@ -2,8 +2,8 @@ package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.apis.APIRequest;
 import com.tecknobit.nova.helpers.services.repositories.UsersRepository;
-import com.tecknobit.nova.records.User;
-import com.tecknobit.nova.records.User.Role;
+import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.User.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,24 +1,23 @@
-package com.tecknobit.nova.records.release;
+package com.tecknobit.novacore.records.release;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
-import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.project.Project;
-import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
-import com.tecknobit.nova.records.release.events.RejectedReleaseEvent;
-import com.tecknobit.nova.records.release.events.ReleaseEvent;
+import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.project.Project;
+import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
+import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent;
+import com.tecknobit.novacore.records.release.events.ReleaseEvent;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.project.Project.PROJECT_KEY;
-import static com.tecknobit.nova.records.project.Project.PROJECT_MEMBERS_KEY;
-import static com.tecknobit.nova.records.release.Release.RELEASES_KEY;
-import static com.tecknobit.nova.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_KEY;
+import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
 
 @Entity
-@Table(name = RELEASES_KEY)
+@Table(name = Release.RELEASES_KEY)
 public class Release extends NovaItem {
 
     public static final List<String> ALLOWED_ASSETS_TYPE = List.of(

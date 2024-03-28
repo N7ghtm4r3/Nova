@@ -4,12 +4,12 @@ import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseEventsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseTagRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleasesRepository;
-import com.tecknobit.nova.records.release.Release;
-import com.tecknobit.nova.records.release.Release.ReleaseStatus;
-import com.tecknobit.nova.records.release.events.AssetUploadingEvent;
-import com.tecknobit.nova.records.release.events.RejectedReleaseEvent;
-import com.tecknobit.nova.records.release.events.ReleaseEvent;
-import com.tecknobit.nova.records.release.events.ReleaseEvent.ReleaseTag;
+import com.tecknobit.novacore.records.release.Release;
+import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
+import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
+import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent;
+import com.tecknobit.novacore.records.release.events.ReleaseEvent;
+import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.tecknobit.nova.Launcher.generateIdentifier;
-import static com.tecknobit.nova.records.release.Release.ReleaseStatus.*;
+import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 
 @Service
 public class ReleasesHelper implements ResourcesManager {

@@ -1,17 +1,17 @@
-package com.tecknobit.nova.records.project;
+package com.tecknobit.novacore.records.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.tecknobit.nova.records.NovaItem;
-import com.tecknobit.nova.records.User;
-import com.tecknobit.nova.records.release.Release;
+import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
-import static com.tecknobit.nova.records.User.*;
+import static com.tecknobit.novacore.records.User.*;
 
 @Entity
 @Table(name = PROJECTS_KEY)
