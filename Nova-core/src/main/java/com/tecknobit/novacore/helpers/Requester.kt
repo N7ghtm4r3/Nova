@@ -9,17 +9,26 @@ import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.records.User.*
 import com.tecknobit.novacore.records.project.JoiningQRCode.CREATE_JOIN_CODE_KEY
 import com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY
+import com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY
 import com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY
 import com.tecknobit.novacore.records.release.Release.*
+import com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY
 import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REASONS_KEY
 import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY
 import com.tecknobit.novacore.records.release.events.RejectedTag.COMMENT_KEY
-import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent
 import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
+import org.springframework.core.io.FileSystemResource
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
+import org.springframework.web.client.RestTemplate
+import java.io.File
 
 open class Requester (
     protected var host: String,
@@ -96,8 +105,15 @@ open class Requester (
         )
     }
 
-    fun changeProfilePic() {
-        TODO("TO IMPLEMENT LATER")
+    fun changeProfilePic(
+        profilePic: File
+    ) : JSONObject {
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        body.add(PROFILE_PIC_URL_KEY, FileSystemResource(profilePic))
+        return execMultipartRequest(
+            body = body,
+            endpoint = assembleUsersEndpointPath(CHANGE_PROFILE_PIC_ENDPOINT)
+        )
     }
 
     fun changeEmail(
@@ -151,8 +167,17 @@ open class Requester (
         )
     }
 
-    fun addProject() {
-        TODO("TO IMPLEMENT LATER")
+    fun addProject(
+        logoPic: File,
+        projectName: String
+    ) : JSONObject {
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        body.add(LOGO_URL_KEY, FileSystemResource(logoPic))
+        body.add(NAME_KEY, projectName)
+        return execMultipartRequest(
+            body = body,
+            endpoint = assembleProjectsEndpointPath()
+        )
     }
 
     fun getProject(
@@ -301,8 +326,41 @@ open class Requester (
         )
     }
 
-    fun uploadAsset() {
-        TODO("TO IMPLEMENT LATER")
+    fun uploadAsset(
+        projectId: String,
+        releaseId: String,
+        assets: List<File>
+    ) : JSONObject {
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        val fileSystemResourceAssets = mutableListOf<FileSystemResource> ()
+        assets.forEach { asset ->
+            fileSystemResourceAssets.add(FileSystemResource(asset))
+        }
+        body.add(ASSETS_UPLOADED_KEY, fileSystemResourceAssets)
+        return execMultipartRequest(
+            body = body,
+            endpoint = assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId
+            )
+        )
+    }
+
+    protected fun execMultipartRequest(
+        body: MultiValueMap<String, Any>,
+        endpoint: String
+    ) : JSONObject {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.MULTIPART_FORM_DATA
+        headers.add(TOKEN_KEY, userToken)
+        val requestEntity: HttpEntity<Any?> = HttpEntity<Any?>(body, headers)
+        val restTemplate = RestTemplate()
+        val response = restTemplate.postForEntity(
+            host + endpoint,
+            requestEntity,
+            String::class.java
+        ).body
+        return JSONObject(response)
     }
 
     fun commentAsset(
@@ -310,13 +368,15 @@ open class Requester (
         releaseId: String,
         eventId: String,
         releaseStatus: ReleaseStatus,
-        reasons: String,
-        tags: String
+        reasons: String? = null,
+        tags: String? = null
     ) : JSONObject {
         val payload = Params()
         payload.addParam(RELEASE_EVENT_STATUS_KEY, releaseStatus)
-        payload.addParam(REASONS_KEY, reasons)
-        payload.addParam(TAGS_KEY, formatValuesList(tags))
+        if(reasons != null)
+            payload.addParam(REASONS_KEY, reasons)
+        if(tags != null)
+            payload.addParam(TAGS_KEY, formatValuesList(tags))
         return execPost(
             endpoint = assembleReleasesEndpointPath(
                 projectId = projectId,
@@ -345,6 +405,47 @@ open class Requester (
                 endpoint = EVENTS_ENDPOINT
             ),
             payload = payload
+        )
+    }
+
+    fun promoteRelease(
+        projectId: String,
+        releaseId: String,
+        releaseStatus: ReleaseStatus
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(RELEASE_STATUS_KEY, releaseStatus)
+        return execPatch(
+            endpoint =  assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId,
+            ),
+            payload = payload
+        )
+    }
+
+    fun createReportRelease(
+        projectId: String,
+        releaseId: String
+    ) : JSONObject {
+        return execGet(
+            endpoint =  assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId,
+                endpoint = CREATE_REPORT_ENDPOINT
+            )
+        )
+    }
+
+    fun deleteRelease(
+        projectId: String,
+        releaseId: String
+    ) : JSONObject {
+        return execDelete(
+            endpoint =  assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId
+            )
         )
     }
 
@@ -462,15 +563,16 @@ open class Requester (
         return jResponse
     }
 
-    fun manageResponse(
-        response: JSONObject,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+    fun sendRequest(
+        request: () -> JSONObject,
+        onSuccess: (JSONObject) -> Unit,
+        onFailure: (JSONObject) -> Unit
     ) {
+        val response = request.invoke()
         if(isSuccessfulResponse(response))
-            onSuccess.invoke()
+            onSuccess.invoke(response)
         else
-            onFailure.invoke()
+            onFailure.invoke(response)
     }
 
     private fun isSuccessfulResponse(

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
@@ -46,7 +47,7 @@ public class ReleasesHelper implements ResourcesManager {
         return releasesRepository.findById(releaseId).orElse(null);
     }
 
-    public boolean uploadAssets(String releaseId, MultipartFile[] assets) throws IOException {
+    public boolean uploadAssets(String releaseId, List<MultipartFile> assets) throws IOException {
         String eventId = generateIdentifier();
         releaseEventsRepository.insertAssetUploading(
                 eventId,
@@ -155,5 +156,7 @@ public class ReleasesHelper implements ResourcesManager {
         deleteReportResource(releaseId);
         releasesRepository.deleteRelease(releaseId);
     }
+
+    public record UploadingAssets(List<MultipartFile> assets_uploaded){}
 
 }

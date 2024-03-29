@@ -116,7 +116,7 @@ public class ReportsProvider {
         Project project = currentRelease.getProject();
         reportTemplate = insertLogo(project)
                 .replaceAll(PROJECT_NAME_TAG, project.getName())
-                .replaceAll(RELEASE_VERSION_TAG, "v. " + currentRelease.getReleaseVersion())
+                .replaceAll(RELEASE_VERSION_TAG, currentRelease.getReleaseVersion())
                 .replaceAll(RELEASE_CREATION_DATE_TAG, mantis.getResource("creation_date_key")
                         + " " + currentRelease.getCreationDate())
                 .replaceAll(RELEASE_STATUS_TAG, releaseStatusBadge(currentRelease.getStatus()))

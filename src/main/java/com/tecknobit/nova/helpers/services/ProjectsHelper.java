@@ -124,6 +124,6 @@ public class ProjectsHelper implements ResourcesManager {
         deleteLogoResource(projectId);
     }
 
-    public record ProjectPayload(MultipartFile logoUrl, String name) {}
+    public record ProjectPayload(MultipartFile logo_url, String name) {}
 
 }

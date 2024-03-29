@@ -18,6 +18,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("commons-validator:commons-validator:1.7")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.3")
+    implementation("org.springframework:spring-web:6.1.5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.4")
     implementation("com.github.N7ghtm4r3:APIManager:2.2.1")
     implementation("org.json:json:20230227")
@@ -35,6 +36,10 @@ afterEvaluate {
             }
         }
     }
+}
+
+configurations.all {
+    exclude("commons-logging", "commons-logging")
 }
 
 tasks.test {

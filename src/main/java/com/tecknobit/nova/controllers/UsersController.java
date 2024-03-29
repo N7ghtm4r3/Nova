@@ -131,13 +131,13 @@ public class UsersController extends NovaController {
             return failedResponse(WRONG_EMAIL_MESSAGE);
     }
 
-    @PatchMapping(
+    @PostMapping(
             path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PROFILE_PIC_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
     )
-    @RequestPath(path = "/api/v1/users/{id}/changeProfilePic", method = PATCH)
+    @RequestPath(path = "/api/v1/users/{id}/changeProfilePic", method = POST)
     public String changeProfilePic(
             @PathVariable(IDENTIFIER_KEY) String id,
             @RequestHeader(TOKEN_KEY) String token,

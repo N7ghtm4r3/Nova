@@ -82,9 +82,9 @@ public class ProjectsController extends ProjectManager {
             @RequestHeader(TOKEN_KEY) String token,
             @ModelAttribute ProjectPayload payload
     ) {
-        if(isMe(id, token)) {
+        if(isMe(id, token) && me.isVendor()) {
             try {
-                MultipartFile logo = payload.logoUrl();
+                MultipartFile logo = payload.logo_url();
                 String name = payload.name();
                 if(!logo.isEmpty() && isProjectNameValid(name))
                     return successResponse(projectsHelper.addProject(name, logo, generateIdentifier(), id));

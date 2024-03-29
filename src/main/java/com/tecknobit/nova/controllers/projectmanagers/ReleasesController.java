@@ -12,7 +12,6 @@ import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +28,6 @@ import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_
 import static com.tecknobit.novacore.records.release.Release.*;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.ASSET_UPLOADING_EVENT_IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REASONS_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedTag.COMMENT_KEY;
@@ -129,19 +127,19 @@ public class ReleasesController extends ProjectManager {
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
     )
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PUT)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = POST)
     public String uploadAsset(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
             @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token,
-            @RequestParam(ASSETS_UPLOADED_KEY) MultipartFile[] assets
+            @ModelAttribute ReleasesHelper.UploadingAssets assets
     ) {
         if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
             Release release = getReleaseIfAuthorized(releaseId);
@@ -149,7 +147,7 @@ public class ReleasesController extends ProjectManager {
                 switch (release.getStatus()) {
                     case New, Rejected, Alpha, Beta -> {
                         try {
-                            if(releasesHelper.uploadAssets(releaseId, assets))
+                            if(releasesHelper.uploadAssets(releaseId, assets.assets_uploaded()))
                                 return successResponse();
                             return failedResponse(WRONG_ASSETS_MESSAGE);
                         } catch (IOException e) {
@@ -312,7 +310,7 @@ public class ReleasesController extends ProjectManager {
                                 releasesHelper.setAlphaStatus(releaseId);
                             }
                             case Beta -> {
-                                if(currentReleaseStatus == Beta)
+                                if(currentReleaseStatus == Approved || currentReleaseStatus == Beta)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
                                 releasesHelper.setBetaStatus(releaseId);
                             }
