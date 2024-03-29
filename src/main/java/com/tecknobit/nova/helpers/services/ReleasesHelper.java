@@ -33,10 +33,6 @@ public class ReleasesHelper implements ResourcesManager {
     private ReleaseTagRepository releaseTagRepository;
 
     public void addRelease(String projectId, String releaseId, String releaseVersion, String releaseNotesContent) {
-        releaseVersion = releaseVersion.replaceFirst("^v\\.", "");
-        if(!releaseVersion.startsWith(" "))
-            releaseVersion = " " + releaseVersion;
-        releaseVersion = "v." + releaseVersion;
         releasesRepository.addRelease(
                 releaseId,
                 System.currentTimeMillis(),

@@ -7,8 +7,18 @@ import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode
 import com.tecknobit.novacore.helpers.Endpoints.*
 import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.records.User.*
+import com.tecknobit.novacore.records.project.JoiningQRCode.CREATE_JOIN_CODE_KEY
+import com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY
+import com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY
+import com.tecknobit.novacore.records.release.Release.*
+import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REASONS_KEY
+import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY
+import com.tecknobit.novacore.records.release.events.RejectedTag.COMMENT_KEY
+import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent
+import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import org.json.JSONArray
 import org.json.JSONObject
 
 open class Requester (
@@ -153,6 +163,106 @@ open class Requester (
         )
     }
 
+    fun addMembers(
+        projectId: String,
+        mailingList: String,
+        role: Role,
+        createJoinCode: Boolean
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(PROJECT_MEMBERS_KEY, formatValuesList(mailingList))
+        payload.addParam(ROLE_KEY, role)
+        payload.addParam(CREATE_JOIN_CODE_KEY, createJoinCode)
+        return execPut(
+            endpoint = assembleProjectsEndpointPath(projectId + ADD_MEMBERS_ENDPOINT),
+            payload = payload
+        )
+    }
+
+    @Wrapper
+    fun joinWithId(
+        id: String,
+        email: String,
+        name: String,
+        surname: String,
+        password: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(IDENTIFIER_KEY, id)
+        return join(
+            payload = payload,
+            email = email,
+            name = name,
+            surname = surname,
+            password = password
+        )
+    }
+
+    @Wrapper
+    fun joinWithCode(
+        joinCode: String,
+        email: String,
+        name: String,
+        surname: String,
+        password: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(JOIN_CODE_KEY, joinCode)
+        return join(
+            payload = payload,
+            email = email,
+            name = name,
+            surname = surname,
+            password = password
+        )
+    }
+
+    private fun join(
+        payload: Params,
+        email: String,
+        name: String,
+        surname: String,
+        password: String
+    ) : JSONObject {
+        payload.addParam(EMAIL_KEY, email)
+        payload.addParam(PASSWORD_KEY, password)
+        payload.addParam(NAME_KEY, name)
+        payload.addParam(SURNAME_KEY, surname)
+        payload.addParam(PASSWORD_KEY, password)
+        return execPost(
+            endpoint = "$PROJECTS_KEY$JOIN_ENDPOINT",
+            payload = payload
+        )
+    }
+
+    fun removeMember(
+        projectId: String,
+        memberId: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(MEMBER_IDENTIFIER_KEY, memberId)
+        return execPatch(
+            endpoint = assembleProjectsEndpointPath(projectId + REMOVE_MEMBER_ENDPOINT),
+            payload = payload
+        )
+    }
+
+    fun leaveProject(
+        projectId: String
+    ) : JSONObject {
+        return execDelete(
+            endpoint = assembleProjectsEndpointPath(projectId + LEAVE_ENDPOINT),
+        )
+    }
+
+    fun deleteProject(
+        projectId: String
+    ) : JSONObject {
+        return execDelete(
+            endpoint = assembleProjectsEndpointPath(projectId),
+        )
+    }
+
     private fun assembleProjectsEndpointPath(
         endpoint: String = ""
     ): String {
@@ -160,6 +270,104 @@ open class Requester (
         if(endpoint.isNotEmpty() && !endpoint.startsWith("/"))
             vEndpoint = "/$endpoint"
         return "$userId/$PROJECTS_KEY$vEndpoint"
+    }
+
+    fun addRelease(
+        projectId: String,
+        releaseVersion: String,
+        releaseNotes: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(RELEASE_VERSION_KEY, releaseVersion)
+        payload.addParam(RELEASE_NOTES_KEY, releaseNotes)
+        return execPost(
+            endpoint =  assembleReleasesEndpointPath(
+                projectId = projectId,
+                endpoint = ADD_RELEASE_ENDPOINT
+            ),
+            payload = payload
+        )
+    }
+
+    fun getRelease(
+        projectId: String,
+        releaseId: String
+    ) : JSONObject {
+        return execGet(
+            endpoint =  assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId
+            )
+        )
+    }
+
+    fun uploadAsset() {
+        TODO("TO IMPLEMENT LATER")
+    }
+
+    fun commentAsset(
+        projectId: String,
+        releaseId: String,
+        eventId: String,
+        releaseStatus: ReleaseStatus,
+        reasons: String,
+        tags: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(RELEASE_EVENT_STATUS_KEY, releaseStatus)
+        payload.addParam(REASONS_KEY, reasons)
+        payload.addParam(TAGS_KEY, formatValuesList(tags))
+        return execPost(
+            endpoint = assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId,
+                extraId = eventId,
+                endpoint = COMMENT_ASSET_ENDPOINT
+            ),
+            payload = payload
+        )
+    }
+
+    fun fillRejectedTag(
+        projectId: String,
+        releaseId: String,
+        eventId: String,
+        tagId: String,
+        comment: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(COMMENT_KEY, comment)
+        return execPut(
+            endpoint = assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId,
+                extraId = "$eventId/$TAGS_KEY/$tagId",
+                endpoint = EVENTS_ENDPOINT
+            ),
+            payload = payload
+        )
+    }
+
+    private fun assembleReleasesEndpointPath(
+        projectId: String,
+        releaseId: String = "",
+        extraId: String = "",
+        endpoint: String = ""
+    ): String {
+        var vReleaseId: String = releaseId
+        if(releaseId.isNotEmpty())
+            vReleaseId = "/$releaseId"
+        var vExtraId: String = extraId
+        var vEndpoint: String = endpoint
+        if(endpoint.isNotEmpty() && !endpoint.startsWith("/"))
+            vEndpoint = "/$endpoint"
+        if(extraId.isNotEmpty() && !extraId.startsWith("/") && !vEndpoint.endsWith("/"))
+            vExtraId = "/$vExtraId"
+        return assembleProjectsEndpointPath(projectId) + "/$RELEASES_KEY$vReleaseId$vEndpoint$vExtraId"
+    }
+
+    private fun formatValuesList(values: String) : JSONArray {
+        return JSONArray(values.replace(" ", "").split(","))
     }
 
     @Wrapper
@@ -184,14 +392,17 @@ open class Requester (
         )
     }
 
-    /*
     @Wrapper
     private fun execPut(
         endpoint: String,
         payload: Params
     ) : JSONObject {
-
-    }*/
+        return execRequest(
+            method = RequestMethod.PUT,
+            endpoint = endpoint,
+            payload = payload
+        )
+    }
 
     @Wrapper
     private fun execPatch(

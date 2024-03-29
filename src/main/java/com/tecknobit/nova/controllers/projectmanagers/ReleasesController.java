@@ -79,22 +79,29 @@ public class ReleasesController extends ProjectManager {
         if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
             loadJsonHelper(payload);
             String releaseVersion = jsonHelper.getString(RELEASE_VERSION_KEY);
+            releaseVersion = releaseVersion.replaceFirst("^v\\.", "");
+            if(!releaseVersion.startsWith(" "))
+                releaseVersion = " " + releaseVersion;
+            releaseVersion = "v." + releaseVersion;
             String releaseNotes = jsonHelper.getString(RELEASE_NOTES_KEY);
             Project project = projectsHelper.getProject(id, projectId);
-            if(isReleaseVersionValid(releaseVersion) && project.hasNotReleaseVersion(releaseVersion)) {
-                if(areReleaseNotesValid(releaseNotes)) {
-                    String releaseId = generateIdentifier();
-                    releasesHelper.addRelease(
-                            projectId,
-                            releaseId,
-                            releaseVersion,
-                            releaseNotes
-                    );
-                    return successResponse();
+            if(project != null) {
+                if(isReleaseVersionValid(releaseVersion) && project.hasNotReleaseVersion(releaseVersion)) {
+                    if(areReleaseNotesValid(releaseNotes)) {
+                        String releaseId = generateIdentifier();
+                        releasesHelper.addRelease(
+                                projectId,
+                                releaseId,
+                                releaseVersion,
+                                releaseNotes
+                        );
+                        return successResponse();
+                    } else
+                        return failedResponse(WRONG_RELEASE_NOTES_MESSAGE);
                 } else
-                    return failedResponse(WRONG_RELEASE_NOTES_MESSAGE);
+                    return failedResponse(WRONG_RELEASE_VERSION_MESSAGE);
             } else
-                return failedResponse(WRONG_RELEASE_VERSION_MESSAGE);
+                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
@@ -388,8 +395,9 @@ public class ReleasesController extends ProjectManager {
 
     private Release getReleaseIfAuthorized(String releaseId) {
         Release release = releasesHelper.getRelease(releaseId);
-        if(release != null && currentProject.hasRelease(releaseId))
-            return release;
+        if(currentProject != null)
+            if(release != null && currentProject.hasRelease(releaseId))
+                return release;
         return null;
     }
 

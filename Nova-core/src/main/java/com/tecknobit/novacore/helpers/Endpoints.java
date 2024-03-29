@@ -29,6 +29,17 @@ public class Endpoints {
 
     public static final String LEAVE_ENDPOINT = "/leave";
 
+    /**RELEASES ENDPOINTS**/
+    public static final String ADD_RELEASE_ENDPOINT = "/addRelease";
+
+    public static final String COMMENT_ASSET_ENDPOINT = "/comment/";
+
+    public static final String EVENTS_ENDPOINT = "/events/";
+
+    public static final String TAGS_ENDPOINT = "/tags/";
+
+    public static final String CREATE_REPORT_ENDPOINT = "/createReport";
+
     private Endpoints() {
     }
 
