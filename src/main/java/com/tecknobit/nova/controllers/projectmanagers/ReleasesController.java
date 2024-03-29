@@ -12,6 +12,7 @@ import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_
 import static com.tecknobit.novacore.records.release.Release.*;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.ASSET_UPLOADING_EVENT_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REASONS_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedTag.COMMENT_KEY;
@@ -139,7 +141,7 @@ public class ReleasesController extends ProjectManager {
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
             @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token,
-            @ModelAttribute ReleasesHelper.UploadingAssets assets
+            @RequestParam(ASSETS_UPLOADED_KEY) MultipartFile[] assets
     ) {
         if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
             Release release = getReleaseIfAuthorized(releaseId);
@@ -147,7 +149,7 @@ public class ReleasesController extends ProjectManager {
                 switch (release.getStatus()) {
                     case New, Rejected, Alpha, Beta -> {
                         try {
-                            if(releasesHelper.uploadAssets(releaseId, assets.assets_uploaded()))
+                            if(releasesHelper.uploadAssets(releaseId, assets))
                                 return successResponse();
                             return failedResponse(WRONG_ASSETS_MESSAGE);
                         } catch (IOException e) {

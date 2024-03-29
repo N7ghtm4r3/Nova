@@ -336,7 +336,7 @@ open class Requester (
         assets.forEach { asset ->
             fileSystemResourceAssets.add(FileSystemResource(asset))
         }
-        body.add(ASSETS_UPLOADED_KEY, fileSystemResourceAssets)
+        body.put(ASSETS_UPLOADED_KEY, fileSystemResourceAssets.toList())
         return execMultipartRequest(
             body = body,
             endpoint = assembleReleasesEndpointPath(
@@ -529,7 +529,7 @@ open class Requester (
         )
     }
 
-    protected fun execRequest(
+    private fun execRequest(
         method: RequestMethod,
         endpoint: String,
         payload: Params? = null
