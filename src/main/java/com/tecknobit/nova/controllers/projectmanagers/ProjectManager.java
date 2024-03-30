@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ProjectManager extends NovaController {
 
     /**
-     * {@code projectsHelper} instance to manage the project database operations
+     * {@code projectsHelper} helper to manage the project database operations
      */
     protected final ProjectsHelper projectsHelper;
 
@@ -27,7 +27,7 @@ public abstract class ProjectManager extends NovaController {
     /**
      * Constructor to init the {@link ProjectManager} manager
      *
-     * @param projectsHelper: instance to manage the projects database operations
+     * @param projectsHelper: helper to manage the projects database operations
      */
     @Autowired
     protected ProjectManager(ProjectsHelper projectsHelper) {

@@ -47,14 +47,14 @@ public class UsersController extends NovaController {
     public static final String CHANGE_LANGUAGE_ENDPOINT = "/changeLanguage";
 
     /**
-     * {@code usersHelper} instance to manage the users database operations
+     * {@code usersHelper} helper to manage the users database operations
      */
     private final UsersHelper usersHelper;
 
     /**
      * Constructor to init the {@link UsersController} controller
      *
-     * @param usersHelper: instance to manage the users database operations
+     * @param usersHelper: helper to manage the users database operations
      */
     @Autowired
     public UsersController(UsersHelper usersHelper) {

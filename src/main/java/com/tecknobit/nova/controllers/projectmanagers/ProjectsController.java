@@ -2,6 +2,7 @@ package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.apimanager.formatters.JsonHelper;
+import com.tecknobit.nova.controllers.NovaController;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ProjectsHelper.ProjectPayload;
 import com.tecknobit.nova.helpers.services.UsersHelper;
@@ -28,6 +29,13 @@ import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 
+/**
+ * The {@code ProjectsController} class is useful to manage all the project operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see NovaController
+ * @see ProjectManager
+ */
 @RestController
 //TODO: USE FROM CORE LIBRARY
 @RequestMapping(BASE_ENDPOINT)
@@ -45,14 +53,31 @@ public class ProjectsController extends ProjectManager {
     //TODO: USE FROM CORE LIBRARY
     public static final String LEAVE_ENDPOINT = "/leave";
 
+    /**
+     * {@code usersHelper} helper to manage the users database operations
+     */
     private final UsersHelper usersHelper;
 
+    /**
+     * Constructor to init the {@link ProjectsController} controller
+     *
+     * @param projectsHelper: helper to manage the projects database operations
+     * @param usersHelper: helper to manage the users database operations
+     */
     @Autowired
     public ProjectsController(ProjectsHelper projectsHelper, UsersHelper usersHelper) {
         super(projectsHelper);
         this.usersHelper = usersHelper;
     }
 
+    /**
+     * Method to get a projects list
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     */
     @GetMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY,
             headers = {
@@ -70,6 +95,23 @@ public class ProjectsController extends ProjectManager {
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to add a project
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "logoUrl": "the logo of the project path", -> [String]
+     *                  "name": "the project name" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PostMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY,
             headers = {
@@ -97,6 +139,15 @@ public class ProjectsController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to get a project
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param projectId: the project identifier to get
+     *
+     * @return the result of the request as {@link String}
+     */
     @GetMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}",
             headers = {
@@ -119,6 +170,25 @@ public class ProjectsController extends ProjectManager {
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to add members in a project
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where add the members
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "projectMembers": "the emails of the members", -> [List of String]
+     *                  "role": "the role to attribute at the members" -> [String]
+     *                  "createJoinCode": "whether create a textual join code" -> [boolean]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PutMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + ADD_MEMBERS_ENDPOINT,
             headers = {
@@ -155,6 +225,26 @@ public class ProjectsController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to join in a project. <br>
+     * If the member is already logged in the same server will be just add to the project, else will be signed up
+     * and returned the credentials after joined in the project
+     *
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "id" : "the identifier of the joining qrcode" -> [String] //OR "join_code": "the textual join code",
+     *                  "name" : "the name of the user" -> [String],
+     *                  "surname": "the surname of the user" -> [String],
+     *                  "email": "the email of the user" -> [String],
+     *                  "password": "the password of the user" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PostMapping(
             path = PROJECTS_KEY + JOIN_ENDPOINT
     )
@@ -239,6 +329,23 @@ public class ProjectsController extends ProjectManager {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
     }
 
+    /**
+     * Method to remove a member from a project
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier from remove the member
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "member_id": "the identifier of the member to remove", -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PatchMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + REMOVE_MEMBER_ENDPOINT,
             headers = {
@@ -265,6 +372,18 @@ public class ProjectsController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to leave from a project
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier from leave
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     *
+     * @apiNote if the user who made the request is the project author the request will fail because the author cannot
+     * leave the project
+     */
     @DeleteMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" + LEAVE_ENDPOINT,
             headers = {
@@ -291,6 +410,18 @@ public class ProjectsController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to delete a project
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier of the project to delete
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     *
+     * @apiNote if the user who made the request is not the project author the request will fail because only the author
+     * can delete a project
+     */
     @DeleteMapping(
             path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}",
             headers = {

@@ -1,6 +1,7 @@
 package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
+import com.tecknobit.nova.controllers.NovaController;
 import com.tecknobit.nova.helpers.ReportsProvider;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ReleasesHelper;
@@ -37,25 +38,50 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_TAG_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
 
+/**
+ * The {@code ReleasesController} class is useful to manage all the release operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see NovaController
+ * @see ProjectManager
+ */
 @RestController
+//TODO: USE FROM CORE LIBRARY
 @RequestMapping(BASE_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"
         + RELEASES_KEY + "/")
 public class ReleasesController extends ProjectManager {
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String ADD_RELEASE_ENDPOINT = "/addRelease";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String COMMENT_ASSET_ENDPOINT = "/comment/";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String EVENTS_ENDPOINT = "/events/";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String TAGS_ENDPOINT = "/tags/";
 
+    //TODO: USE FROM CORE LIBRARY
     public static final String CREATE_REPORT_ENDPOINT = "/createReport";
 
+    /**
+     * {@code releasesHelper} helper to manage the releases database operations
+     */
     private final ReleasesHelper releasesHelper;
 
+    /**
+     * {@code reportsProvider} helper to manage the reports creation and their serve
+     */
     private final ReportsProvider reportsProvider;
 
+    /**
+     * Constructor to init the {@link ProjectsController} controller
+     *
+     * @param projectsHelper: helper to manage the projects database operations
+     * @param releasesHelper: helper to manage the releases database operations
+     */
     @Autowired
     public ReleasesController(ProjectsHelper projectsHelper, ReleasesHelper releasesHelper) {
         super(projectsHelper);
@@ -63,6 +89,24 @@ public class ReleasesController extends ProjectManager {
         reportsProvider = new ReportsProvider();
     }
 
+    /**
+     * Method to add a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "release_version": "the version for the release", -> [String]
+     *                  "release_notes": "the notes attached to the release" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PostMapping(
             path = ADD_RELEASE_ENDPOINT,
             headers = {
@@ -106,6 +150,16 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to get a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier to get
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     */
     @GetMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
@@ -129,6 +183,19 @@ public class ReleasesController extends ProjectManager {
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to upload some assets on a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier where upload the asset
+     * @param token: the token of the user
+     * @param assets: the assets to upload
+     *
+     * @return the result of the request as {@link String}
+     *
+     * @apiNote this request, if successful, will make change the release status to {@link ReleaseStatus#Verifying}
+     */
     @PostMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
@@ -166,6 +233,45 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to comment the last assets uploaded on a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier where comment the last assets uploaded
+     * @param eventId: the event identifier to comment
+     * @param token: the token of the user
+     * @param payload: payload of the request:
+     *               <ul>
+     *                   <li>
+     *                       {@link ReleaseStatus#Approved} ->
+     * <pre>
+     *      {@code
+     *              {
+     *                  "status" : "Approved" -> [String] // the release has been approved by the Customer
+     *              }
+     *      }
+     * </pre>
+     *                   </li>
+     *                   <li>
+     *                       {@link ReleaseStatus#Rejected} ->
+     * <pre>
+     *      {@code
+     *              {
+     *                  "status" : "Rejected" -> [String] // the release has been rejected by the Customer,
+     *                  "reasons" : "reasons of the rejection", -> [String]
+     *                  "tags": "list of tags attached to the rejection" -> [List of String]
+     *              }
+     *      }
+     * </pre>
+     *                   </li>
+     *               </ul>
+     *
+     * @return the result of the request as {@link String}
+     *
+     * @apiNote this request, if successful, will make change the release status to {@link ReleaseStatus#Approved} or
+     * {@link ReleaseStatus#Rejected}
+     */
     @PostMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}" + COMMENT_ASSET_ENDPOINT + "{" + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + "}",
             headers = {
@@ -233,6 +339,26 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to fill a rejected tag
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier where fill the rejected tag
+     * @param eventId: the rejected event identifier where the rejected tag is attached
+     * @param rejectedTagId: the rejected tag to fill
+     * @param token: the token of the user
+     * @param payload: payload of the request:
+     * <pre>
+     *      {@code
+     *              {
+     *                  "comment" : "the comment to attach at the rejected tag" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PutMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}" + EVENTS_ENDPOINT + "{" + RELEASE_EVENT_IDENTIFIER_KEY + "}"
                     + TAGS_ENDPOINT + "{" + RELEASE_TAG_IDENTIFIER_KEY + "}",
@@ -277,6 +403,24 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to promote a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier to promote
+     * @param token: the token of the user
+     * @param payload: payload of the request:
+     * <pre>
+     *      {@code
+     *              {
+     *                  "release_status" : "the release status to set" -> [String] //Alpha, Beta or Latest
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PatchMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
@@ -337,6 +481,16 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to create a report for a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier from create the report
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}, if successful includes the path to reach the report
+     */
     @GetMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}" + CREATE_REPORT_ENDPOINT,
             headers = {
@@ -369,6 +523,16 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to delete a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier of the release to delete
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     */
     @DeleteMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
@@ -393,6 +557,13 @@ public class ReleasesController extends ProjectManager {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to get a release if the user is authorized and if the release is attached to the requested project
+     *
+     * @param releaseId: the release identifier to fetch
+     *
+     * @return the release attached to the requested project as {@link Release} or null if not authorized
+     */
     private Release getReleaseIfAuthorized(String releaseId) {
         Release release = releasesHelper.getRelease(releaseId);
         if(currentProject != null)
