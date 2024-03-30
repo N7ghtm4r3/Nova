@@ -18,28 +18,64 @@ import java.util.List;
 import static com.tecknobit.novacore.records.User.*;
 import static com.tecknobit.novacore.records.release.Release.RELEASES_KEY;
 
+/**
+ * The {@code Project} class is useful to represent a Nova's user
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see NovaItem
+ */
 @Entity
 @Table(name = PROJECTS_KEY)
 public class Project extends NovaItem {
 
+    /**
+     * {@code PROJECT_MEMBERS_TABLE} the key for the <b>"project members"</b> table
+     */
     public static final String PROJECT_MEMBERS_TABLE = "project_members";
 
+    /**
+     * {@code PROJECT_IDENTIFIER_KEY} the key for the <b>"project_id"</b> field
+     */
     public static final String PROJECT_IDENTIFIER_KEY = "project_id";
 
+    /**
+     * {@code PROJECT_KEY} the key for the <b>"project"</b> field
+     */
     public static final String PROJECT_KEY = "project";
 
+    /**
+     * {@code AUTHOR_KEY} the key for the <b>"author"</b> field
+     */
     public static final String AUTHOR_KEY = "author";
 
+    /**
+     * {@code LOGO_URL_KEY} the key for the <b>"logo_url"</b> field
+     */
     public static final String LOGO_URL_KEY = "logo_url";
 
+    /**
+     * {@code PROJECT_NAME_KEY} the key for the <b>"name"</b> field
+     */
     public static final String PROJECT_NAME_KEY = "name";
 
+    /**
+     * {@code PROJECT_MEMBERS_KEY} the key for the <b>"projectMembers"</b> field
+     */
     public static final String PROJECT_MEMBERS_KEY = "projectMembers";
 
+    /**
+     * {@code WORKING_PROGRESS_VERSION_KEY} the key for the <b>"working_progress_version"</b> field
+     */
     public static final String WORKING_PROGRESS_VERSION_KEY = "working_progress_version";
 
+    /**
+     * {@code PROJECT_RELEASES_KEY} the key for the <b>"project_releases"</b> field
+     */
     public static final String PROJECT_RELEASES_KEY = "project_releases";
 
+    /**
+     * {@code author} the author of the project
+     */
     @ManyToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
@@ -56,15 +92,24 @@ public class Project extends NovaItem {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private final User author;
 
+    /**
+     * {@code logoUrl} the logo of the project formatted as url
+     */
     @Column(name = LOGO_URL_KEY)
     private final String logoUrl;
 
+    /**
+     * {@code name} the name of the project
+     */
     @Column(
             name = PROJECT_NAME_KEY,
             unique = true
     )
     private final String name;
 
+    /**
+     * {@code projectMembers} the members of the project
+     */
     @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = PROJECT_MEMBERS_TABLE,
@@ -81,6 +126,9 @@ public class Project extends NovaItem {
     })
     private final List<User> projectMembers;
 
+    /**
+     * {@code releases} the releases of the project
+     */
     @OneToMany(
             mappedBy = PROJECT_KEY,
             cascade = CascadeType.ALL,
@@ -88,6 +136,11 @@ public class Project extends NovaItem {
     )
     private final List<Release> releases;
 
+    /**
+     * {@code joiningQRCodes} the joining QR-Codes created to join in this project
+     * 
+     * @apiNote this is useful for the server-side, so for the clients will be ever hidden 
+     */
     @OneToMany(
             mappedBy = PROJECT_KEY,
             cascade = CascadeType.ALL,
@@ -95,10 +148,23 @@ public class Project extends NovaItem {
     )
     private final List<JoiningQRCode> joiningQRCodes;
 
+    /**
+     * Constructor to init the {@link Project} class <br>
+     *
+     * No-any params required
+     *
+     * @apiNote empty constructor required
+     */
     public Project() {
         this(null, null, null, null, List.of(), List.of(), List.of());
     }
 
+    /**
+     * Constructor to init the {@link Project} class
+     *
+     * @param jProject: project details formatted as JSON
+     *
+     */
     public Project(JSONObject jProject) {
         super(jProject);
         author = returnUserInstance(hItem.getJSONObject(AUTHOR_KEY));
@@ -109,6 +175,20 @@ public class Project extends NovaItem {
         joiningQRCodes = null;
     }
 
+    /**
+     * Constructor to init the {@link Project} class
+     *
+     * @param id: identifier of the project
+     * @param author the author of the project
+     * @param logoUrl: the logo of the project formatted as url
+     * @param name: the name of the project
+     * @param projectMembers: the members of the project
+     * @param releases: the releases of the project
+     * @param joiningQRCodes: the joining QR-Codes created to join in this project
+     *
+     * @apiNote this is useful for the server-side, so for the clients will be ever hidden
+     *
+     */
     public Project(String id, User author, String logoUrl, String name, List<User> projectMembers,
                    List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
         super(id);
@@ -120,27 +200,63 @@ public class Project extends NovaItem {
         this.joiningQRCodes = joiningQRCodes;
     }
 
+    /**
+     * Method to get {@link #author} instance <br>
+     * No-any params required
+     *
+     * @return {@link #author} instance as {@link User}
+     */
     public User getAuthor() {
         return author;
     }
 
+    /**
+     * Method to get {@link #logoUrl} instance <br>
+     * No-any params required
+     *
+     * @return {@link #logoUrl} instance as {@link String}
+     */
     public String getLogoUrl() {
         return logoUrl;
     }
 
+    /**
+     * Method to get {@link #name} instance <br>
+     * No-any params required
+     *
+     * @return {@link #name} instance as {@link String}
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Method to get {@link #projectMembers} instance <br>
+     * No-any params required
+     *
+     * @return {@link #projectMembers} instance as {@link List} of {@link User}
+     */
     public List<User> getProjectMembers() {
         return projectMembers;
     }
 
+    /**
+     * Method to get {@link #"workingProgressVersion"} instance <br>
+     * No-any params required
+     *
+     * @return {@link #"workingProgressVersion"} instance as {@link String}
+     */
     @JsonIgnore
     public String getWorkingProgressVersion() {
         return "workingProgressVersion";
     }
 
+    /**
+     * Method to get the version of the current release work in progress <br>
+     * No-any params required
+     *
+     * @return the version of the current release work in progress as {@link String}
+     */
     @JsonIgnore
     public String getWorkingProgressVersionText() {
         if("workingProgressVersion" == null)
@@ -150,15 +266,34 @@ public class Project extends NovaItem {
         return "v. " + "workingProgressVersion";
     }
 
+    /**
+     * Method to get {@link #releases} instance <br>
+     * No-any params required
+     *
+     * @return {@link #releases} instance as {@link List} of {@link Release}
+     */
     public List<Release> getReleases() {
         return releases;
     }
 
+    /**
+     * Method to get {@link #joiningQRCodes} instance <br>
+     * No-any params required
+     *
+     * @return {@link #joiningQRCodes} instance as {@link List} of {@link JoiningQRCode}
+     */
     @JsonIgnore
     public List<JoiningQRCode> getJoiningQRCodes() {
         return joiningQRCodes;
     }
 
+    /**
+     * Method to get whether a {@link User#MEMBER_IDENTIFIER_KEY} is a member of the checked project
+     * 
+     * @param memberId: the member identifier to check
+     *                
+     * @return whether a member is a real member of the checked project as boolean
+     */
     public boolean hasMemberId(String memberId) {
         if(memberId != null) {
             for (User member : projectMembers)
@@ -168,6 +303,13 @@ public class Project extends NovaItem {
         return false;
     }
 
+    /**
+     * Method to get a project member, if exists, from the project
+     * 
+     * @param memberId: the identifier of the member to get
+     *                
+     * @return the member as {@link User} if exists or null if not exists
+     */
     public User getMember(String memberId) {
         if(memberId != null) {
             for (User projectMember : projectMembers)
@@ -177,6 +319,13 @@ public class Project extends NovaItem {
         return null;
     }
 
+    /**
+     * Method to get whether the checked project not contains a specified member's email
+     *
+     * @param memberEmail: the email of the member to check
+     *
+     * @return whether a member's email is not contained by the checked project as boolean
+     */
     public boolean hasNotMemberEmail(String memberEmail) {
         for (User member : projectMembers)
             if(member.getEmail().equals(memberEmail))
@@ -184,6 +333,13 @@ public class Project extends NovaItem {
         return true;
     }
 
+    /**
+     * Method to get whether the checked project has the specified release
+     *
+     * @param releaseId: the identifier of the release to check
+     *
+     * @return whether the checked project has the specified release as boolean
+     */
     public boolean hasRelease(String releaseId) {
         for (Release release : releases)
             if(release.getId().equals(releaseId))
@@ -191,6 +347,13 @@ public class Project extends NovaItem {
         return false;
     }
 
+    /**
+     * Method to get whether the checked project has the specified release version
+     *
+     * @param releaseVersion: the version of the release to check
+     *
+     * @return whether the checked project has the specified release version as boolean
+     */
     public boolean hasNotReleaseVersion(String releaseVersion) {
         for (Release release : releases)
             if(release.getReleaseVersion().equals(releaseVersion))
@@ -198,6 +361,13 @@ public class Project extends NovaItem {
         return true;
     }
 
+    /**
+     * Method to assemble and return a {@link Project} instance
+     *
+     * @param jProject: project details formatted as JSON
+     *
+     * @return the project instance as {@link Project}
+     */
     @Returner
     public static Project returnProjectInstance(JSONObject jProject) {
         if(jProject != null)
@@ -205,6 +375,13 @@ public class Project extends NovaItem {
         return null;
     }
 
+    /**
+     * Method to assemble and return a {@link List} of projects
+     *
+     * @param jProjects: projects list details formatted as JSON
+     *
+     * @return the projects list as {@link List} of {@link Project}
+     */
     @Returner
     public static List<Project> returnProjectsList(JSONArray jProjects) {
         List<Project> projects = new ArrayList<>();
