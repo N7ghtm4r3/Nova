@@ -1,5 +1,10 @@
 package com.tecknobit.nova.helpers;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
+
 import java.io.File;
 
 public class ResourcesProvider {
@@ -44,6 +49,34 @@ public class ResourcesProvider {
     private static void printError(String directory) {
         System.err.println("Error during the creation of the \"" + directory + "\" folder");
         System.exit(-1);
+    }
+
+    /**
+     * The {@code ResourceConfigs} class is useful to set the configuration of the resources to correctly serve the
+     * images by the server
+     *
+     * @author N7ghtm4r3 - Tecknobit
+     * @see WebMvcConfigurer
+     */
+    @Configuration
+    public static class ResourcesConfigs implements WebMvcConfigurer {
+
+        /**
+         * Add handlers to serve static resources such as images, js, and, css
+         * files from specific locations under web application root, the classpath,
+         * and others.
+         *
+         * @see ResourceHandlerRegistry
+         */
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+            registry.addResourceHandler("/**")
+                    .addResourceLocations("file:" + RESOURCES_PATH)
+                    .setCachePeriod(0)
+                    .resourceChain(true)
+                    .addResolver(new PathResourceResolver());
+        }
+
     }
 
 }

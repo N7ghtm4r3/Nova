@@ -17,6 +17,12 @@ import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.helpers.Endpoints.BASE_ENDPOINT;
 import static com.tecknobit.novacore.records.User.*;
 
+/**
+ * The {@code UsersController} class is useful to manage all the user operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see NovaController
+ */
 @RestController
 //TODO: USE FROM CORE LIBRARY
 @RequestMapping(path = BASE_ENDPOINT + USERS_KEY)
@@ -40,13 +46,39 @@ public class UsersController extends NovaController {
     //TODO: USE FROM CORE LIBRARY
     public static final String CHANGE_LANGUAGE_ENDPOINT = "/changeLanguage";
 
+    /**
+     * {@code usersHelper} instance to manage the users database operations
+     */
     private final UsersHelper usersHelper;
 
+    /**
+     * Constructor to init the {@link UsersController} controller
+     *
+     * @param usersHelper: instance to manage the users database operations
+     */
     @Autowired
     public UsersController(UsersHelper usersHelper) {
         this.usersHelper = usersHelper;
     }
 
+    /**
+     * Method to sign up in the <b>Nova's system</b>
+     *
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "server_secret" : "the secret of the server" -> [String],
+     *                  "name" : "the name of the user" -> [String],
+     *                  "surname": "the surname of the user" -> [String],
+     *                  "email": "the email of the user" -> [String],
+     *                  "password": "the password of the user" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PostMapping(path = SIGN_UP_ENDPOINT)
     @RequestPath(path = "/api/v1/users/signUp", method = POST)
     public String signUp(@RequestBody Map<String, String> payload) {
@@ -66,12 +98,34 @@ public class UsersController extends NovaController {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to sign in the <b>Nova's system</b>
+     *
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "email": "the email of the user", -> [String]
+     *                  "password": "the password of the user" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PostMapping(path = SIGN_IN_ENDPOINT)
     @RequestPath(path = "/api/v1/users/signIn", method = POST)
     public String signIn(@RequestBody Map<String, String> payload) {
         return executeAuth(payload);
     }
 
+    /**
+     * Method to execute the auth operations
+     *
+     * @param payload: the payload received with the auth request
+     * @param personalData: the personal data of the user like name and surname
+     * @return the result of the auth operation as {@link String}
+     */
     private String executeAuth(Map<String, String> payload, String ... personalData) {
         loadJsonHelper(payload);
         String email = jsonHelper.getString(EMAIL_KEY);
@@ -131,6 +185,15 @@ public class UsersController extends NovaController {
             return failedResponse(WRONG_EMAIL_MESSAGE);
     }
 
+    /**
+     * Method to change the profile pic of the user
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param profilePic: the profile pic chosen by the user to set as the new profile pic
+     *
+     * @return the result of the request as {@link String}
+     */
     @PostMapping(
             path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PROFILE_PIC_ENDPOINT,
             headers = {
@@ -159,6 +222,22 @@ public class UsersController extends NovaController {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to change the email of the user
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "email": "the new email of the user" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PatchMapping(
             path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_EMAIL_ENDPOINT,
             headers = {
@@ -187,6 +266,22 @@ public class UsersController extends NovaController {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to change the password of the user
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "password": "the new password of the user" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PatchMapping(
             path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PASSWORD_ENDPOINT,
             headers = {
@@ -215,6 +310,22 @@ public class UsersController extends NovaController {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to change the language of the user
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "language": "the new language of the user" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
     @PatchMapping(
             path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_LANGUAGE_ENDPOINT,
             headers = {
@@ -243,6 +354,14 @@ public class UsersController extends NovaController {
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 
+    /**
+     * Method to delete the account of the user
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     */
     @DeleteMapping(
             path = "/{" + IDENTIFIER_KEY + "}",
             headers = {
