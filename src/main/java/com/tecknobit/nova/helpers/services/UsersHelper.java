@@ -1,6 +1,7 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.apis.APIRequest;
+import com.tecknobit.nova.helpers.resources.ResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.UsersRepository;
 import com.tecknobit.novacore.records.User;
 import com.tecknobit.novacore.records.User.Role;

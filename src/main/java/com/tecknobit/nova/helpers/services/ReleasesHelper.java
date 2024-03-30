@@ -1,6 +1,7 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
+import com.tecknobit.nova.helpers.resources.ResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseEventsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseTagRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleasesRepository;

@@ -2,7 +2,7 @@ package com.tecknobit.nova;
 
 import com.tecknobit.apimanager.apis.ServerProtector;
 import com.tecknobit.apimanager.exceptions.SaveData;
-import com.tecknobit.nova.helpers.ResourcesProvider;
+import com.tecknobit.nova.helpers.resources.ResourcesProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -19,8 +19,8 @@ import org.springframework.web.filter.CorsFilter;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import static com.tecknobit.nova.helpers.ResourcesProvider.CUSTOM_CONFIGURATION_FILE_PATH;
-import static com.tecknobit.nova.helpers.ResourcesProvider.DEFAULT_CONFIGURATION_FILE_PATH;
+import static com.tecknobit.nova.helpers.resources.ResourcesProvider.CUSTOM_CONFIGURATION_FILE_PATH;
+import static com.tecknobit.nova.helpers.resources.ResourcesProvider.DEFAULT_CONFIGURATION_FILE_PATH;
 
 /**
  * The {@code Launcher} class is useful to launch <b>Nova's backend service</b>

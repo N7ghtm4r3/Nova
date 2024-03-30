@@ -21,24 +21,54 @@ import java.util.Objects;
 
 import static com.tecknobit.apimanager.apis.ResourcesUtils.getResourceContent;
 import static com.tecknobit.apimanager.trading.TradingTools.roundValue;
-import static com.tecknobit.nova.helpers.ResourcesProvider.*;
+import static com.tecknobit.nova.helpers.resources.ResourcesProvider.*;
 
+/**
+ * The {@code ReportsProvider} class is useful to create and provide the reports for the releases
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ */
 public class ReportsProvider {
 
+    /**
+     * {@code PROJECT_LOGO_TAG} the tag to indicate where is the project logo and where place the real value
+     */
     public static final String PROJECT_LOGO_TAG = "<project_logo>";
 
+    /**
+     * {@code PROJECT_NAME_TAG} the tag to indicate where is the project name and where place the real value
+     */
     public static final String PROJECT_NAME_TAG = "<project_name>";
 
+    /**
+     * {@code RELEASE_VERSION_TAG} the tag to indicate where is the release version and where place the real value
+     */
     public static final String RELEASE_VERSION_TAG = "<release_version>";
 
+    /**
+     * {@code RELEASE_CREATION_DATE_TAG} the tag to indicate where is the release creation date and where place the
+     * real value
+     */
     public static final String RELEASE_CREATION_DATE_TAG = "<release_creation_date>";
 
+    /**
+     * {@code RELEASE_STATUS_TAG} the tag to indicate where is the release status and where place the real value
+     */
     public static final String RELEASE_STATUS_TAG = "<release_status>";
 
+    /**
+     * {@code RELEASE_NOTES_TAG} the tag to indicate where are the release notes and where place the real value
+     */
     public static final String RELEASE_NOTES_TAG = "<release_notes>";
 
+    /**
+     * {@code RELEASE_EVENTS_TAG} the tag to indicate where are the release events and where place the real value
+     */
     public static final String RELEASE_EVENTS_TAG = "<release_events>";
 
+    /**
+     * {@code reportTemplate} the report template to use and where place the real instead of the tags
+     */
     private String reportTemplate;
 
     {
@@ -49,6 +79,9 @@ public class ReportsProvider {
         }
     }
 
+    /**
+     * {@code mantis} helper to manage the multi-language of the report
+     */
     private static final Mantis mantis;
 
     static {
@@ -59,14 +92,37 @@ public class ReportsProvider {
         }
     }
 
+    /**
+     * {@code BREAK_LINE} constant of the break line html tag
+     */
     private static final String BREAK_LINE = "<br>";
 
+    /**
+     * {@code currentRelease} the release on which create its report
+     */
     private Release currentRelease;
 
+    /**
+     * {@code releaseId} the release identifier on which create its report
+     */
     private String releaseId;
 
+    /**
+     * {@code reportName} the report name
+     */
     private String reportName;
 
+    /**
+     * Method to create the report for a release
+     *
+     * @param release: the release on which create its report
+     *
+     * @return the pathname of the report created
+     *
+     * @apiNote if an existing report already exists, but is different from the current release status, will be deleted
+     * and replaced with a new one
+     * @throws Exception when an error occurred
+     */
     public String getReleaseReport(Release release) throws Exception {
         setCurrentRelease(release);
         deleteReleaseReportIfExists();
@@ -76,6 +132,11 @@ public class ReportsProvider {
         return reportName;
     }
 
+    /**
+     * Method to delete a report if an existing report already exists and is different from the current release status
+     *
+     * @throws Exception when an error occurred
+     */
     private void deleteReleaseReportIfExists() throws Exception {
         File reports = new File(RESOURCES_REPORTS_PATH);
         File reportToDelete = null;
@@ -91,12 +152,21 @@ public class ReportsProvider {
                 throw new Exception();
     }
 
+    /**
+     * Method to set the current release details
+     *
+     * @param currentRelease: the current release details to set the {@link #currentRelease} instance
+     */
     private void setCurrentRelease(Release currentRelease) {
         this.currentRelease = currentRelease;
         releaseId = currentRelease.getId();
         reportName = REPORTS_DIRECTORY + "/" + currentRelease.getId() + "_" + currentRelease.getLastEvent() + ".pdf";
     }
 
+    /**
+     * Method to create the release report <br>
+     * No-any params required
+     */
     private void createReport() {
         insertHeader();
         insertReleaseEvents();
@@ -112,6 +182,12 @@ public class ReportsProvider {
         PdfConverterExtension.exportToPdf(RESOURCES_PATH + reportName, html, "", DataHolder.NULL);
     }
 
+    /**
+     * Method to insert the header of the report, so insert, replacing the related tags, the project logo, project name,
+     * release version, the creation date of the release, the current status of the release and the notes of
+     * the release.<br>
+     * No-any params required
+     */
     private void insertHeader() {
         Project project = currentRelease.getProject();
         reportTemplate = insertLogo(project)
@@ -123,10 +199,19 @@ public class ReportsProvider {
                 .replaceAll(RELEASE_NOTES_TAG, currentRelease.getReleaseNotes());
     }
 
+    /**
+     * Method to insert the project logo replacing the related tag
+     * @param project: the project from fetch the logo
+     * @return the {@link #reportTemplate} changed with the project logo inserted
+     */
     private String insertLogo(Project project) {
         return reportTemplate.replaceAll(PROJECT_LOGO_TAG, RESOURCES_PATH + project.getLogoUrl());
     }
 
+    /**
+     * Method to insert and create the structure for the events of the release replacing the related tag<br>
+     * No-any params required
+     */
     private void insertReleaseEvents() {
         StringBuilder report = new StringBuilder();
         for (ReleaseEvent event : currentRelease.getReleaseEvents()) {
@@ -175,6 +260,12 @@ public class ReportsProvider {
                 .replaceAll(RELEASE_EVENTS_TAG, report.toString());
     }
 
+    /**
+     * Method to create the release status badge
+     *
+     * @param status: the status from create the related badge
+     * @return release status badge created as {@link String}
+     */
     private String releaseStatusBadge(ReleaseStatus status) {
         return "<b><span style=\"color:" +
                 status.getColor() + ";" +
@@ -185,6 +276,12 @@ public class ReportsProvider {
                 BREAK_LINE;
     }
 
+    /**
+     * Method to get the comment related to the release status
+     *
+     * @param status: the status from get the related comment
+     * @return the comment related to the release status as {@link String}
+     */
     private String getStatusComment(ReleaseStatus status) {
         return switch (status) {
             case Verifying -> mantis.getResource("new_asset_has_been_uploaded_key");

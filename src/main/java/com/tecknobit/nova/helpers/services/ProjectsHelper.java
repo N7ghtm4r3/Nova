@@ -1,5 +1,6 @@
 package com.tecknobit.nova.helpers.services;
 
+import com.tecknobit.nova.helpers.resources.ResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
 import com.tecknobit.novacore.records.User;
