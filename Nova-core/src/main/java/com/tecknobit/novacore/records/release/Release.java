@@ -2,6 +2,7 @@ package com.tecknobit.novacore.records.release;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.project.Project;
@@ -9,7 +10,10 @@ import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
 import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent;
 import com.tecknobit.novacore.records.release.events.ReleaseEvent;
 import jakarta.persistence.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.novacore.records.project.Project.PROJECT_KEY;
@@ -133,6 +137,17 @@ public class Release extends NovaItem {
         this(null, null, null, null, null, -1, List.of(), -1);
     }
 
+    public Release(JSONObject jRelease) {
+        super(jRelease);
+        project = Project.returnProjectInstance(hItem.getJSONObject(PROJECT_KEY));
+        releaseVersion = hItem.getString(RELEASE_VERSION_KEY);
+        status = ReleaseStatus.valueOf(hItem.getString(RELEASE_STATUS_KEY));
+        releaseNotes = hItem.getString(RELEASE_NOTES_KEY);
+        creationDate = hItem.getLong(CREATION_DATE_KEY);
+        releaseEvents = ReleaseEvent.returnReleaseEventsList(hItem.getJSONArray(RELEASE_EVENTS_KEY));
+        approbationDate = hItem.getLong(APPROBATION_DATE_KEY, -1);
+    }
+
     public Release(String id, Project project, String releaseVersion, ReleaseStatus status, String releaseNotes,
                    long creationDate, List<ReleaseEvent> releaseEvents, long approbationDate) {
         super(id);
@@ -206,6 +221,15 @@ public class Release extends NovaItem {
         if(releaseEvents.isEmpty())
             return 0L;
         return releaseEvents.get(releaseEvents.size() - 1).getReleaseEventTimestamp();
+    }
+
+    @Returner
+    public static List<Release> returnReleasesList(JSONArray jReleases) {
+        List<Release> releases = new ArrayList<>();
+        if(jReleases != null)
+            for (int j = 0; j < jReleases.length(); j++)
+                releases.add(new Release(jReleases.getJSONObject(j)));
+        return releases;
     }
 
 }

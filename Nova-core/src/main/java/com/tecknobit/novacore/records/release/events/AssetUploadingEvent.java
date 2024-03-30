@@ -2,12 +2,16 @@ package com.tecknobit.novacore.records.release.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.Verifying;
@@ -45,6 +49,12 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
 
     public AssetUploadingEvent() {
         this(null, -1, null, List.of(), false);
+    }
+
+    public AssetUploadingEvent(JSONObject jAssetUploadingEvent) {
+        super(jAssetUploadingEvent);
+        assetsUploaded = AssetUploaded.returnAssetUploadedList(hItem.getJSONArray(ASSETS_UPLOADED_KEY));
+        commented = hItem.getBoolean(COMMENTED_KEY);
     }
 
     public AssetUploadingEvent(String id, long releaseEventDate, Release release, List<AssetUploaded> assetsUploaded,
@@ -92,6 +102,12 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
             this(null, null, null);
         }
 
+        public AssetUploaded(JSONObject jAssetUploaded) {
+            super(jAssetUploaded);
+            assetUploadingEvent = null;
+            url = hItem.getString(ASSET_URL_KEY);
+        }
+
         public AssetUploaded(String id, AssetUploadingEvent assetUploadingEvent, String url) {
             super(id);
             this.assetUploadingEvent = assetUploadingEvent;
@@ -105,6 +121,15 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
 
         public String getUrl() {
             return url;
+        }
+
+        @Returner
+        public static List<AssetUploaded> returnAssetUploadedList(JSONArray jAssetUploaded) {
+            List<AssetUploaded> assetUploaded = new ArrayList<>();
+            if(jAssetUploaded != null)
+                for (int j = 0; j < jAssetUploaded.length(); j++)
+                    assetUploaded.add(new AssetUploaded(jAssetUploaded.getJSONObject(j)));
+            return assetUploaded;
         }
 
     }

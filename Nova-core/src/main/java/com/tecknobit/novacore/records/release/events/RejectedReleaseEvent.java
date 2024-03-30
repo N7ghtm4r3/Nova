@@ -2,6 +2,7 @@ package com.tecknobit.novacore.records.release.events;
 
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -29,6 +30,12 @@ public class RejectedReleaseEvent extends ReleaseStandardEvent {
 
     public RejectedReleaseEvent() {
         this(null, null, -1, null, List.of());
+    }
+
+    public RejectedReleaseEvent(JSONObject jRejectedReleaseEvent) {
+        super(jRejectedReleaseEvent);
+        reasons = hItem.getString(REASONS_KEY);
+        tags = RejectedTag.returnRejectedTagsList(hItem.getJSONArray(REJECTED_RELEASE_EVENT_KEY));
     }
 
     public RejectedReleaseEvent(String id, Release release, long releaseEventDate, String reasons,

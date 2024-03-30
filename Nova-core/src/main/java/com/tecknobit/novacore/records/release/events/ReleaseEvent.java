@@ -2,13 +2,21 @@ package com.tecknobit.novacore.records.release.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.tecknobit.novacore.records.release.Release.RELEASE_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.COMMENTED_KEY;
+import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY;
 
 @Entity
 @Structure
@@ -76,6 +84,12 @@ public abstract class ReleaseEvent extends NovaItem {
         this(null, null, -1);
     }
 
+    public ReleaseEvent(JSONObject jReleaseEvent) {
+        super(jReleaseEvent);
+        release = null;
+        releaseEventDate = hItem.getLong(RELEASE_EVENT_DATE_KEY);
+    }
+
     public ReleaseEvent(String id, Release release, long releaseEventDate) {
         super(id);
         this.release = release;
@@ -94,6 +108,23 @@ public abstract class ReleaseEvent extends NovaItem {
     @JsonIgnore
     public String getReleaseEventDate() {
         return TimeFormatter.getStringDate(releaseEventDate);
+    }
+
+    @Returner
+    public static List<ReleaseEvent> returnReleaseEventsList(JSONArray jReleaseEvents) {
+        List<ReleaseEvent> releaseEvents = new ArrayList<>();
+        if(jReleaseEvents != null) {
+            for (int j = 0; j < jReleaseEvents.length(); j++) {
+                JSONObject jEvent = jReleaseEvents.getJSONObject(j);
+                if(jEvent.has(COMMENTED_KEY))
+                    releaseEvents.add(new AssetUploadingEvent(jEvent));
+                else if(jEvent.has(TAGS_KEY))
+                    releaseEvents.add(new RejectedReleaseEvent(jEvent));
+                else
+                    releaseEvents.add(new ReleaseStandardEvent(jEvent));
+            }
+        }
+        return releaseEvents;
     }
 
 }

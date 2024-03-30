@@ -2,16 +2,21 @@ package com.tecknobit.novacore.records.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.User;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.release.Release.RELEASES_KEY;
 
 @Entity
 @Table(name = PROJECTS_KEY)
@@ -76,9 +81,6 @@ public class Project extends NovaItem {
     })
     private final List<User> projectMembers;
 
-    @Transient
-    private final String workingProgressVersion;
-
     @OneToMany(
             mappedBy = PROJECT_KEY,
             cascade = CascadeType.ALL,
@@ -94,17 +96,26 @@ public class Project extends NovaItem {
     private final List<JoiningQRCode> joiningQRCodes;
 
     public Project() {
-        this(null, null, null, null, List.of(), null, List.of(), List.of());
+        this(null, null, null, null, List.of(), List.of(), List.of());
+    }
+
+    public Project(JSONObject jProject) {
+        super(jProject);
+        author = returnUserInstance(hItem.getJSONObject(AUTHOR_KEY));
+        logoUrl = hItem.getString(LOGO_URL_KEY);
+        name = hItem.getString(PROJECT_NAME_KEY);
+        projectMembers = User.returnUsersList(hItem.getJSONArray(PROJECT_MEMBERS_KEY));
+        releases = Release.returnReleasesList(hItem.getJSONArray(RELEASES_KEY));
+        joiningQRCodes = null;
     }
 
     public Project(String id, User author, String logoUrl, String name, List<User> projectMembers,
-                   String workingProgressVersion, List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
+                   List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
         super(id);
         this.author = author;
         this.logoUrl = logoUrl;
         this.name = name;
         this.projectMembers = projectMembers;
-        this.workingProgressVersion = workingProgressVersion;
         this.releases = releases;
         this.joiningQRCodes = joiningQRCodes;
     }
@@ -127,16 +138,16 @@ public class Project extends NovaItem {
 
     @JsonIgnore
     public String getWorkingProgressVersion() {
-        return workingProgressVersion;
+        return "workingProgressVersion";
     }
 
     @JsonIgnore
     public String getWorkingProgressVersionText() {
-        if(workingProgressVersion == null)
+        if("workingProgressVersion" == null)
             return null;
-        if(workingProgressVersion.startsWith("v. "))
-            return workingProgressVersion;
-        return "v. " + workingProgressVersion;
+        if("workingProgressVersion".startsWith("v. "))
+            return "workingProgressVersion";
+        return "v. " + "workingProgressVersion";
     }
 
     public List<Release> getReleases() {
@@ -185,6 +196,22 @@ public class Project extends NovaItem {
             if(release.getReleaseVersion().equals(releaseVersion))
                 return false;
         return true;
+    }
+
+    @Returner
+    public static Project returnProjectInstance(JSONObject jProject) {
+        if(jProject != null)
+            return new Project(jProject);
+        return null;
+    }
+
+    @Returner
+    public static List<Project> returnProjectsList(JSONArray jProjects) {
+        List<Project> projects = new ArrayList<>();
+        if(jProjects != null)
+            for (int j = 0; j < jProjects.length(); j++)
+                projects.add(new Project(jProjects.getJSONObject(j)));
+        return projects;
     }
 
 }

@@ -2,11 +2,17 @@ package com.tecknobit.novacore.records.release.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY;
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
@@ -49,6 +55,13 @@ public final class RejectedTag extends NovaItem {
         this(null, null, null, null);
     }
 
+    public RejectedTag(JSONObject jRejectedTag) {
+        super(jRejectedTag);
+        rejectedReleaseEvent = null;
+        tag = ReleaseTag.valueOf(hItem.getString(TAG_KEY));
+        comment = hItem.getString(COMMENT_KEY);
+    }
+
     public RejectedTag(String id, RejectedReleaseEvent rejectedReleaseEvent, ReleaseTag tag, String comment) {
         super(id);
         this.rejectedReleaseEvent = rejectedReleaseEvent;
@@ -67,6 +80,15 @@ public final class RejectedTag extends NovaItem {
 
     public String getComment() {
         return comment;
+    }
+
+    @Returner
+    public static List<RejectedTag> returnRejectedTagsList(JSONArray jTags) {
+        List<RejectedTag> tags = new ArrayList<>();
+        if(jTags != null)
+            for (int j = 0; j < jTags.length(); j++)
+                tags.add(new RejectedTag(jTags.getJSONObject(j)));
+        return tags;
     }
 
 }

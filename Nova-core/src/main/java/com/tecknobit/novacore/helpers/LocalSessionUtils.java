@@ -18,11 +18,12 @@ public interface LocalSessionUtils {
                     TOKEN_KEY + " VARCHAR(32) NOT NULL,\n" +
                     PROFILE_PIC_URL_KEY + " TEXT NOT NULL,\n" +
                     EMAIL_KEY + " VARCHAR(75) NOT NULL,\n" +
+                    PASSWORD_KEY + " VARCHAR(32) NOT NULL,\n" +
                     HOST_ADDRESS_KEY + " VARCHAR(75) NOT NULL,\n" +
                     ROLE_KEY + " VARCHAR(8) NOT NULL\n"
                     + ");";
 
-    void insertSession(String id, String token, String profilePicUrl, String email, String hostAddress,
+    void insertSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
                        Role role);
 
     List<NovaSession> getSessions();
@@ -33,7 +34,8 @@ public interface LocalSessionUtils {
 
     void deleteSession(String id);
 
-    record NovaSession(String id, String token, String profilePicUrl, String email, String hostAddress, Role role) {
+    record NovaSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
+                       Role role) {
 
         public static final String HOST_ADDRESS_KEY = "host_address";
 
