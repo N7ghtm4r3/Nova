@@ -15,6 +15,7 @@ import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.nova.Launcher.protector;
 import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.helpers.Endpoints.BASE_ENDPOINT;
+import static com.tecknobit.novacore.helpers.Endpoints.*;
 import static com.tecknobit.novacore.records.User.*;
 
 /**
@@ -24,27 +25,8 @@ import static com.tecknobit.novacore.records.User.*;
  * @see NovaController
  */
 @RestController
-//TODO: USE FROM CORE LIBRARY
-@RequestMapping(path = BASE_ENDPOINT + USERS_KEY)
+@RequestMapping(path = BASE_ENDPOINT)
 public class UsersController extends NovaController {
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String SIGN_UP_ENDPOINT = "/signUp";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String SIGN_IN_ENDPOINT = "/signIn";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String CHANGE_PROFILE_PIC_ENDPOINT = "/changeProfilePic";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String CHANGE_EMAIL_ENDPOINT = "/changeEmail";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String CHANGE_PASSWORD_ENDPOINT = "/changePassword";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String CHANGE_LANGUAGE_ENDPOINT = "/changeLanguage";
 
     /**
      * {@code usersHelper} helper to manage the users database operations

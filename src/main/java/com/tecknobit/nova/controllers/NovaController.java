@@ -15,6 +15,8 @@ import java.util.Optional;
 
 import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.FAILED;
 import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.novacore.helpers.Requester.RESPONSE_MESSAGE_KEY;
+import static com.tecknobit.novacore.helpers.Requester.RESPONSE_STATUS_KEY;
 
 /**
  * The {@code NovaController} class is useful to give the base behavior of the <b>Nova's controllers</b>
@@ -39,12 +41,6 @@ public abstract class NovaController {
      * {@code RESPONSE_SUCCESSFUL_MESSAGE} message to use when the request has been successful
      */
     public static final String RESPONSE_SUCCESSFUL_MESSAGE = "Operation executed successfully";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String RESPONSE_STATUS_KEY = "status";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String RESPONSE_MESSAGE_KEY = "response";
 
     /**
      * {@code usersRepository} instance for the user repository

@@ -22,7 +22,8 @@ import java.util.Map;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.novacore.InputValidator.*;
-import static com.tecknobit.novacore.helpers.Endpoints.BASE_ENDPOINT;
+import static com.tecknobit.novacore.helpers.Endpoints.*;
+import static com.tecknobit.novacore.helpers.Endpoints.COMMENT_ASSET_ENDPOINT;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.User.TOKEN_KEY;
@@ -46,25 +47,9 @@ import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent
  * @see ProjectManager
  */
 @RestController
-//TODO: USE FROM CORE LIBRARY
 @RequestMapping(BASE_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"
         + RELEASES_KEY + "/")
 public class ReleasesController extends ProjectManager {
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String ADD_RELEASE_ENDPOINT = "/addRelease";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String COMMENT_ASSET_ENDPOINT = "/comment/";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String EVENTS_ENDPOINT = "/events/";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String TAGS_ENDPOINT = "/tags/";
-
-    //TODO: USE FROM CORE LIBRARY
-    public static final String CREATE_REPORT_ENDPOINT = "/createReport";
 
     /**
      * {@code releasesHelper} helper to manage the releases database operations

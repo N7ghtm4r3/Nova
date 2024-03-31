@@ -30,6 +30,7 @@ public abstract class NovaItem {
     /**
      * {@code hItem} helper to work with JSON values
      */
+    @Transient
     protected final JsonHelper hItem;
 
     /**

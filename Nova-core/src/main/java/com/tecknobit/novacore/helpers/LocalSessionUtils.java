@@ -6,12 +6,27 @@ import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.HOST_
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.*;
 
+/**
+ * The {@code LocalSessionUtils} class is useful to manage the local sessions of the user, so manage the credentials
+ * of the user and all his/her personal data like profile pic, email and password
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ */
 public interface LocalSessionUtils {
 
+    /**
+     * {@code DATABASE_NAME} the name of the local database
+     */
     String DATABASE_NAME = "NovaSessions.db";
 
+    /**
+     * {@code SESSIONS_TABLE} the name of the sessions table
+     */
     String SESSIONS_TABLE = "sessions";
 
+    /**
+     * {@code CREATE_SESSIONS_TABLE} the query to create the {@link #SESSIONS_TABLE}
+     */
     String CREATE_SESSIONS_TABLE =
             "CREATE TABLE IF NOT EXISTS " + SESSIONS_TABLE + " (" +
                     IDENTIFIER_KEY + " VARCHAR(32) PRIMARY KEY,\n" +
@@ -23,20 +38,66 @@ public interface LocalSessionUtils {
                     ROLE_KEY + " VARCHAR(8) NOT NULL\n"
                     + ");";
 
+    /**
+     * Method to insert a new session
+     *
+     * @param id: the identifier of the user in that session
+     * @param token: the token of the user in that session
+     * @param profilePicUrl: the profile pic url of the user in that session
+     * @param email: the email of the user in that session
+     * @param password: the password of the user in that session
+     * @param hostAddress: the host address used in that session
+     * @param role: the identifier of the user in that session
+     */
     void insertSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
                        Role role);
 
+    /**
+     * Method to list all the local sessions of the user. <br>
+     * No-any params required
+     *
+     * @return the list of the local sessions of the user as {@link List} of {@link NovaSession}
+     */
     List<NovaSession> getSessions();
 
+    /**
+     * Method to get the local session specified by the identifier of the user in that session
+     *
+     * @param id: the user identifier to fetch the local session
+     * @return the local session as {@link NovaSession}
+     */
     NovaSession getSession(String id);
 
+    /**
+     * Method to delete all the local sessions, used when the user executes a logout or the account deletion <br>
+     * No-any params required
+     */
     void deleteAllSessions();
 
+    /**
+     * Method to delete a specific local session specified by the identifier of the user in that session
+     * @param id: the user identifier to delete the local session
+     */
     void deleteSession(String id);
 
+    /**
+     * The {@code NovaSession} record is useful to store and work with the local sessions
+     *
+     * @param id: the identifier of the user in that session
+     * @param token: the token of the user in that session
+     * @param profilePicUrl: the profile pic url of the user in that session
+     * @param email: the email of the user in that session
+     * @param password: the password of the user in that session
+     * @param hostAddress: the host address used in that session
+     * @param role: the identifier of the user in that session
+     * @author N7ghtm4r3 - Tecknobit
+     */
     record NovaSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
                        Role role) {
 
+        /**
+         * {@code HOST_ADDRESS_KEY} the key for the <b>"host_address"</b> field
+         */
         public static final String HOST_ADDRESS_KEY = "host_address";
 
     }
