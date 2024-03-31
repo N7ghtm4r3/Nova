@@ -17,10 +17,27 @@ import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_TABLE;
 import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;
 
+/**
+ * The {@code JoiningQRCodeRepository} interface is useful to manage the queries for the joining qrcodes
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see JoiningQRCode
+ */
 @Service
 @Repository
 public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, String> {
 
+    /**
+     *  Method to execute the query to add a new {@link JoiningQRCode}
+     *
+     * @param joiningQRCodeId: the identifier of the qrcode
+     * @param creationDate: the creation date when the qrcode has been created
+     * @param joinCode: the textual join code
+     * @param projectId: the project identifier where join with the qrcode
+     * @param role: the role to attribute at the members
+     * @param projectMembers: the emails of the members
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -51,6 +68,13 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
             @Param(PROJECT_MEMBERS_TABLE) String projectMembers
     );
 
+    /**
+     *  Method to execute the query to select a {@link JoiningQRCode} by its identifier
+     *
+     * @param joiningQRCodeId: the identifier of the qrcode to get
+     *
+     * @return the selected qrcode as {@link JoiningQRCode}
+     */
     @Query(
             value = "SELECT * FROM " + JOINING_QRCODES_TABLE + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
@@ -59,6 +83,13 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
             @Param(IDENTIFIER_KEY) String joiningQRCodeId
     );
 
+    /**
+     *  Method to execute the query to select a {@link JoiningQRCode} by its textual join code
+     *
+     * @param joinCode: the textual join code of the qrcode to get
+     *
+     * @return the selected qrcode as {@link JoiningQRCode}
+     */
     @Query(
             value = "SELECT * FROM " + JOINING_QRCODES_TABLE + " WHERE " + JOIN_CODE_KEY + "=:" + JOIN_CODE_KEY,
             nativeQuery = true
@@ -67,6 +98,13 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
             @Param(JOIN_CODE_KEY) String joinCode
     );
 
+    /**
+     *  Method to execute the query to update an existing {@link JoiningQRCode} after a user join in a project and
+     *  the allowed mailing list must remove the joined member
+     *
+     * @param joiningQRCodeId: the identifier of the qrcode
+     * @param projectMembers: the emails of the members
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -79,6 +117,12 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
             @Param(PROJECT_MEMBERS_TABLE) String projectMembers
     );
 
+    /**
+     *  Method to execute the query to delete an existing {@link JoiningQRCode} after that all the member joined in the
+     *  project or when the qrcode is expired
+     *
+     * @param joiningQRCodeId: the identifier of the qrcode to delete
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(

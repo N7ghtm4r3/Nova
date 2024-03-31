@@ -13,10 +13,25 @@ import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedTag.*;
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
 
+/**
+ * The {@code ReleaseTagRepository} interface is useful to manage the queries for the tag assigned when the releases
+ * are rejected
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see RejectedTag
+ */
 @Service
 @Repository
 public interface ReleaseTagRepository extends JpaRepository<RejectedTag, String> {
 
+    /**
+     * Method to execute the query to insert a new {@link RejectedTag}
+     *
+     * @param rejectedTagId: the identifier of the rejected tag
+     * @param tag: the value of the tag to insert
+     * @param eventId: the identifier of the event
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -39,6 +54,12 @@ public interface ReleaseTagRepository extends JpaRepository<RejectedTag, String>
             @Param(RELEASE_EVENT_KEY) String eventId
     );
 
+    /**
+     * Method to execute the query to comment an existing {@link RejectedTag}
+     *
+     * @param rejectedTagId: the identifier of the rejected tag
+     * @param comment: the comment to insert
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(

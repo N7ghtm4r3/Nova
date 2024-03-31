@@ -13,10 +13,26 @@ import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_KEY;
 import static com.tecknobit.novacore.records.release.Release.*;
 
+/**
+ * The {@code ReleasesRepository} interface is useful to manage the queries for the releases
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see Release
+ */
 @Service
 @Repository
 public interface ReleasesRepository extends JpaRepository<Release, String> {
 
+    /**
+     * Method to execute the query to add a new {@link Release}
+     *
+     * @param releaseId: the identifier of the release
+     * @param creationDate: the creation date when the release has been created
+     * @param releaseVersion: the version of the release
+     * @param projectId: the identifier of the project where attach the release
+     * @param releaseNotes: the notes attached to the release
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -44,6 +60,12 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
             @Param(RELEASE_NOTES_KEY) String releaseNotes
     );
 
+    /**
+     * Method to execute the query to approve an existing {@link Release}
+     *
+     * @param releaseId: the identifier of the release to approve
+     * @param approbationDate: the approbation date when the release has been approved
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -57,6 +79,12 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
             @Param(APPROBATION_DATE_KEY) long approbationDate
     );
 
+    /**
+     * Method to execute the query to set as finished the existing latest releases in a project
+     *
+     * @param projectId: the identifier of the project where set the pass {@link ReleaseStatus#Latest} releases as
+     * {@link ReleaseStatus#Finished}
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -67,9 +95,15 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
             nativeQuery = true
     )
     void setAsFinished(
-            @Param(PROJECT_KEY) String project
+            @Param(PROJECT_KEY) String projectId
     );
 
+    /**
+     * Method to execute the query to update the status of an existing {@link Release}
+     *
+     * @param releaseId: the identifier of the release to change status
+     * @param status: the status to set at the release
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -83,6 +117,11 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
             @Param(RELEASE_STATUS_KEY) String status
     );
 
+    /**
+     * Method to execute the query to delete an existing {@link Release}
+     *
+     * @param releaseId: the identifier of the release to delete
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(

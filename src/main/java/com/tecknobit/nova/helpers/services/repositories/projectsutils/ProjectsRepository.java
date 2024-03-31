@@ -15,10 +15,24 @@ import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.*;
 import static com.tecknobit.novacore.records.project.Project.*;
 
+/**
+ * The {@code ProjectsRepository} interface is useful to manage the queries for the projects
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see Project
+ */
 @Service
 @Repository
 public interface ProjectsRepository extends JpaRepository<Project, String> {
 
+    /**
+     *  Method to execute the query to get the list of {@link Project} where the user who made the request is the author
+     *
+     * @param userId: the identifier of the user
+     *
+     * @return list of projects as {@link List} of {@link Project}
+     */
     @Query(
             value = "SELECT * FROM " + PROJECTS_KEY + " WHERE " + AUTHOR_KEY + "=:" + IDENTIFIER_KEY,
             nativeQuery = true
@@ -27,6 +41,13 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(IDENTIFIER_KEY) String userId
     );
 
+    /**
+     *  Method to execute the query to get the list of {@link Project} where the user who made the request is a member
+     *
+     * @param userId: the identifier of the user
+     *
+     * @return list of projects as {@link List} of {@link Project}
+     */
     @Query(
             value = "SELECT " + PROJECTS_KEY + ".* FROM " + PROJECTS_KEY + " AS " + PROJECTS_KEY + " INNER JOIN "
                     + PROJECT_MEMBERS_TABLE + " AS " + PROJECT_MEMBERS_TABLE + " ON " + PROJECTS_KEY + "."
@@ -38,6 +59,14 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(IDENTIFIER_KEY) String userId
     );
 
+    /**
+     *  Method to execute the query to add a new {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     * @param logoUrl: the logo of the project formatted as url
+     * @param name: the project name
+     * @param author: the identifier of the author who create the project
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -60,7 +89,15 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(NAME_KEY) String name,
             @Param(AUTHOR_KEY) String author
     );
-    
+
+    /**
+     *  Method to execute the query to get an existing {@link Project} if the user is authorized
+     *
+     * @param projectId: the identifier of the project
+     * @param userId: the identifier of the user
+     *
+     * @return the selected project as {@link Project}
+     */
     @Query(
             value = "SELECT * FROM " + PROJECTS_KEY + " WHERE " + AUTHOR_KEY + "=:" + AUTHOR_KEY
                     + " AND " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY
@@ -76,6 +113,12 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
           @Param(AUTHOR_KEY) String userId
     );
 
+    /**
+     *  Method to execute the query to join a new member in an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     * @param memberId: the identifier of the member to join
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -95,6 +138,12 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(MEMBER_IDENTIFIER_KEY) String memberId
     );
 
+    /**
+     *  Method to execute the query to remove a member from an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     * @param memberId: the identifier of the member to remove
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -107,6 +156,11 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(MEMBER_IDENTIFIER_KEY) String memberId
     );
 
+    /**
+     *  Method to execute the query to remove all the members from an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -117,6 +171,11 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
             @Param(IDENTIFIER_KEY) String projectId
     );
 
+    /**
+     *  Method to execute the query to delete an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project to delete
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(

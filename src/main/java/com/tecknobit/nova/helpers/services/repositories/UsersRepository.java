@@ -11,10 +11,23 @@ import org.springframework.stereotype.Service;
 
 import static com.tecknobit.novacore.records.User.*;
 
+/**
+ * The {@code ReleaseTagRepository} interface is useful to manage the queries for the users operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see User
+ */
 @Service
 @Repository
 public interface UsersRepository extends JpaRepository<User, String> {
 
+    /**
+     * Method to execute the query to find a {@link User} by email field
+     *
+     * @param email: the email to find the user
+     * @return the user, if exists, as {@link User}
+     */
     @Query(
             value = "SELECT * FROM " + USERS_KEY + " WHERE " + EMAIL_KEY + "=:" + EMAIL_KEY,
             nativeQuery = true
@@ -23,6 +36,12 @@ public interface UsersRepository extends JpaRepository<User, String> {
             @Param(EMAIL_KEY) String email
     );
 
+    /**
+     * Method to execute the query to change the profile pic of the {@link User}
+     *
+     * @param profilePicUrl: the profile pic formatted as url
+     * @param id: the identifier of the user
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -35,6 +54,12 @@ public interface UsersRepository extends JpaRepository<User, String> {
             @Param(IDENTIFIER_KEY) String id
     );
 
+    /**
+     * Method to execute the query to change the email of the {@link User}
+     *
+     * @param newEmail: the new email of the user
+     * @param id: the identifier of the user
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -47,6 +72,12 @@ public interface UsersRepository extends JpaRepository<User, String> {
             @Param(IDENTIFIER_KEY) String id
     );
 
+    /**
+     * Method to execute the query to change the password of the {@link User}
+     *
+     * @param newPassword: the new password of the user
+     * @param id: the identifier of the user
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -59,6 +90,12 @@ public interface UsersRepository extends JpaRepository<User, String> {
             @Param(IDENTIFIER_KEY) String id
     );
 
+    /**
+     * Method to execute the query to change the language of the {@link User}
+     *
+     * @param newLanguage: the new language of the user
+     * @param id: the identifier of the user
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(

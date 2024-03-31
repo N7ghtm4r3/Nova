@@ -1,5 +1,8 @@
 package com.tecknobit.nova.helpers.services.repositories.releaseutils;
 
+import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
+import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
+import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent;
 import com.tecknobit.novacore.records.release.events.ReleaseEvent;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,10 +22,25 @@ import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
 import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY;
 
+/**
+ * The {@code ReleaseEventsRepository} interface is useful to manage the queries for the events of the releases
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see ReleaseEvent
+ */
 @Service
 @Repository
 public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, String> {
 
+    /**
+     * Method to execute the query to insert a new asset uploading event ({@link AssetUploadingEvent})
+     *
+     * @param eventId: the identifier of the event
+     * @param releaseEventDate: date when the event occurred
+     * @param releaseId: the identifier of the release when the event occurred
+     * @param status: the status of the event ({@link ReleaseStatus#Verifying})
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -47,6 +65,13 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(RELEASE_EVENT_STATUS_KEY) String status
     );
 
+    /**
+     * Method to execute the query to insert a new asset uploaded ({@link AssetUploaded})
+     *
+     * @param eventId: the identifier of the event
+     * @param assetId: the identifier of the asset
+     * @param assetUrl: the url to reach the asset
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -68,6 +93,11 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(ASSET_UPLOADING_EVENT_IDENTIFIER_KEY) String eventId
     );
 
+    /**
+     * Method to execute the query to set as commented the last {@link AssetUploadingEvent}
+     *
+     * @param eventId: the identifier of the event
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -80,6 +110,14 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(IDENTIFIER_KEY) String eventId
     );
 
+    /**
+     * Method to execute the query to insert a new rejected release event ({@link RejectedReleaseEvent})
+     *
+     * @param eventId: the identifier of the event
+     * @param releaseEventDate: date when the event occurred
+     * @param releaseId: the identifier of the release when the event occurred
+     * @param status: the status of the event ({@link ReleaseStatus#Rejected})
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -108,6 +146,14 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(REASONS_KEY) String reasons
     );
 
+    /**
+     * Method to execute the query to insert a new release event
+     *
+     * @param eventId: the identifier of the event
+     * @param releaseEventDate: date when the event occurred
+     * @param releaseId: the identifier of the release when the event occurred
+     * @param status: the status of the event
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -132,6 +178,11 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(RELEASE_EVENT_STATUS_KEY) String status
     );
 
+    /**
+     * Method to execute the query to delete an existing asset uploading event ({@link AssetUploadingEvent})
+     *
+     * @param eventId: the identifier of the event to delete
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -142,6 +193,11 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(IDENTIFIER_KEY) String eventId
     );
 
+    /**
+     * Method to execute the query to delete an existing rejected release event ({@link RejectedReleaseEvent})
+     *
+     * @param eventId: the identifier of the event to delete
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
@@ -152,6 +208,11 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
             @Param(IDENTIFIER_KEY) String eventId
     );
 
+    /**
+     * Method to execute the query to delete an existing release event
+     *
+     * @param eventId: the identifier of the event to delete
+     */
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
