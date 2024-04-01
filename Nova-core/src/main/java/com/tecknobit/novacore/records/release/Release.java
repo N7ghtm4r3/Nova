@@ -13,6 +13,8 @@ import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent;
 import com.tecknobit.novacore.records.release.events.ReleaseEvent;
 import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -236,7 +238,9 @@ public class Release extends NovaItem {
     /**
      * {@code releaseEvents} list of the events occurred on the release
      */
+    @Fetch(FetchMode.JOIN)
     @OneToMany(
+            fetch = FetchType.LAZY,
             mappedBy = RELEASE_KEY,
             cascade = CascadeType.ALL
     )

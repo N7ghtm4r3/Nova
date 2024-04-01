@@ -204,6 +204,9 @@ public class User extends NovaItem {
     @Column(name = ROLE_KEY)
     private final Role role;
 
+    /**
+     * {@code NovaNotification} the list of the notifications which belong to the user
+     */
     @OneToMany(
             mappedBy = USER_KEY,
             cascade = CascadeType.ALL,
@@ -252,14 +255,13 @@ public class User extends NovaItem {
      * Constructor to init the {@link User} class
      *
      * @param id: identifier of the user
-     * @param token: the token which the user is allowed to operate on server
-     * @param name: the name of the user
-     * @param surname: the surname of the user
-     * @param email: the email of the user
-     * @param password: the password of the user
-     * @param language: the language selected by the user
-     * @param role: the role of the user on the server
-     *
+     * @param token:{@code token} the token which the user is allowed to operate on server
+     * @param name:{@code name} the name of the user
+     * @param surname:{@code surname} the surname of the user
+     * @param email:{@code email} the email of the user
+     * @param password:{@code password} the password of the user
+     * @param language:{@code language} the language selected by the user
+     * @param role:{@code role} the role of the user on the server           @apiNote this value cannot change on server, this means when the user      execute the authentication on the server with a role it will be ever the same
      */
     public User(String id, String token, String name, String surname, String email, String password, String language,
                 Role role) {
@@ -271,17 +273,17 @@ public class User extends NovaItem {
      *
      *
      * @param id: identifier of the user
-     * @param token: the token which the user is allowed to operate on server
-     * @param name: the name of the user
-     * @param surname: the surname of the user
-     * @param email: the email of the user
-     * @param profilePicUrl: the profile pic of the user formatted as url
-     * @param password: the password of the user
-     * @param authoredProjects: list of projects which user is the author
-     * @param projects: list of projects which user is a member
-     * @param language: the language selected by the user
-     * @param role: the role of the user on the server
-     *
+     * @param token:{@code token} the token which the user is allowed to operate on server
+     * @param name:{@code name} the name of the user
+     * @param surname:{@code surname} the surname of the user
+     * @param email:{@code email} the email of the user
+     * @param profilePicUrl:{@code profilePicUrl} the profile pic of the user formatted as url
+     * @param password:{@code password} the password of the user
+     * @param authoredProjects:{@code authoredProjects} list of projects which user is the author           @apiNote if the user is a {@link Role#Customer} will be ever empty
+     * @param projects:{@code projects} list of projects which user is a member
+     * @param language:{@code language} the language selected by the user
+     * @param role:{@code role} the role of the user on the server           @apiNote this value cannot change on server, this means when the user      execute the authentication on the server with a role it will be ever the same
+     * @param notifications:{@code NovaNotification} the list of the notifications which belong to the user
      */
     public User(String id, String name, String surname, String email, String profilePicUrl, String token, String password,
                 List<Project> authoredProjects, List<Project> projects, String language, Role role,
@@ -400,6 +402,12 @@ public class User extends NovaItem {
         return role;
     }
 
+    /**
+     * Method to get {@link #notifications} instance <br>
+     * No-any params required
+     *
+     * @return {@link #notifications} instance as {@link List} of {@link NovaNotification}
+     */
     public List<NovaNotification> getNotifications() {
         return notifications;
     }

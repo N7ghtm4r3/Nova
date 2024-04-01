@@ -2,12 +2,15 @@ package com.tecknobit.nova.controllers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.nova.helpers.services.UsersHelper;
+import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
+import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
@@ -16,6 +19,7 @@ import static com.tecknobit.nova.Launcher.protector;
 import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.helpers.Endpoints.BASE_ENDPOINT;
 import static com.tecknobit.novacore.helpers.Endpoints.*;
+import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
 import static com.tecknobit.novacore.records.User.*;
 
 /**
@@ -32,6 +36,12 @@ public class UsersController extends NovaController {
      * {@code usersHelper} helper to manage the users database operations
      */
     private final UsersHelper usersHelper;
+
+    /**
+     * {@code notificationsRepository} instance useful to manage the notifications
+     */
+    @Autowired
+    private NotificationsRepository notificationsRepository;
 
     /**
      * Constructor to init the {@link UsersController} controller
@@ -177,7 +187,7 @@ public class UsersController extends NovaController {
      * @return the result of the request as {@link String}
      */
     @PostMapping(
-            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PROFILE_PIC_ENDPOINT,
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + CHANGE_PROFILE_PIC_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
@@ -221,7 +231,7 @@ public class UsersController extends NovaController {
      * @return the result of the request as {@link String}
      */
     @PatchMapping(
-            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_EMAIL_ENDPOINT,
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + CHANGE_EMAIL_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
@@ -265,7 +275,7 @@ public class UsersController extends NovaController {
      * @return the result of the request as {@link String}
      */
     @PatchMapping(
-            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_PASSWORD_ENDPOINT,
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + CHANGE_PASSWORD_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
@@ -309,7 +319,7 @@ public class UsersController extends NovaController {
      * @return the result of the request as {@link String}
      */
     @PatchMapping(
-            path = "/{" + IDENTIFIER_KEY + "}" + CHANGE_LANGUAGE_ENDPOINT,
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + CHANGE_LANGUAGE_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
@@ -337,6 +347,33 @@ public class UsersController extends NovaController {
     }
 
     /**
+     * Method to get the notifications of the user
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     *
+     * @return the result of the request as {@link String}
+     */
+    @GetMapping(
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}/" + NOTIFICATIONS_KEY,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}/notifications", method = GET)
+    public <T> T getNotifications(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if(isMe(id, token)) {
+            List<NovaNotification> notifications = notificationsRepository.getUserNotifications(id);
+            notificationsRepository.setUserNotificationsAsSent(id);
+            return (T) successResponse(notifications);
+        } else
+            return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    /**
      * Method to delete the account of the user
      *
      * @param id: the identifier of the user
@@ -345,7 +382,7 @@ public class UsersController extends NovaController {
      * @return the result of the request as {@link String}
      */
     @DeleteMapping(
-            path = "/{" + IDENTIFIER_KEY + "}",
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }

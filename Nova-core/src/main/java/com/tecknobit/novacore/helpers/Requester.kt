@@ -7,6 +7,7 @@ import com.tecknobit.apimanager.apis.APIRequest.*
 import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode
 import com.tecknobit.novacore.helpers.Endpoints.*
 import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
+import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
 import com.tecknobit.novacore.records.User.*
 import com.tecknobit.novacore.records.project.JoiningQRCode.CREATE_JOIN_CODE_KEY
 import com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY
@@ -238,6 +239,20 @@ open class Requester (
         return execPatch(
             endpoint = assembleUsersEndpointPath(CHANGE_LANGUAGE_ENDPOINT),
             payload = payload
+        )
+    }
+
+    /**
+     * Function to execute the request to get the user notifications
+     *
+     * No-any params required
+     *
+     * @return the result of the request as [JSONObject]
+     */
+    @RequestPath(path = "/api/v1/users/{id}/notifications", method = RequestMethod.GET)
+    fun getNotifications(): JSONObject {
+        return execGet(
+            endpoint = assembleUsersEndpointPath("/$NOTIFICATIONS_KEY")
         )
     }
 
@@ -922,7 +937,6 @@ open class Requester (
         runBlocking {
             async {
                 val requestUrl = host + endpoint
-                println(requestUrl)
                 if(payload != null) {
                     apiRequest.sendJSONPayloadedAPIRequest(
                         requestUrl,

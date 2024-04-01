@@ -6,6 +6,7 @@ import com.tecknobit.nova.helpers.services.repositories.releaseutils.Notificatio
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseEventsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseTagRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleasesRepository;
+import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.User;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
@@ -105,6 +106,16 @@ public class ReleasesHelper implements ResourcesManager {
     }
 
     /**
+     * Method to read all the notifications related to a specific {@link Release} for a user
+     *
+     * @param userId: the identifier of the user
+     * @param releaseId: the identifier of the release
+     */
+    public void readAllNotifications(String userId, String releaseId) {
+        notificationsRepository.setUserNotificationsAsRed(userId, releaseId);
+    }
+
+    /**
      * Method to upload a new assets on a release
      *
      * @param requesterUser: the user who made the request to uploads the assets
@@ -113,6 +124,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param assets: the assets to upload
      *
      * @return whether the upload has been successful
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     public boolean uploadAssets(String requesterUser, Project project, String releaseId,
                                 MultipartFile[] assets) throws IOException {
@@ -147,6 +161,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param project: the project where the release is attached
      * @param releaseId: the release identifier
      * @param eventId: the event related to those assets
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     public void approveAssets(String requesterUser, Project project, String releaseId, String eventId) {
         setApprovedStatus(requesterUser, project, releaseId);
@@ -163,6 +180,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param eventId: the event related to those assets
      * @param reasons: the reasons of the rejection
      * @param tags: the tags attached to the rejection
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     public void rejectAsset(String requesterUser, Project project, String releaseId, String eventId, String reasons,
                             ArrayList<ReleaseTag> tags) {
@@ -196,6 +216,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param requesterUser: the user who made a request
      * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     @Wrapper
     private void setVerifyingStatus(String requesterUser, Project project, String releaseId) {
@@ -208,6 +231,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param requesterUser: the user who made a request
      * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     @Wrapper
     private void setApprovedStatus(String requesterUser, Project project, String releaseId) {
@@ -220,6 +246,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param requesterUser: the user who made a request
      * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     @Wrapper
     private void setRejectedStatus(String requesterUser, Project project, String releaseId) {
@@ -232,6 +261,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param requesterUser: the user who made a request
      * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     @Wrapper
     public void setAlphaStatus(String requesterUser, Project project, String releaseId) {
@@ -244,6 +276,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param requesterUser: the user who made a request
      * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     @Wrapper
     public void setBetaStatus(String requesterUser, Project project, String releaseId) {
@@ -256,6 +291,9 @@ public class ReleasesHelper implements ResourcesManager {
      * @param requesterUser: the user who made a request
      * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
+     *
+     * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
+     * of the project
      */
     @Wrapper
     public void setLatestStatus(String requesterUser, Project project, String projectId, String releaseId) {

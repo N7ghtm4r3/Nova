@@ -142,6 +142,8 @@ public class ReleasesController extends ProjectManager {
      * @param token: the token of the user
      *
      * @return the result of the request as {@link String}
+     *
+     * @apiNote the notifications related to the release belong to the user will be set as red and deleted
      */
     @GetMapping(
             path = "{" + RELEASE_IDENTIFIER_KEY + "}",
@@ -158,9 +160,10 @@ public class ReleasesController extends ProjectManager {
     ) {
         if(isMe(id, token) && amIProjectMember(id, projectId)) {
             Release release = getReleaseIfAuthorized(releaseId);
-            if(release != null)
+            if(release != null) {
+                releasesHelper.readAllNotifications(id, releaseId);
                 return (T) successResponse(release);
-            else
+            } else
                 return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         } else
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
