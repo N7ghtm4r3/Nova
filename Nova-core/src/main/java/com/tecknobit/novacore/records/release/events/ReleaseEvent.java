@@ -127,7 +127,6 @@ public abstract class ReleaseEvent extends NovaItem {
      * {@code release} the date when the event is occurred
      */
     @ManyToOne(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
     @JoinColumn(name = RELEASE_IDENTIFIER_KEY)

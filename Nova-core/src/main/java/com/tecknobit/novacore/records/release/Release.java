@@ -189,7 +189,6 @@ public class Release extends NovaItem {
      * {@code project} the project where the release is linked
      */
     @ManyToOne(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
     @JoinColumn(name = PROJECT_KEY)

@@ -218,7 +218,7 @@ public class ProjectsHelper implements ResourcesManager {
     public void deleteProject(Project project) {
         String projectId = project.getId();
         for (Release release : project.getReleases())
-            releasesHelper.deleteRelease(release);
+            releasesHelper.deleteRelease(null, null, release);
         projectsRepository.removeAllMembers(projectId);
         projectsRepository.deleteProject(projectId);
         deleteLogoResource(projectId);

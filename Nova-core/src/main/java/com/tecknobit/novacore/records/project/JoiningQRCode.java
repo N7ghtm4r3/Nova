@@ -55,7 +55,6 @@ public class JoiningQRCode extends NovaItem {
      * {@code project} the project attached to the joining qrcode
      */
     @ManyToOne(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
     @JoinColumn(name = PROJECT_IDENTIFIER_KEY)

@@ -46,7 +46,6 @@ public final class RejectedTag extends NovaItem {
      * {@code rejectedReleaseEvent} the rejected event related to this tag
      */
     @ManyToOne(
-            fetch = FetchType.LAZY,
             cascade = CascadeType.ALL
     )
     @JoinColumn(name = RELEASE_EVENT_KEY)

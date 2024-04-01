@@ -105,7 +105,7 @@ public class ReleasesController extends ProjectManager {
             @RequestHeader(TOKEN_KEY) String token,
             @RequestBody Map<String, String> payload
     ) {
-        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+        if(isMe(id, token) && amIProjectMember(id, projectId)) {
             loadJsonHelper(payload);
             String releaseVersion = jsonHelper.getString(RELEASE_VERSION_KEY);
             releaseVersion = releaseVersion.replaceFirst("^v\\.", "");
@@ -531,10 +531,10 @@ public class ReleasesController extends ProjectManager {
             @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token
     ) {
-        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+        if(isMe(id, token) && amIProjectMember(id, projectId)) {
             Release release = getReleaseIfAuthorized(releaseId);
             if(release != null) {
-                releasesHelper.deleteRelease(release);
+                releasesHelper.deleteRelease(id, currentProject, release);
                 return successResponse();
             } else
                 return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);

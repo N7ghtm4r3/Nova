@@ -2,9 +2,12 @@ package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.nova.helpers.resources.ResourcesManager;
+import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseEventsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseTagRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleasesRepository;
+import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
 import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
@@ -48,6 +51,9 @@ public class ReleasesHelper implements ResourcesManager {
      */
     @Autowired
     private ReleaseTagRepository releaseTagRepository;
+
+    @Autowired
+    private NotificationsRepository notificationsRepository;
 
     /**
      * Method to add a new release
@@ -232,9 +238,11 @@ public class ReleasesHelper implements ResourcesManager {
     /**
      * Method to delete a release and all the data related to it
      *
+     * @param requesterUser: the user who made the request to delete the release
+     * @param project: the project where the release is attached
      * @param release: the release to delete
      */
-    public void deleteRelease(Release release) {
+    public void deleteRelease(String requesterUser, Project project, Release release) {
         String releaseId = release.getId();
         for (ReleaseEvent event : release.getReleaseEvents()) {
             String eventId = event.getId();
@@ -249,6 +257,24 @@ public class ReleasesHelper implements ResourcesManager {
         }
         deleteReportResource(releaseId);
         releasesRepository.deleteRelease(releaseId);
+        if(project != null) {
+            String releaseVersion = release.getReleaseVersion();
+            String authorId = project.getAuthor().getId();
+            if(!authorId.equals(requesterUser))
+                sendReleaseDeletedNotification(project, releaseVersion, authorId);
+            for (User member : project.getProjectMembers())
+                if(!member.getId().equals(requesterUser))
+                    sendReleaseDeletedNotification(project, releaseVersion, member.getId());
+        }
+    }
+
+    private void sendReleaseDeletedNotification(Project project, String releaseVersion, String memberId) {
+        notificationsRepository.insertReleaseDeletedNotification(
+                generateIdentifier(),
+                project.getLogoUrl(),
+                releaseVersion,
+                memberId
+        );
     }
 
 }

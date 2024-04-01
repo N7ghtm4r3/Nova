@@ -165,7 +165,6 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
          * {@code assetUploadingEvent} event where the asset has been uploaded
          */
         @ManyToOne(
-                fetch = FetchType.LAZY,
                 cascade = CascadeType.ALL
         )
         @JoinColumn(name = ASSET_UPLOADING_EVENT_IDENTIFIER_KEY)

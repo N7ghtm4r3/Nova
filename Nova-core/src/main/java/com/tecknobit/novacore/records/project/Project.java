@@ -7,6 +7,8 @@ import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.User;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.json.JSONArray;
@@ -15,6 +17,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
 import static com.tecknobit.novacore.records.User.*;
 import static com.tecknobit.novacore.records.release.Release.RELEASES_KEY;
 
@@ -77,7 +80,7 @@ public class Project extends NovaItem {
      * {@code author} the author of the project
      */
     @ManyToOne(
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             cascade = CascadeType.ALL
     )
     @JoinColumn(name = AUTHOR_KEY)
@@ -86,6 +89,7 @@ public class Project extends NovaItem {
             PASSWORD_KEY,
             PROJECTS_KEY,
             AUTHORED_PROJECTS_KEY,
+            NOTIFICATIONS_KEY,
             "hibernateLazyInitializer",
             "handler"
     })
@@ -110,7 +114,11 @@ public class Project extends NovaItem {
     /**
      * {@code projectMembers} the members of the project
      */
-    @ManyToMany(cascade = CascadeType.REMOVE)
+    @Fetch(FetchMode.JOIN)
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE
+    )
     @JoinTable(
             name = PROJECT_MEMBERS_TABLE,
             joinColumns = {@JoinColumn(name = IDENTIFIER_KEY)},
@@ -121,6 +129,7 @@ public class Project extends NovaItem {
             PASSWORD_KEY,
             PROJECTS_KEY,
             AUTHORED_PROJECTS_KEY,
+            NOTIFICATIONS_KEY,
             "hibernateLazyInitializer",
             "handler"
     })

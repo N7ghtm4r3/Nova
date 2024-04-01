@@ -1,6 +1,7 @@
 package com.tecknobit.novacore.records;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.novacore.records.project.Project;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
 import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 import static jakarta.persistence.EnumType.STRING;
@@ -202,6 +204,18 @@ public class User extends NovaItem {
     @Column(name = ROLE_KEY)
     private final Role role;
 
+    @OneToMany(
+            mappedBy = USER_KEY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnoreProperties({
+            USER_KEY,
+            "hibernateLazyInitializer",
+            "handler"
+    })
+    private final List<NovaNotification> notifications;
+
     /**
      * Constructor to init the {@link User} class <br>
      *
@@ -210,7 +224,7 @@ public class User extends NovaItem {
      * @apiNote empty constructor required
      */
     public User() {
-        this(null, null, null, null, null, null, null, List.of(), List.of(), null, null);
+        this(null, null, null, null, null, null, null, List.of(), List.of(), null, null, List.of());
     }
 
     /**
@@ -231,6 +245,7 @@ public class User extends NovaItem {
         projects = Project.returnProjectsList(hItem.getJSONArray(PROJECTS_KEY));
         language = hItem.getString(LANGUAGE_KEY);
         role = Role.valueOf(hItem.getString(ROLE_KEY));
+        notifications = NovaNotification.returnNotificationsList(hItem.getJSONArray(NOTIFICATIONS_KEY));
     }
 
     /**
@@ -248,7 +263,7 @@ public class User extends NovaItem {
      */
     public User(String id, String token, String name, String surname, String email, String password, String language,
                 Role role) {
-        this(id, name, surname, email, null, token, password, List.of(), List.of(), language, role);
+        this(id, name, surname, email, null, token, password, List.of(), List.of(), language, role, List.of());
     }
 
     /**
@@ -269,7 +284,8 @@ public class User extends NovaItem {
      *
      */
     public User(String id, String name, String surname, String email, String profilePicUrl, String token, String password,
-                List<Project> authoredProjects, List<Project> projects, String language, Role role) {
+                List<Project> authoredProjects, List<Project> projects, String language, Role role,
+                List<NovaNotification> notifications) {
         super(id);
         this.name = name;
         this.surname = surname;
@@ -281,6 +297,7 @@ public class User extends NovaItem {
         this.projects = projects;
         this.language = language;
         this.role = role;
+        this.notifications = notifications;
     }
 
     /**
@@ -381,6 +398,10 @@ public class User extends NovaItem {
      */
     public Role getRole() {
         return role;
+    }
+
+    public List<NovaNotification> getNotifications() {
+        return notifications;
     }
 
     /**
