@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
@@ -52,28 +53,50 @@ public class ReleasesHelper implements ResourcesManager {
     @Autowired
     private ReleaseTagRepository releaseTagRepository;
 
+    /**
+     * {@code notificationsRepository} instance useful to manage the notifications
+     */
     @Autowired
     private NotificationsRepository notificationsRepository;
 
     /**
      * Method to add a new release
      *
+     * @param requesterUser: the user who made the request to add the release
+     * @param project: the project where attach the release
      * @param releaseId: the identifier of the release
      * @param releaseVersion: the version of the release
-     * @param projectId: the identifier of the project where attach the release
+     * @param releaseNotesContent: the notes attached to the release
      */
-    public void addRelease(String projectId, String releaseId, String releaseVersion, String releaseNotesContent) {
+    public void addRelease(String requesterUser, Project project, String releaseId, String releaseVersion,
+                           String releaseNotesContent) {
         releasesRepository.addRelease(
                 releaseId,
                 System.currentTimeMillis(),
                 releaseVersion,
-                projectId,
+                project.getId(),
                 releaseNotesContent
         );
+        List<User> members = project.getProjectMembers();
+        members.add(project.getAuthor());
+        for(User member : members) {
+            String memberId = member.getId();
+            if(!memberId.equals(requesterUser)) {
+                notificationsRepository.insertNotification(
+                        generateIdentifier(),
+                        project.getLogoUrl(),
+                        releaseId,
+                        releaseVersion,
+                        ReleaseStatus.New.name(),
+                        memberId
+                );
+            }
+        }
     }
 
     /**
      * Method to get a release
+     *
      * @param releaseId: the release identifier
      * @return the release, if exists, as {@link Release}
      */
@@ -84,12 +107,15 @@ public class ReleasesHelper implements ResourcesManager {
     /**
      * Method to upload a new assets on a release
      *
+     * @param requesterUser: the user who made the request to uploads the assets
+     * @param project: the project where the release is attached
      * @param releaseId: the release identifier
      * @param assets: the assets to upload
      *
      * @return whether the upload has been successful
      */
-    public boolean uploadAssets(String releaseId, MultipartFile[] assets) throws IOException {
+    public boolean uploadAssets(String requesterUser, Project project, String releaseId,
+                                MultipartFile[] assets) throws IOException {
         String eventId = generateIdentifier();
         releaseEventsRepository.insertAssetUploading(
                 eventId,
@@ -110,30 +136,37 @@ public class ReleasesHelper implements ResourcesManager {
             } else
                 return false;
         }
-        setVerifyingStatus(releaseId);
+        setVerifyingStatus(requesterUser, project, releaseId);
         return true;
     }
 
     /**
      * Method to approve a release assets
+     *
+     * @param requesterUser: the user who made the request to approve the assets
+     * @param project: the project where the release is attached
      * @param releaseId: the release identifier
      * @param eventId: the event related to those assets
      */
-    public void approveAsset(String releaseId, String eventId) {
-        setApprovedStatus(releaseId);
+    public void approveAssets(String requesterUser, Project project, String releaseId, String eventId) {
+        setApprovedStatus(requesterUser, project, releaseId);
         releasesRepository.approveAsset(releaseId, System.currentTimeMillis());
         releaseEventsRepository.setUploadingCommented(eventId);
     }
 
     /**
      * Method reject a release assets
+     *
+     * @param requesterUser: the user who made the request to reject the assets
+     * @param project: the project where the release is attached
      * @param releaseId: the release identifier
      * @param eventId: the event related to those assets
      * @param reasons: the reasons of the rejection
      * @param tags: the tags attached to the rejection
      */
-    public void rejectAsset(String releaseId, String eventId, String reasons, ArrayList<ReleaseTag> tags) {
-        setRejectedStatus(releaseId);
+    public void rejectAsset(String requesterUser, Project project, String releaseId, String eventId, String reasons,
+                            ArrayList<ReleaseTag> tags) {
+        setRejectedStatus(requesterUser, project, releaseId);
         String rejectedReleaseEventId = generateIdentifier();
         releaseEventsRepository.insertRejectedReleaseEvent(
                 rejectedReleaseEventId,
@@ -149,6 +182,7 @@ public class ReleasesHelper implements ResourcesManager {
 
     /**
      * Method to insert a comment to a {@link RejectedTag}
+     *
      * @param comment: the comment to add
      * @param rejectedTagId: the identifier of the tag where place the comment
      */
@@ -159,72 +193,87 @@ public class ReleasesHelper implements ResourcesManager {
     /**
      * Method to set the {@link ReleaseStatus#Verifying} status
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      */
     @Wrapper
-    private void setVerifyingStatus(String releaseId) {
-        setReleaseStatus(releaseId, Verifying);
+    private void setVerifyingStatus(String requesterUser, Project project, String releaseId) {
+        setReleaseStatus(requesterUser, project, releaseId, Verifying);
     }
 
     /**
      * Method to set the {@link ReleaseStatus#Approved} status
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      */
     @Wrapper
-    private void setApprovedStatus(String releaseId) {
-        setReleaseStatus(releaseId, Approved);
+    private void setApprovedStatus(String requesterUser, Project project, String releaseId) {
+        setReleaseStatus(requesterUser, project, releaseId, Approved);
     }
 
     /**
      * Method to set the {@link ReleaseStatus#Rejected} status
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      */
     @Wrapper
-    private void setRejectedStatus(String releaseId) {
-        setReleaseStatus(releaseId, Rejected);
+    private void setRejectedStatus(String requesterUser, Project project, String releaseId) {
+        setReleaseStatus(requesterUser, project, releaseId, Rejected);
     }
 
     /**
      * Method to set the {@link ReleaseStatus#Alpha} status
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      */
     @Wrapper
-    public void setAlphaStatus(String releaseId) {
-        setReleaseStatus(releaseId, Alpha);
+    public void setAlphaStatus(String requesterUser, Project project, String releaseId) {
+        setReleaseStatus(requesterUser, project, releaseId, Alpha);
     }
 
     /**
      * Method to set the {@link ReleaseStatus#Beta} status
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      */
     @Wrapper
-    public void setBetaStatus(String releaseId) {
-        setReleaseStatus(releaseId, Beta);
+    public void setBetaStatus(String requesterUser, Project project, String releaseId) {
+        setReleaseStatus(requesterUser, project, releaseId, Beta);
     }
 
     /**
      * Method to set the {@link ReleaseStatus#Latest} status
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      */
     @Wrapper
-    public void setLatestStatus(String projectId, String releaseId) {
+    public void setLatestStatus(String requesterUser, Project project, String projectId, String releaseId) {
         releasesRepository.setAsFinished(projectId);
-        setReleaseStatus(releaseId, Latest);
+        setReleaseStatus(requesterUser, project, releaseId, Latest);
     }
 
     /**
      * Method to change the status of a release
      *
+     * @param requesterUser: the user who made a request
+     * @param project: the project where the release is attached
      * @param releaseId: the identifier of the release
      * @param status: the status to set
      */
-    private void setReleaseStatus(String releaseId, ReleaseStatus status) {
+    private void setReleaseStatus(String requesterUser, Project project, String releaseId, ReleaseStatus status) {
         releasesRepository.updateReleaseStatus(releaseId, status.name());
+        Release release = getRelease(releaseId);
         if(status != Verifying && status != Rejected) {
             releaseEventsRepository.insertReleaseEvent(
                     generateIdentifier(),
@@ -232,6 +281,21 @@ public class ReleasesHelper implements ResourcesManager {
                     releaseId,
                     status.name()
             );
+        }
+        List<User> members = project.getProjectMembers();
+        members.add(project.getAuthor());
+        for(User member : members) {
+            String memberId = member.getId();
+            if(!memberId.equals(requesterUser)) {
+                notificationsRepository.insertNotification(
+                        generateIdentifier(),
+                        project.getLogoUrl(),
+                        releaseId,
+                        release.getReleaseVersion(),
+                        status.name(),
+                        memberId
+                );
+            }
         }
     }
 
@@ -258,23 +322,20 @@ public class ReleasesHelper implements ResourcesManager {
         deleteReportResource(releaseId);
         releasesRepository.deleteRelease(releaseId);
         if(project != null) {
-            String releaseVersion = release.getReleaseVersion();
-            String authorId = project.getAuthor().getId();
-            if(!authorId.equals(requesterUser))
-                sendReleaseDeletedNotification(project, releaseVersion, authorId);
-            for (User member : project.getProjectMembers())
-                if(!member.getId().equals(requesterUser))
-                    sendReleaseDeletedNotification(project, releaseVersion, member.getId());
+            List<User> members = project.getProjectMembers();
+            members.add(project.getAuthor());
+            for (User member : project.getProjectMembers()) {
+                String memberId = member.getId();
+                if(!memberId.equals(requesterUser)) {
+                    notificationsRepository.insertReleaseDeletedNotification(
+                            generateIdentifier(),
+                            project.getLogoUrl(),
+                            release.getReleaseVersion(),
+                            memberId
+                    );
+                }
+            }
         }
-    }
-
-    private void sendReleaseDeletedNotification(Project project, String releaseVersion, String memberId) {
-        notificationsRepository.insertReleaseDeletedNotification(
-                generateIdentifier(),
-                project.getLogoUrl(),
-                releaseVersion,
-                memberId
-        );
     }
 
 }

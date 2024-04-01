@@ -4,6 +4,7 @@ import com.tecknobit.nova.controllers.projectmanagers.ProjectsController;
 import com.tecknobit.nova.helpers.resources.ResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
+import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
 import com.tecknobit.novacore.records.User;
 import com.tecknobit.novacore.records.project.JoiningQRCode;
 import com.tecknobit.novacore.records.project.Project;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.*;
 import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;
@@ -51,6 +53,12 @@ public class ProjectsHelper implements ResourcesManager {
      */
     @Autowired
     private ReleasesHelper releasesHelper;
+
+    /**
+     * {@code notificationsRepository} instance useful to manage the notifications
+     */
+    @Autowired
+    private NotificationsRepository notificationsRepository;
 
     /**
      * Method to get the project of a {@link User}
@@ -213,13 +221,26 @@ public class ProjectsHelper implements ResourcesManager {
     /**
      * Method to delete a project and all the data related to it
      *
+     * @param authorId: the author identifier who made the request to delete the project
      * @param project: the project to delete
      */
-    public void deleteProject(Project project) {
+    public void deleteProject(String authorId, Project project) {
         String projectId = project.getId();
         for (Release release : project.getReleases())
             releasesHelper.deleteRelease(null, null, release);
         projectsRepository.removeAllMembers(projectId);
+        List<User> members = project.getProjectMembers();
+        members.add(project.getAuthor());
+        for(User member : members) {
+            String memberId = member.getId();
+            if(!memberId.equals(authorId)) {
+                notificationsRepository.insertProjectDeletedNotification(
+                        generateIdentifier(),
+                        project.getLogoUrl(),
+                        memberId
+                );
+            }
+        }
         projectsRepository.deleteProject(projectId);
         deleteLogoResource(projectId);
     }

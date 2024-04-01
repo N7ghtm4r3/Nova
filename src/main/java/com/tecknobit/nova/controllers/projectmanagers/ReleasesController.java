@@ -5,7 +5,6 @@ import com.tecknobit.nova.controllers.NovaController;
 import com.tecknobit.nova.helpers.ReportsProvider;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ReleasesHelper;
-import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
 import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent;
@@ -23,7 +22,6 @@ import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.nova.Launcher.generateIdentifier;
 import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.helpers.Endpoints.*;
-import static com.tecknobit.novacore.helpers.Endpoints.COMMENT_ASSET_ENDPOINT;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.User.TOKEN_KEY;
@@ -113,13 +111,13 @@ public class ReleasesController extends ProjectManager {
                 releaseVersion = " " + releaseVersion;
             releaseVersion = "v." + releaseVersion;
             String releaseNotes = jsonHelper.getString(RELEASE_NOTES_KEY);
-            Project project = projectsHelper.getProject(id, projectId);
-            if(project != null) {
-                if(isReleaseVersionValid(releaseVersion) && project.hasNotReleaseVersion(releaseVersion)) {
+            if(currentProject != null) {
+                if(isReleaseVersionValid(releaseVersion) && currentProject.hasNotReleaseVersion(releaseVersion)) {
                     if(areReleaseNotesValid(releaseNotes)) {
                         String releaseId = generateIdentifier();
                         releasesHelper.addRelease(
-                                projectId,
+                                id,
+                                currentProject,
                                 releaseId,
                                 releaseVersion,
                                 releaseNotes
@@ -201,7 +199,7 @@ public class ReleasesController extends ProjectManager {
                 switch (release.getStatus()) {
                     case New, Rejected, Alpha, Beta -> {
                         try {
-                            if(releasesHelper.uploadAssets(releaseId, assets))
+                            if(releasesHelper.uploadAssets(id, currentProject, releaseId, assets))
                                 return successResponse();
                             return failedResponse(WRONG_ASSETS_MESSAGE);
                         } catch (IOException e) {
@@ -267,7 +265,7 @@ public class ReleasesController extends ProjectManager {
             path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
             method = POST
     )
-    public String commentAsset(
+    public String commentAssets(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
             @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
@@ -285,7 +283,7 @@ public class ReleasesController extends ProjectManager {
                         ReleaseStatus status = ReleaseStatus.valueOf(jsonHelper.getString(RELEASE_EVENT_STATUS_KEY));
                         switch (status) {
                             case Approved -> {
-                                releasesHelper.approveAsset(releaseId, eventId);
+                                releasesHelper.approveAssets(id, currentProject, releaseId, eventId);
                                 return successResponse();
                             }
                             case Rejected -> {
@@ -297,6 +295,8 @@ public class ReleasesController extends ProjectManager {
                                         for (String tag : tags)
                                             rejectedTags.add(ReleaseTag.fetchReleaseTag(tag));
                                         releasesHelper.rejectAsset(
+                                                id,
+                                                currentProject,
                                                 releaseId,
                                                 eventId,
                                                 reasons,
@@ -438,17 +438,17 @@ public class ReleasesController extends ProjectManager {
                             case Alpha -> {
                                 if(currentReleaseStatus != Approved)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                                releasesHelper.setAlphaStatus(releaseId);
+                                releasesHelper.setAlphaStatus(id, currentProject, releaseId);
                             }
                             case Beta -> {
                                 if(currentReleaseStatus == Approved || currentReleaseStatus == Beta)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                                releasesHelper.setBetaStatus(releaseId);
+                                releasesHelper.setBetaStatus(id, currentProject, releaseId);
                             }
                             case Latest -> {
                                 if(currentReleaseStatus == Alpha)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                                releasesHelper.setLatestStatus(projectId, releaseId);
+                                releasesHelper.setLatestStatus(id, currentProject, projectId, releaseId);
                             }
                             default -> {
                                 return failedResponse(WRONG_PROCEDURE_MESSAGE);

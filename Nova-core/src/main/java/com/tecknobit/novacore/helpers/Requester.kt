@@ -633,7 +633,7 @@ open class Requester (
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
         method = RequestMethod.POST
     )
-    fun commentAsset(
+    fun commentAssets(
         projectId: String,
         releaseId: String,
         eventId: String,
