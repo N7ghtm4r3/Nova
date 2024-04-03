@@ -232,7 +232,7 @@ public class InputValidator {
      * @return whether the language is valid or not as {@code boolean}
      */
     public static boolean isLanguageValid(String language) {
-        return language != null && LANGUAGES_SUPPORTED.containsKey(language);
+        return language != null && (LANGUAGES_SUPPORTED.containsKey(language) || LANGUAGES_SUPPORTED.containsValue(language));
     }
 
     /**

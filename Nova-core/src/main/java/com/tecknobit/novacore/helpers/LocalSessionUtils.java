@@ -1,5 +1,7 @@
 package com.tecknobit.novacore.helpers;
 
+import com.tecknobit.apimanager.annotations.Wrapper;
+
 import java.util.List;
 
 import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.HOST_ADDRESS_KEY;
@@ -33,11 +35,14 @@ public interface LocalSessionUtils {
                     IDENTIFIER_KEY + " VARCHAR(32) PRIMARY KEY,\n" +
                     TOKEN_KEY + " VARCHAR(32) NOT NULL,\n" +
                     PROFILE_PIC_URL_KEY + " TEXT NOT NULL,\n" +
+                    NAME_KEY + " VARCHAR(20) NOT NULL,\n" +
+                    SURNAME_KEY + " VARCHAR(30) NOT NULL,\n" +
                     EMAIL_KEY + " VARCHAR(75) NOT NULL,\n" +
                     PASSWORD_KEY + " VARCHAR(32) NOT NULL,\n" +
                     HOST_ADDRESS_KEY + " VARCHAR(75) NOT NULL,\n" +
                     ROLE_KEY + " VARCHAR(8) NOT NULL,\n"+
-                    IS_ACTIVE_SESSION_KEY + " BOOL DEFAULT 0\n"
+                    IS_ACTIVE_SESSION_KEY + " BOOL DEFAULT 0,\n" +
+                    LANGUAGE_KEY + " VARCHAR(2) NOT NULL\n"
                     + ");";
 
     /**
@@ -46,14 +51,17 @@ public interface LocalSessionUtils {
      * @param id: the identifier of the user in that session
      * @param token: the token of the user in that session
      * @param profilePicUrl: the profile pic url of the user in that session
+     * @param name: the name of the user
+     * @param surname: the surname of the user
      * @param email: the email of the user in that session
      * @param password: the password of the user in that session
      * @param hostAddress: the host address used in that session
      * @param role: the identifier of the user in that session
+     * @param language: the language of the user
      *
      */
-    void insertSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
-                       Role role);
+    void insertSession(String id, String token, String profilePicUrl, String name, String surname, String email,
+                       String password, String hostAddress, Role role, String language);
 
     /**
      * Method to change the current active session with a new one specified by the identifier
@@ -104,6 +112,44 @@ public interface LocalSessionUtils {
     NovaSession getActiveSession();
 
     /**
+     * Method to change the email value of the current session
+     *
+     * @param newEmail: the new email value to set
+     */
+    @Wrapper
+    default void changeEmail(String newEmail) {
+        changeSessionValue(EMAIL_KEY, newEmail);
+    }
+
+    /**
+     * Method to change the password value of the current session
+     *
+     * @param newPassword: the new password value to set
+     */
+    @Wrapper
+    default void changePassword(String newPassword) {
+        changeSessionValue(PASSWORD_KEY, newPassword);
+    }
+
+    /**
+     * Method to change the language value of the current session
+     *
+     * @param newLanguage: the new language value to set
+     */
+    @Wrapper
+    default void changeLanguage(String newLanguage) {
+        changeSessionValue(LANGUAGE_KEY, newLanguage);
+    }
+
+    /**
+     * Method to change a value of the current session
+     *
+     * @param key: the key of the value to change
+     * @param sessionValue: the new session value to set
+     */
+    void changeSessionValue(String key, String sessionValue);
+
+    /**
      * Method to delete all the local sessions, used when the user executes a logout or the account deletion <br>
      * No-any params required
      */
@@ -118,19 +164,9 @@ public interface LocalSessionUtils {
     /**
      * The {@code NovaSession} record is useful to store and work with the local sessions
      *
-     * @param id: the identifier of the user in that session
-     * @param token: the token of the user in that session
-     * @param profilePicUrl: the profile pic url of the user in that session
-     * @param email: the email of the user in that session
-     * @param password: the password of the user in that session
-     * @param hostAddress: the host address used in that session
-     * @param role: the identifier of the user in that session
-     * @param isActive: whether the current session is active
-     *
      * @author N7ghtm4r3 - Tecknobit
      */
-    record NovaSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
-                       Role role, boolean isActive) {
+    final class NovaSession {
 
         /**
          * {@code HOST_ADDRESS_KEY} the key for the <b>"host_address"</b> field
@@ -146,6 +182,226 @@ public interface LocalSessionUtils {
          * {@code LOGGED_AS_CUSTOMER_RECORD_VALUE} the value to use when the user is logging as customer
          */
         public static final String LOGGED_AS_CUSTOMER_RECORD_VALUE = "loggedAsCustomer";
+
+        /**
+         * {@code id} the identifier of the user in that session
+         */
+        private final String id;
+
+        /**
+         * {@code token} the toke of the user in that session
+         */
+        private final String token;
+
+        /**
+         * {@code profilePicUrl} the profile pic url of the user in that session
+         */
+        private final String profilePicUrl;
+
+        /**
+         * {@code name} the name of the user in that session
+         */
+        private final String name;
+
+        /**
+         * {@code surname} the surname of the user in that session
+         */
+        private final String surname;
+
+        /**
+         * {@code email} the email of the user in that session
+         */
+        private String email;
+
+        /**
+         * {@code password} the password of the user in that session
+         */
+        private String password;
+
+        /**
+         * {@code hostAddress} the host address used in that session
+         */
+        private final String hostAddress;
+
+        /**
+         * {@code role} the identifier of the user in that session
+         */
+        private final Role role;
+
+        /**
+         * {@code isActive} whether the current session is active
+         */
+        private final boolean isActive;
+
+        /**
+         * {@code language} the language of the user
+         */
+        private String language;
+
+        /**
+         * @param id:            the identifier of the user in that session
+         * @param token:         the token of the user in that session
+         * @param profilePicUrl: the profile pic url of the user in that session
+         * @param name:          the name of the user
+         * @param surname:       the surname of the user
+         * @param email:         the email of the user in that session
+         * @param password:      the password of the user in that session
+         * @param hostAddress:   the host address used in that session
+         * @param role:          the identifier of the user in that session
+         * @param isActive:      whether the current session is active
+         * @param language:      the language of the user
+         */
+        public NovaSession(String id, String token, String profilePicUrl, String name, String surname, String email,
+                           String password, String hostAddress, Role role, boolean isActive, String language) {
+            this.id = id;
+            this.token = token;
+            this.profilePicUrl = profilePicUrl;
+            this.name = name;
+            this.surname = surname;
+            this.email = email;
+            this.password = password;
+            this.hostAddress = hostAddress;
+            this.role = role;
+            this.isActive = isActive;
+            this.language = language;
+        }
+
+        /**
+         * Method to get {@link #id} instance <br>
+         * No-any params required
+         *
+         * @return {@link #id} instance as {@link String}
+         */
+        public String getId() {
+            return id;
+        }
+
+        /**
+         * Method to get {@link #token} instance <br>
+         * No-any params required
+         *
+         * @return {@link #token} instance as {@link String}
+         */
+        public String getToken() {
+            return token;
+        }
+
+        /**
+         * Method to get {@link #profilePicUrl} instance <br>
+         * No-any params required
+         *
+         * @return {@link #profilePicUrl} instance as {@link String}
+         */
+        public String getProfilePicUrl() {
+            return profilePicUrl;
+        }
+
+        /**
+         * Method to get {@link #name} instance <br>
+         * No-any params required
+         *
+         * @return {@link #name} instance as {@link String}
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Method to get {@link #surname} instance <br>
+         * No-any params required
+         *
+         * @return {@link #surname} instance as {@link String}
+         */
+        public String getSurname() {
+            return surname;
+        }
+
+        /**
+         * Method to get {@link #email} instance <br>
+         * No-any params required
+         *
+         * @return {@link #email} instance as {@link String}
+         */
+        public String getEmail() {
+            return email;
+        }
+
+        /**
+         * Method to set {@link #email} instance <br>
+         *
+         * @param email: the email value to set
+         */
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        /**
+         * Method to get {@link #password} instance <br>
+         * No-any params required
+         *
+         * @return {@link #password} instance as {@link String}
+         */
+        public String getPassword() {
+            return password;
+        }
+
+        /**
+         * Method to set {@link #password} instance <br>
+         *
+         * @param password: the password value to set
+         */
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        /**
+         * Method to get {@link #hostAddress} instance <br>
+         * No-any params required
+         *
+         * @return {@link #hostAddress} instance as {@link String}
+         */
+        public String getHostAddress() {
+            return hostAddress;
+        }
+
+        /**
+         * Method to get {@link #role} instance <br>
+         * No-any params required
+         *
+         * @return {@link #role} instance as {@link Role}
+         */
+        public Role getRole() {
+            return role;
+        }
+
+        /**
+         * Method to get {@link #isActive} instance <br>
+         * No-any params required
+         *
+         * @return {@link #isActive} instance as boolean
+         */
+        public boolean isActive() {
+            return isActive;
+        }
+
+        /**
+         * Method to get {@link #language} instance <br>
+         * No-any params required
+         *
+         * @return {@link #language} instance as {@link String}
+         */
+        public String getLanguage() {
+            return language;
+        }
+
+        /**
+         * Method to set {@link #language} instance <br>
+         *
+         * @param language: the language value to set
+         */
+        public void setLanguage(String language) {
+            this.language = language;
+        }
 
         /**
          * Method to get whether the member is a {@link Role#Vendor} <br>

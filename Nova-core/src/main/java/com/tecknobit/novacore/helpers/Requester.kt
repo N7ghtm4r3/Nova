@@ -82,10 +82,10 @@ open class Requester (
      * **mustValidateCertificates** flag whether the requests must validate the SSL certificates, this need for example
      * when the SSL is a self-signed certificate
      */
-    protected val mustValidateCertificates = host.startsWith("https")
+    protected var mustValidateCertificates = host.startsWith("https")
 
     init {
-        changeHost(host + BASE_ENDPOINT)
+        changeHost(host)
         setUserCredentials(userId, userToken)
     }
 
@@ -108,11 +108,14 @@ open class Requester (
     /**
      * Function to change during the runtime, for example when the local session changed, the host address to make the
      * requests
+     *
+     * @param host: the new host address to use
      */
     fun changeHost(
         host: String
     ) {
-        this.host = host
+        this.host = host + BASE_ENDPOINT
+        mustValidateCertificates = host.startsWith("https")
     }
 
     /**
