@@ -3,6 +3,7 @@ package com.tecknobit.novacore;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.commons.validator.routines.UrlValidator;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -70,7 +71,7 @@ public class InputValidator {
     /**
      * {@code DEFAULT_LANGUAGE} default language used
      */
-    public static final String DEFAULT_LANGUAGE = "ENGLISH";
+    public static final String DEFAULT_LANGUAGE = "en";
 
     /**
      * {@code WRONG_MAILING_LIST_MESSAGE} error message used when the mailing list inserted is not valid
@@ -135,28 +136,18 @@ public class InputValidator {
     /**
      * {@code LANGUAGES_SUPPORTED} list of the supported languages
      */
-    public static final List<String> LANGUAGES_SUPPORTED = List.of(
-            "RUSSIAN",
-            "ENGLISH",
-            "ARABIC",
-            "CHINESE",
-            "CZECH",
-            "DANISH",
-            "DUTCH",
-            "FRENCH",
-            "GERMAN",
-            "GREEK",
-            "HINDI",
-            "ITALIAN",
-            "JAPANESE",
-            "KOREAN",
-            "PORTUGUESE",
-            "SLOVAK",
-            "SPANISH",
-            "SWEDISH",
-            "TURKISH",
-            "UKRAINIAN"
-    );
+    public static final HashMap<String, String> LANGUAGES_SUPPORTED = new HashMap<>();
+
+    static {
+        LANGUAGES_SUPPORTED.put("it", "ITALIAN");
+        LANGUAGES_SUPPORTED.put("en", "ENGLISH");
+        LANGUAGES_SUPPORTED.put("de", "GERMAN");
+        LANGUAGES_SUPPORTED.put("fr", "FRENCH");
+        LANGUAGES_SUPPORTED.put("es", "SPANISH");
+        LANGUAGES_SUPPORTED.put("hi", "HINDI");
+        LANGUAGES_SUPPORTED.put("pt", "PORTUGUESE");
+        LANGUAGES_SUPPORTED.put("zh", "CHINESE");
+    }
 
     /**
      * Constructor to init the {@link InputValidator} class <br>
@@ -241,7 +232,7 @@ public class InputValidator {
      * @return whether the language is valid or not as {@code boolean}
      */
     public static boolean isLanguageValid(String language) {
-        return language != null && LANGUAGES_SUPPORTED.contains(language);
+        return language != null && LANGUAGES_SUPPORTED.containsKey(language);
     }
 
     /**

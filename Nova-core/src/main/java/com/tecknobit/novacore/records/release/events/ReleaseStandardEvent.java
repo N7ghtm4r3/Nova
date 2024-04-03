@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENTS_KEY;
 
 /**
@@ -16,6 +18,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
  *
  * @author N7ghtm4r3 - Tecknobit
  * @see NovaItem
+ * @see Serializable
  * @see ReleaseEvent
  */
 @Entity

@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,7 @@ import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;
  *
  * @author N7ghtm4r3 - Tecknobit
  * @see NovaItem
+ * @see Serializable
  */
 @Entity
 @Table(name = JoiningQRCode.JOINING_QRCODES_TABLE)

@@ -3,6 +3,7 @@ package com.tecknobit.novacore.helpers;
 import java.util.List;
 
 import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.HOST_ADDRESS_KEY;
+import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.IS_ACTIVE_SESSION_KEY;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.User.*;
 
@@ -35,7 +36,8 @@ public interface LocalSessionUtils {
                     EMAIL_KEY + " VARCHAR(75) NOT NULL,\n" +
                     PASSWORD_KEY + " VARCHAR(32) NOT NULL,\n" +
                     HOST_ADDRESS_KEY + " VARCHAR(75) NOT NULL,\n" +
-                    ROLE_KEY + " VARCHAR(8) NOT NULL\n"
+                    ROLE_KEY + " VARCHAR(8) NOT NULL,\n"+
+                    IS_ACTIVE_SESSION_KEY + " BOOL DEFAULT 0\n"
                     + ");";
 
     /**
@@ -48,9 +50,34 @@ public interface LocalSessionUtils {
      * @param password: the password of the user in that session
      * @param hostAddress: the host address used in that session
      * @param role: the identifier of the user in that session
+     *
      */
     void insertSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
                        Role role);
+
+    /**
+     * Method to change the current active session with a new one specified by the identifier
+     *
+     * @param id: the identifier of the session to set as active
+     */
+    default void changeActiveSession(String id) {
+        setCurrentActiveSessionAsInactive();
+        setNewActiveSession(id);
+    }
+
+    /**
+     * Method to set the current active session as inactive <br>
+     *
+     * No-any params required
+     */
+    void setCurrentActiveSessionAsInactive();
+
+    /**
+     * Method to set as the active session a new session
+     *
+     * @param id: the identifier of the session to set as active
+     */
+    void setNewActiveSession(String id);
 
     /**
      * Method to list all the local sessions of the user. <br>
@@ -67,6 +94,14 @@ public interface LocalSessionUtils {
      * @return the local session as {@link NovaSession}
      */
     NovaSession getSession(String id);
+
+    /**
+     * Method to get the current active local session <br>
+     *
+     * No-any params required
+     * @return the local session as {@link NovaSession}
+     */
+    NovaSession getActiveSession();
 
     /**
      * Method to delete all the local sessions, used when the user executes a logout or the account deletion <br>
@@ -90,15 +125,47 @@ public interface LocalSessionUtils {
      * @param password: the password of the user in that session
      * @param hostAddress: the host address used in that session
      * @param role: the identifier of the user in that session
+     * @param isActive: whether the current session is active
+     *
      * @author N7ghtm4r3 - Tecknobit
      */
     record NovaSession(String id, String token, String profilePicUrl, String email, String password, String hostAddress,
-                       Role role) {
+                       Role role, boolean isActive) {
 
         /**
          * {@code HOST_ADDRESS_KEY} the key for the <b>"host_address"</b> field
          */
         public static final String HOST_ADDRESS_KEY = "host_address";
+
+        /**
+         * {@code IS_ACTIVE_SESSION_KEY} the key for the <b>"is_active"</b> field
+         */
+        public static final String IS_ACTIVE_SESSION_KEY = "is_active";
+
+        /**
+         * {@code LOGGED_AS_CUSTOMER_RECORD_VALUE} the value to use when the user is logging as customer
+         */
+        public static final String LOGGED_AS_CUSTOMER_RECORD_VALUE = "loggedAsCustomer";
+
+        /**
+         * Method to get whether the member is a {@link Role#Vendor} <br>
+         * No-any params required
+         *
+         * @return whether the member is a {@link Role#Vendor} as boolean
+         */
+        public boolean isVendor() {
+            return role == Role.Vendor;
+        }
+
+        /**
+         * Method to get whether the member is a {@link Role#Customer} <br>
+         * No-any params required
+         *
+         * @return whether the member is a {@link Role#Customer} as boolean
+         */
+        public boolean isCustomer() {
+            return role == Role.Customer;
+        }
 
     }
 

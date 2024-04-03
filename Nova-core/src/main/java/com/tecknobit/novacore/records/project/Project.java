@@ -3,7 +3,9 @@ package com.tecknobit.novacore.records.project;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
+import com.tecknobit.novacore.records.NotificationsTarget;
 import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.User;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
@@ -14,6 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +29,12 @@ import static com.tecknobit.novacore.records.release.Release.RELEASES_KEY;
  *
  * @author N7ghtm4r3 - Tecknobit
  * @see NovaItem
+ * @see Serializable
+ * @see NotificationsTarget
  */
 @Entity
 @Table(name = PROJECTS_KEY)
-public class Project extends NovaItem {
+public class Project extends NovaItem implements NotificationsTarget {
 
     /**
      * {@code PROJECT_MEMBERS_TABLE} the key for the <b>"project members"</b> table
@@ -350,9 +355,10 @@ public class Project extends NovaItem {
      * @return whether the checked project has the specified release as boolean
      */
     public boolean hasRelease(String releaseId) {
-        for (Release release : releases)
-            if(release.getId().equals(releaseId))
-                return true;
+        if(releaseId != null)
+            for (Release release : releases)
+                if(release.getId().equals(releaseId))
+                    return true;
         return false;
     }
 
@@ -368,6 +374,22 @@ public class Project extends NovaItem {
             if(release.getReleaseVersion().equals(releaseVersion))
                 return false;
         return true;
+    }
+
+    /**
+     * Method to count the notifications of a specific target
+     *
+     * @param notifications: the list of notifications to check
+     *
+     * @return the count of the notifications for the specific target as int
+     */
+    @Override
+    public int getNotifications(List<NovaNotification> notifications) {
+        int notificationsCounter = 0;
+        for (NovaNotification notification : notifications)
+            if(hasRelease(notification.getReleaseId()))
+                notificationsCounter++;
+        return notificationsCounter;
     }
 
     /**

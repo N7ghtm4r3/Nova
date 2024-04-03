@@ -5,6 +5,10 @@ import com.tecknobit.apimanager.annotations.Wrapper
 import com.tecknobit.apimanager.apis.APIRequest
 import com.tecknobit.apimanager.apis.APIRequest.*
 import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode
+import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.*
+import com.tecknobit.apimanager.formatters.JsonHelper
+import com.tecknobit.novacore.InputValidator
+import com.tecknobit.novacore.InputValidator.DEFAULT_LANGUAGE
 import com.tecknobit.novacore.helpers.Endpoints.*
 import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
@@ -31,6 +35,7 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.io.File
+import java.io.IOException
 
 /**
  * The **Requester** class is useful to communicate with the Nova's backend
@@ -58,6 +63,8 @@ open class Requester (
          * **RESPONSE_MESSAGE_KEY** the key for the <b>"response"</b> field
          */
         const val RESPONSE_MESSAGE_KEY: String = "response"
+
+        const val SERVER_NOT_REACHABLE = "Server is temporarily unavailable"
 
     }
 
@@ -136,7 +143,12 @@ open class Requester (
         payload.addParam(SURNAME_KEY, surname)
         payload.addParam(EMAIL_KEY, email)
         payload.addParam(PASSWORD_KEY, password)
-        payload.addParam(LANGUAGE_KEY, language)
+        payload.addParam(LANGUAGE_KEY,
+            if(!InputValidator.isLanguageValid(language))
+                DEFAULT_LANGUAGE
+            else
+                language
+        )
         return execPost(
             endpoint = SIGN_UP_ENDPOINT,
             payload = payload
@@ -931,31 +943,53 @@ open class Requester (
         payload: Params? = null
     ) : JSONObject {
         var response: String? = null
-        val jResponse: JSONObject
+        var jResponse: JSONObject
         if(mustValidateCertificates)
             apiRequest.validateSelfSignedCertificate()
         runBlocking {
-            async {
-                val requestUrl = host + endpoint
-                if(payload != null) {
-                    apiRequest.sendJSONPayloadedAPIRequest(
-                        requestUrl,
-                        method,
-                        headers,
-                        payload
-                    )
-                } else {
-                    apiRequest.sendAPIRequest(
-                        requestUrl,
-                        method,
-                        headers
-                    )
-                }
-                response = apiRequest.response
-            }.await()
-            jResponse = JSONObject(response)
+            try {
+                async {
+                    val requestUrl = host + endpoint
+                    try {
+                        if(payload != null) {
+                            apiRequest.sendJSONPayloadedAPIRequest(
+                                requestUrl,
+                                method,
+                                headers,
+                                payload
+                            )
+                        } else {
+                            apiRequest.sendAPIRequest(
+                                requestUrl,
+                                method,
+                                headers
+                            )
+                        }
+                        response = apiRequest.response
+                    } catch (e: IOException) {
+                        response = connectionErrorMessage(SERVER_NOT_REACHABLE)
+                    }
+                }.await()
+                jResponse = JSONObject(response)
+            } catch (e: Exception) {
+                jResponse = JSONObject(connectionErrorMessage(SERVER_NOT_REACHABLE))
+            }
         }
         return jResponse
+    }
+
+    /**
+     * Function to set the [RESPONSE_STATUS_KEY] to send when an error during the connection occurred
+     *
+     * @param error: the error to use
+     *
+     * @return the error message as [String]
+     */
+    private fun connectionErrorMessage(error: String): String {
+        return JSONObject()
+            .put(RESPONSE_STATUS_KEY, GENERIC_RESPONSE)
+            .put(RESPONSE_MESSAGE_KEY, error)
+            .toString()
     }
 
     /**
@@ -964,17 +998,25 @@ open class Requester (
      * @param request: the request to execute
      * @param onSuccess: the action to execute if the request has been successful
      * @param onFailure: the action to execute if the request has been failed
+     * @param onConnectionError: the action to execute if the request has been failed for a connection error
      */
     fun sendRequest(
         request: () -> JSONObject,
-        onSuccess: (JSONObject) -> Unit,
-        onFailure: (JSONObject) -> Unit
+        onSuccess: (JsonHelper) -> Unit,
+        onFailure: (JSONObject) -> Unit,
+        onConnectionError: ((JsonHelper) -> Unit)? = null
     ) {
         val response = request.invoke()
-        if(isSuccessfulResponse(response))
-            onSuccess.invoke(response)
-        else
-            onFailure.invoke(response)
+        when(isSuccessfulResponse(response)) {
+            SUCCESSFUL -> onSuccess.invoke(JsonHelper(response))
+            GENERIC_RESPONSE -> {
+                if(onConnectionError != null)
+                    onConnectionError.invoke(JsonHelper(response))
+                else
+                    onFailure.invoke(response)
+            }
+            else -> onFailure.invoke(response)
+        }
     }
 
     /**
@@ -982,12 +1024,18 @@ open class Requester (
      *
      * @param response: the response of the request
      *
-     * @return whether the request has been successful or not as [Boolean]
+     * @return whether the request has been successful or not as [StandardResponseCode]
      */
     private fun isSuccessfulResponse(
-        response: JSONObject
-    ): Boolean {
-        return response.getString(RESPONSE_STATUS_KEY) == StandardResponseCode.SUCCESSFUL.name
+        response: JSONObject?
+    ): StandardResponseCode {
+        if(response == null || !response.has(RESPONSE_STATUS_KEY))
+            return FAILED
+        return when(response.getString(RESPONSE_STATUS_KEY)) {
+            SUCCESSFUL.name -> SUCCESSFUL
+            GENERIC_RESPONSE.name -> GENERIC_RESPONSE
+            else -> FAILED
+        }
     }
 
 }

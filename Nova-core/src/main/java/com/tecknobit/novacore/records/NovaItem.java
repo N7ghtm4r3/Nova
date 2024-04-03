@@ -5,15 +5,19 @@ import com.tecknobit.apimanager.formatters.JsonHelper;
 import jakarta.persistence.*;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * The {@code NovaItem} class is useful to create a Nova's item giving the basis utils to work correctly
  *
  * @author N7ghtm4r3 - Tecknobit
+ *
+ * @see Serializable
  */
 @Entity
 @Structure
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class NovaItem {
+public abstract class NovaItem implements Serializable {
 
     /**
      * {@code IDENTIFIER_KEY} the key for the <b>"id"</b> field

@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent
  *
  * @author N7ghtm4r3 - Tecknobit
  * @see NovaItem
+ * @see Serializable
  */
 @Entity
 @Structure

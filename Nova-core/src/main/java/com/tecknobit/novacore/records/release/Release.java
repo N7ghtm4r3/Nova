@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
+import com.tecknobit.novacore.records.NotificationsTarget;
 import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.User.Role;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
@@ -18,6 +20,7 @@ import org.hibernate.annotations.FetchMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +33,12 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
  *
  * @author N7ghtm4r3 - Tecknobit
  * @see NovaItem
+ * @see Serializable
+ * @see NotificationsTarget
  */
 @Entity
 @Table(name = Release.RELEASES_KEY)
-public class Release extends NovaItem {
+public class Release extends NovaItem implements NotificationsTarget {
 
     /**
      * {@code ALLOWED_ASSETS_TYPE} list of allowed type to upload as assets
@@ -455,6 +460,24 @@ public class Release extends NovaItem {
         if(releaseEvents.isEmpty())
             return 0L;
         return releaseEvents.get(releaseEvents.size() - 1).getReleaseEventTimestamp();
+    }
+
+    /**
+     * Method to count the notifications of a specific target
+     *
+     * @param notifications: the list of notifications to check
+     *
+     * @return the count of the notifications for the specific target as int
+     */
+    @Override
+    public int getNotifications(List<NovaNotification> notifications) {
+        int notificationsCounter = 0;
+        for (NovaNotification notification : notifications) {
+            String notificationReleaseId = notification.getReleaseId();
+            if(notificationReleaseId != null && notificationReleaseId.equals(id))
+                notificationsCounter++;
+        }
+        return notificationsCounter;
     }
 
     /**

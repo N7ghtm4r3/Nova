@@ -6,6 +6,7 @@ import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
 import jakarta.persistence.*;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,6 +15,7 @@ import java.util.List;
  *
  * @author N7ghtm4r3 - Tecknobit
  * @see NovaItem
+ * @see Serializable
  * @see ReleaseEvent
  * @see ReleaseStandardEvent
  */

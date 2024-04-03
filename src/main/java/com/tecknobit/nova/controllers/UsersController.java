@@ -158,6 +158,7 @@ public class UsersController extends NovaController {
                                 response.put(NAME_KEY, user.getName());
                                 response.put(SURNAME_KEY, user.getSurname());
                                 response.put(LANGUAGE_KEY, user.getLanguage());
+                                response.put(ROLE_KEY, user.getRole());
                             } else
                                 return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
                         } catch (Exception e) {
