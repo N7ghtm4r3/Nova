@@ -10,6 +10,7 @@ import com.tecknobit.apimanager.formatters.JsonHelper
 import com.tecknobit.novacore.InputValidator
 import com.tecknobit.novacore.InputValidator.DEFAULT_LANGUAGE
 import com.tecknobit.novacore.helpers.Endpoints.*
+import com.tecknobit.novacore.records.NovaItem
 import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
 import com.tecknobit.novacore.records.User.*
@@ -1043,6 +1044,18 @@ open class Requester (
             GENERIC_RESPONSE.name -> GENERIC_RESPONSE
             else -> FAILED
         }
+    }
+
+    interface ListFetcher<T : NovaItem> {
+
+        fun refreshList()
+
+    }
+
+    interface ItemFetcher<T : NovaItem> {
+
+        fun refreshItem()
+
     }
 
 }

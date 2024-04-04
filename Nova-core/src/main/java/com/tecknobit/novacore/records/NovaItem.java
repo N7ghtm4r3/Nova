@@ -35,7 +35,7 @@ public abstract class NovaItem implements Serializable {
      * {@code hItem} helper to work with JSON values
      */
     @Transient
-    protected final JsonHelper hItem;
+    protected transient final JsonHelper hItem;
 
     /**
      * Constructor to init the {@link NovaItem} class
