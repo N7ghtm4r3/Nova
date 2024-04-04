@@ -1,5 +1,6 @@
 package com.tecknobit.novacore.records.project;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
@@ -230,6 +231,7 @@ public class Project extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #logoUrl} instance as {@link String}
      */
+    @JsonGetter(LOGO_URL_KEY)
     public String getLogoUrl() {
         return logoUrl;
     }

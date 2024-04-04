@@ -112,6 +112,16 @@ public interface LocalSessionUtils {
     NovaSession getActiveSession();
 
     /**
+     * Method to change the profile pic value of the current session
+     *
+     * @param profilePic: the new profile pic value to set
+     */
+    @Wrapper
+    default void changeProfilePic(String profilePic) {
+        changeSessionValue(PROFILE_PIC_URL_KEY, getActiveSession().hostAddress + "/" + profilePic);
+    }
+
+    /**
      * Method to change the email value of the current session
      *
      * @param newEmail: the new email value to set
@@ -196,7 +206,7 @@ public interface LocalSessionUtils {
         /**
          * {@code profilePicUrl} the profile pic url of the user in that session
          */
-        private final String profilePicUrl;
+        private String profilePicUrl;
 
         /**
          * {@code name} the name of the user in that session
@@ -294,6 +304,15 @@ public interface LocalSessionUtils {
          */
         public String getProfilePicUrl() {
             return profilePicUrl;
+        }
+
+        /**
+         * Method to set {@link #profilePicUrl} instance <br>
+         *
+         * @param profilePicUrl: the profile pic url value to set
+         */
+        public void setProfilePicUrl(String profilePicUrl) {
+            this.profilePicUrl = profilePicUrl;
         }
 
         /**
@@ -401,6 +420,10 @@ public interface LocalSessionUtils {
          */
         public void setLanguage(String language) {
             this.language = language;
+        }
+
+        public boolean isHostSet() {
+            return !hostAddress.equals(LOGGED_AS_CUSTOMER_RECORD_VALUE);
         }
 
         /**

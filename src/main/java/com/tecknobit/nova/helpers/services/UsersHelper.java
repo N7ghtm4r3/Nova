@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.tecknobit.apimanager.apis.APIRequest.SHA256_ALGORITHM;
+import static java.lang.System.currentTimeMillis;
 
 /**
  * The {@code UsersHelper} class is useful to manage all the user database operations
@@ -77,8 +78,9 @@ public class UsersHelper implements ResourcesManager {
      * @param userId: the identifier of the user
      */
     public String changeProfilePic(MultipartFile profilePic, String userId) throws IOException {
-        String profilePicPath = createProfileResource(profilePic, userId);
+        String profilePicPath = createProfileResource(profilePic, userId + currentTimeMillis());
         usersRepository.changeProfilePic(profilePicPath, userId);
+        deleteProfileResource(userId);
         saveResource(profilePic, profilePicPath);
         return profilePicPath;
     }

@@ -1,5 +1,6 @@
 package com.tecknobit.novacore.records;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
@@ -340,6 +341,7 @@ public class User extends NovaItem {
      *
      * @return {@link #profilePicUrl} instance as {@link String}
      */
+    @JsonGetter(PROFILE_PIC_URL_KEY)
     public String getProfilePicUrl() {
         return profilePicUrl;
     }

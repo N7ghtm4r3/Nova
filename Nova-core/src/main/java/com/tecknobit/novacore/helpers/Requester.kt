@@ -47,9 +47,9 @@ import java.io.IOException
  * @author N7ghtm4r3 - Tecknobit
  */
 open class Requester (
-    protected var host: String,
-    protected var userId: String? = null,
-    protected var userToken: String? = null
+    public var host: String,
+    public var userId: String? = null,
+    public var userToken: String? = null
 ) {
 
     companion object {
@@ -64,6 +64,10 @@ open class Requester (
          */
         const val RESPONSE_MESSAGE_KEY: String = "response"
 
+        /**
+         * **SERVER_NOT_REACHABLE** message to send when the server is not available at the moment when the
+         * request has been sent
+         */
         const val SERVER_NOT_REACHABLE = "Server is temporarily unavailable"
 
     }
@@ -189,7 +193,7 @@ open class Requester (
      * @return the result of the request as [JSONObject]
      */
     @RequestPath(path = "/api/v1/users/{id}/changeProfilePic", method = RequestMethod.POST)
-    fun changeProfilePic(
+    open fun changeProfilePic(
         profilePic: File
     ) : JSONObject {
         val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
@@ -292,7 +296,7 @@ open class Requester (
      *
      * @return an endpoint to make the request as [String]
      */
-    private fun assembleUsersEndpointPath(
+    protected fun assembleUsersEndpointPath(
         endpoint: String = ""
     ): String {
         return "$USERS_KEY/$userId$endpoint"
@@ -321,7 +325,7 @@ open class Requester (
      * @return the result of the request as [JSONObject]
      */
     @RequestPath(path = "/api/v1/{id}/projects", method = RequestMethod.POST)
-    fun addProject(
+    open fun addProject(
         logoPic: File,
         projectName: String
     ) : JSONObject {
@@ -535,7 +539,7 @@ open class Requester (
      *
      * @return an endpoint to make the request as [String]
      */
-    private fun assembleProjectsEndpointPath(
+    protected fun assembleProjectsEndpointPath(
         endpoint: String = ""
     ): String {
         var vEndpoint: String = endpoint
@@ -602,7 +606,7 @@ open class Requester (
      * @return the result of the request as [JSONObject]
      */
     @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = RequestMethod.POST)
-    fun uploadAsset(
+    open fun uploadAsset(
         projectId: String,
         releaseId: String,
         assets: List<File>
@@ -630,7 +634,7 @@ open class Requester (
      *
      * @return the result of the request as [JSONObject]
      */
-    protected fun execMultipartRequest(
+     private fun execMultipartRequest(
         body: MultiValueMap<String, Any>,
         endpoint: String
     ) : JSONObject {
@@ -988,7 +992,7 @@ open class Requester (
      *
      * @return the error message as [String]
      */
-    private fun connectionErrorMessage(error: String): String {
+    protected fun connectionErrorMessage(error: String): String {
         return JSONObject()
             .put(RESPONSE_STATUS_KEY, GENERIC_RESPONSE)
             .put(RESPONSE_MESSAGE_KEY, error)
