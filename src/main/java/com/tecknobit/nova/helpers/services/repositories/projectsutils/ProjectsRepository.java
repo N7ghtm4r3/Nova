@@ -27,21 +27,6 @@ import static com.tecknobit.novacore.records.project.Project.*;
 public interface ProjectsRepository extends JpaRepository<Project, String> {
 
     /**
-     *  Method to execute the query to get the list of {@link Project} where the user who made the request is the author
-     *
-     * @param userId: the identifier of the user
-     *
-     * @return list of projects as {@link List} of {@link Project}
-     */
-    @Query(
-            value = "SELECT * FROM " + PROJECTS_KEY + " WHERE " + AUTHOR_KEY + "=:" + IDENTIFIER_KEY,
-            nativeQuery = true
-    )
-    List<Project> getAuthoredProjects(
-            @Param(IDENTIFIER_KEY) String userId
-    );
-
-    /**
      *  Method to execute the query to get the list of {@link Project} where the user who made the request is a member
      *
      * @param userId: the identifier of the user

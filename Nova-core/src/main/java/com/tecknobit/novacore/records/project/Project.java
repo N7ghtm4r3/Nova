@@ -304,6 +304,19 @@ public class Project extends NovaItem implements NotificationsTarget {
     }
 
     /**
+     * Method to get whether a {@link User#MEMBER_IDENTIFIER_KEY} is the author of the current project
+     *
+     * @param memberId: the member identifier to check
+     *
+     * @return whether a member is the author of the checked project as boolean
+     */
+    public boolean amITheProjectAuthor(String memberId) {
+        if(memberId == null)
+            return false;
+        return author.getId().equals(memberId);
+    }
+
+    /**
      * Method to get whether a {@link User#MEMBER_IDENTIFIER_KEY} is a member of the checked project
      * 
      * @param memberId: the member identifier to check

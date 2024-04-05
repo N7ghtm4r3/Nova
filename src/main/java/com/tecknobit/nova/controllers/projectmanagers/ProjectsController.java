@@ -269,6 +269,7 @@ public class ProjectsController extends ProjectManager {
                                         if(isPasswordValid(password)) {
                                             userId = generateIdentifier();
                                             String token = generateIdentifier();
+                                            Role role = joiningQRCode.getRole();
                                             try {
                                                 usersHelper.signUpUser(
                                                         userId,
@@ -278,11 +279,11 @@ public class ProjectsController extends ProjectManager {
                                                         email,
                                                         password,
                                                         language,
-                                                        joiningQRCode.getRole()
+                                                        role
                                                 );
-                                                response.put(IDENTIFIER_KEY, userId)
-                                                        .put(TOKEN_KEY, token)
-                                                        .put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC);
+                                                response.put(TOKEN_KEY, token)
+                                                        .put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC)
+                                                        .put(ROLE_KEY, role);
                                             } catch (NoSuchAlgorithmException e) {
                                                 return failedResponse(WRONG_PASSWORD_MESSAGE);
                                             }
@@ -300,7 +301,9 @@ public class ProjectsController extends ProjectManager {
                                 userId = user.getId();
                             }
                             projectsHelper.joinMember(joiningQRCode, email, userId);
-                            return successResponse(response);
+                            return successResponse(
+                                    response.put(IDENTIFIER_KEY, userId)
+                            );
                         } else
                             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
                     } else {

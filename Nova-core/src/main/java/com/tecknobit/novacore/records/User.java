@@ -247,7 +247,7 @@ public class User extends NovaItem {
         profilePicUrl = hItem.getString(PROFILE_PIC_URL_KEY);
         token = hItem.getString(TOKEN_KEY);
         password = hItem.getString(PASSWORD_KEY);
-        authoredProjects = Project.returnProjectsList(hItem.getJSONArray(AUTHORED_PROJECTS_KEY));
+        authoredProjects = null;
         projects = Project.returnProjectsList(hItem.getJSONArray(PROJECTS_KEY));
         language = hItem.getString(LANGUAGE_KEY);
         role = Role.valueOf(hItem.getString(ROLE_KEY));
@@ -364,16 +364,6 @@ public class User extends NovaItem {
      */
     public String getPassword() {
         return password;
-    }
-
-    /**
-     * Method to get {@link #authoredProjects} instance <br>
-     * No-any params required
-     *
-     * @return {@link #authoredProjects} instance as {@link List} of {@link Project}
-     */
-    public List<Project> getAuthoredProjects() {
-        return authoredProjects;
     }
 
     /**

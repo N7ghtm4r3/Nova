@@ -69,7 +69,6 @@ public class ProjectsHelper implements ResourcesManager {
      */
     public HashMap<String, List<Project>> getProjects(String userId) {
         HashMap<String, List<Project>> projects = new HashMap<>();
-        projects.put(AUTHORED_PROJECTS_KEY, projectsRepository.getAuthoredProjects(userId));
         projects.put(PROJECTS_KEY, projectsRepository.getProjects(userId));
         return projects;
     }
@@ -91,6 +90,7 @@ public class ProjectsHelper implements ResourcesManager {
                 name,
                 authorId
         );
+        projectsRepository.joinMember(projectId, authorId);
         saveResource(logo, logoUrl);
         return new JSONObject()
                 .put(NAME_KEY, name)
