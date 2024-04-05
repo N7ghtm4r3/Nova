@@ -1,5 +1,6 @@
 package com.tecknobit.novacore.records.release;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
@@ -336,6 +337,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #releaseVersion} instance as {@link String}
      */
+    @JsonGetter(RELEASE_VERSION_KEY)
     public String getReleaseVersion() {
         return releaseVersion;
     }
@@ -346,6 +348,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #status} instance as {@link ReleaseStatus}
      */
+    @JsonGetter(RELEASE_STATUS_KEY)
     public ReleaseStatus getStatus() {
         return status;
     }
@@ -356,6 +359,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #releaseNotes} instance as {@link String}
      */
+    @JsonGetter(RELEASE_NOTES_KEY)
     public String getReleaseNotes() {
         return releaseNotes;
     }
@@ -366,6 +370,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #creationDate} instance as long
      */
+    @JsonGetter(CREATION_DATE_KEY)
     public long getCreationTimestamp() {
         return creationDate;
     }
@@ -387,6 +392,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #releaseEvents} instance as {@link List} of {@link ReleaseEvent}
      */
+    @JsonGetter(RELEASE_EVENTS_KEY)
     public List<ReleaseEvent> getReleaseEvents() {
         return releaseEvents;
     }
@@ -397,6 +403,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #approbationDate} instance as long
      */
+    @JsonGetter(APPROBATION_DATE_KEY)
     public long getApprobationTimestamp() {
         return approbationDate;
     }
@@ -456,6 +463,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return the last event occurred instance as long
      */
+    @JsonIgnore
     public long getLastEvent() {
         if(releaseEvents.isEmpty())
             return 0L;

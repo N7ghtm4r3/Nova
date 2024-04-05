@@ -1,5 +1,6 @@
 package com.tecknobit.novacore.records.release.events;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
@@ -199,6 +200,7 @@ public abstract class ReleaseEvent extends NovaItem {
      *
      * @return {@link #releaseEventDate} instance as long
      */
+    @JsonGetter(RELEASE_EVENT_DATE_KEY)
     public long getReleaseEventTimestamp() {
         return releaseEventDate;
     }

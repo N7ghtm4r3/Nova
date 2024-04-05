@@ -4,6 +4,8 @@ import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -49,10 +51,13 @@ public class RejectedReleaseEvent extends ReleaseStandardEvent {
     @Column(name = REASONS_KEY)
     private final String reasons;
 
+
     /**
      * {@code tags} the tags attached to the rejection
      */
+    @Fetch(FetchMode.JOIN)
     @OneToMany(
+            fetch = FetchType.LAZY,
             mappedBy = REJECTED_RELEASE_EVENT_KEY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
@@ -80,7 +85,7 @@ public class RejectedReleaseEvent extends ReleaseStandardEvent {
     public RejectedReleaseEvent(JSONObject jRejectedReleaseEvent) {
         super(jRejectedReleaseEvent);
         reasons = hItem.getString(REASONS_KEY);
-        tags = RejectedTag.returnRejectedTagsList(hItem.getJSONArray(REJECTED_RELEASE_EVENT_KEY));
+        tags = RejectedTag.returnRejectedTagsList(hItem.getJSONArray(TAGS_KEY));
     }
 
     /**

@@ -19,10 +19,13 @@ import com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY
 import com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY
 import com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY
 import com.tecknobit.novacore.records.release.Release.*
+import com.tecknobit.novacore.records.release.Release.ReleaseStatus.Approved
+import com.tecknobit.novacore.records.release.Release.ReleaseStatus.Rejected
 import com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY
 import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.REASONS_KEY
 import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_KEY
 import com.tecknobit.novacore.records.release.events.RejectedTag.COMMENT_KEY
+import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag
 import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -652,6 +655,38 @@ open class Requester (
         return JSONObject(response)
     }
 
+    @Wrapper
+    fun approveAssets(
+        projectId: String,
+        releaseId: String,
+        eventId: String,
+    ): JSONObject {
+        return commentAssets(
+            projectId = projectId,
+            releaseId = releaseId,
+            eventId = eventId,
+            releaseStatus = Approved
+        )
+    }
+
+    @Wrapper
+    fun rejectAssets(
+        projectId: String,
+        releaseId: String,
+        eventId: String,
+        reasons: String,
+        tags: List<ReleaseTag>
+    ): JSONObject {
+        return commentAssets(
+            projectId = projectId,
+            releaseId = releaseId,
+            eventId = eventId,
+            releaseStatus = Rejected,
+            reasons = reasons,
+            tags = tags
+        )
+    }
+
     /**
      * Function to execute the request to comment the last assets uploaded
      *
@@ -668,20 +703,24 @@ open class Requester (
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
         method = RequestMethod.POST
     )
-    fun commentAssets(
+    private fun commentAssets(
         projectId: String,
         releaseId: String,
         eventId: String,
         releaseStatus: ReleaseStatus,
         reasons: String? = null,
-        tags: String? = null
+        tags: List<ReleaseTag>? = null
     ) : JSONObject {
         val payload = Params()
         payload.addParam(RELEASE_EVENT_STATUS_KEY, releaseStatus)
         if(reasons != null)
             payload.addParam(REASONS_KEY, reasons)
-        if(tags != null)
-            payload.addParam(TAGS_KEY, formatValuesList(tags))
+        if(tags != null) {
+            payload.addParam(TAGS_KEY, formatValuesList(tags.toString()
+                .replace("[", "")
+                .replace("]", "")
+            ))
+        }
         return execPost(
             endpoint = assembleReleasesEndpointPath(
                 projectId = projectId,
@@ -810,7 +849,7 @@ open class Requester (
 
      * @return an endpoint to make the request as [String]
      */
-    private fun assembleReleasesEndpointPath(
+    protected fun assembleReleasesEndpointPath(
         projectId: String,
         releaseId: String = "",
         extraId: String = "",

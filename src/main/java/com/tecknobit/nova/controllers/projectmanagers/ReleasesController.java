@@ -296,7 +296,8 @@ public class ReleasesController extends ProjectManager {
                                         ArrayList<String> tags = jsonHelper.fetchList(TAGS_KEY, new ArrayList<>());
                                         ArrayList<ReleaseTag> rejectedTags = new ArrayList<>();
                                         for (String tag : tags)
-                                            rejectedTags.add(ReleaseTag.fetchReleaseTag(tag));
+                                            if(!tag.isBlank())
+                                                rejectedTags.add(ReleaseTag.fetchReleaseTag(tag));
                                         releasesHelper.rejectAsset(
                                                 id,
                                                 currentProject,
@@ -444,7 +445,7 @@ public class ReleasesController extends ProjectManager {
                                 releasesHelper.setAlphaStatus(id, currentProject, releaseId);
                             }
                             case Beta -> {
-                                if(currentReleaseStatus == Approved || currentReleaseStatus == Beta)
+                                if(currentReleaseStatus == Beta)
                                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
                                 releasesHelper.setBetaStatus(id, currentProject, releaseId);
                             }
