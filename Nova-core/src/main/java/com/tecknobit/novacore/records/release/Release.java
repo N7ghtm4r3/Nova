@@ -256,7 +256,7 @@ public class Release extends NovaItem implements NotificationsTarget {
             "hibernateLazyInitializer",
             "handler"
     })
-    @OrderBy(RELEASE_EVENT_DATE_KEY)
+    @OrderBy(RELEASE_EVENT_DATE_KEY + " DESC")
     private final List<ReleaseEvent> releaseEvents;
 
     /**

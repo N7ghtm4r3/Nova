@@ -1,6 +1,6 @@
 package com.tecknobit.novacore.records;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
 import jakarta.persistence.*;
@@ -125,7 +125,7 @@ public class NovaNotification extends NovaItem {
     public NovaNotification(JSONObject jNotification) {
         super(jNotification);
         projectLogo = hItem.getString(LOGO_URL_KEY);
-        user = null;
+        user = returnUserInstance(hItem.getJSONObject(USER_KEY));
         releaseId = hItem.getString(RELEASE_IDENTIFIER_KEY);
         String sStatus = hItem.getString(RELEASE_STATUS_KEY);
         if(sStatus != null)
@@ -165,6 +165,7 @@ public class NovaNotification extends NovaItem {
      *
      * @return {@link #projectLogo} instance as {@link String}
      */
+    @JsonGetter(LOGO_URL_KEY)
     public String getProjectLogo() {
         return projectLogo;
     }
@@ -175,7 +176,6 @@ public class NovaNotification extends NovaItem {
      *
      * @return {@link #user} instance as {@link User}
      */
-    @JsonIgnore
     public User getUser() {
         return user;
     }
@@ -186,6 +186,7 @@ public class NovaNotification extends NovaItem {
      *
      * @return {@link #releaseId} instance as {@link String}
      */
+    @JsonGetter(RELEASE_IDENTIFIER_KEY)
     public String getReleaseId() {
         return releaseId;
     }
@@ -196,6 +197,7 @@ public class NovaNotification extends NovaItem {
      *
      * @return {@link #status} instance as {@link ReleaseStatus}
      */
+    @JsonGetter(RELEASE_STATUS_KEY)
     public ReleaseStatus getStatus() {
         return status;
     }
@@ -206,6 +208,7 @@ public class NovaNotification extends NovaItem {
      *
      * @return {@link #releaseVersion} instance as {@link String}
      */
+    @JsonGetter(RELEASE_VERSION_KEY)
     public String getReleaseVersion() {
         return releaseVersion;
     }
@@ -216,6 +219,7 @@ public class NovaNotification extends NovaItem {
      *
      * @return {@link #isSent} instance as boolean
      */
+    @JsonGetter(IS_SENT_KEY)
     public boolean isSent() {
         return isSent;
     }

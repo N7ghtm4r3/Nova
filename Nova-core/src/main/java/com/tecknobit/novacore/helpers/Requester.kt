@@ -1100,7 +1100,7 @@ open class Requester (
      *
      * @return whether the request has been successful or not as [StandardResponseCode]
      */
-    private fun isSuccessfulResponse(
+    protected fun isSuccessfulResponse(
         response: JSONObject?
     ): StandardResponseCode {
         if(response == null || !response.has(RESPONSE_STATUS_KEY))
