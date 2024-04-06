@@ -422,6 +422,11 @@ public interface LocalSessionUtils {
             this.language = language;
         }
 
+        /**
+         * Method to get whether the {@link #hostAddress} has been set
+         *
+         * @return whether the {@link #hostAddress} has been set as boolean
+         */
         public boolean isHostSet() {
             return !hostAddress.equals(LOGGED_AS_CUSTOMER_RECORD_VALUE);
         }

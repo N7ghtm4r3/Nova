@@ -23,10 +23,12 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.tecknobit.novacore.records.project.Project.PROJECT_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
 
 /**
@@ -468,6 +470,26 @@ public class Release extends NovaItem implements NotificationsTarget {
         if(releaseEvents.isEmpty())
             return 0L;
         return releaseEvents.get(releaseEvents.size() - 1).getReleaseEventTimestamp();
+    }
+
+    /**
+     * Method to get the last promotion event occurred in the current release <br>
+     * No-any params required
+     *
+     * @return the last status of the last promotion event occurred as {@link ReleaseStatus}
+     */
+    public ReleaseStatus getLastPromotionStatus() {
+        ArrayList<ReleaseEvent> events = new ArrayList<>(releaseEvents);
+        Collections.reverse(events);
+        for(ReleaseEvent releaseEvent : events) {
+            if(releaseEvent instanceof ReleaseStandardEvent) {
+                if(((ReleaseStandardEvent) releaseEvent).getStatus() == Beta)
+                    return Beta;
+                else if(((ReleaseStandardEvent) releaseEvent).getStatus() == Alpha)
+                    return Alpha;
+            }
+        }
+        return Approved;
     }
 
     /**

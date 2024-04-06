@@ -10,7 +10,6 @@ import com.tecknobit.apimanager.formatters.JsonHelper
 import com.tecknobit.novacore.InputValidator
 import com.tecknobit.novacore.InputValidator.DEFAULT_LANGUAGE
 import com.tecknobit.novacore.helpers.Endpoints.*
-import com.tecknobit.novacore.records.NovaItem
 import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
 import com.tecknobit.novacore.records.User.*
@@ -655,7 +654,20 @@ open class Requester (
         return JSONObject(response)
     }
 
+    /**
+     * Function to execute the request to approve the last assets uploaded
+     *
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier where comment the assets
+     * @param eventId: the event identifier to comment
+     *
+     * @return the result of the request as [JSONObject]
+     */
     @Wrapper
+    @RequestPath(
+        path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
+        method = RequestMethod.POST
+    )
     fun approveAssets(
         projectId: String,
         releaseId: String,
@@ -669,7 +681,22 @@ open class Requester (
         )
     }
 
+    /**
+     * Function to execute the request to reject the last assets uploaded
+     *
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier where comment the assets
+     * @param eventId: the event identifier to comment
+     * @param reasons: the reasons of the rejections
+     * @param tags: list of tags attached to the rejection
+     *
+     * @return the result of the request as [JSONObject]
+     */
     @Wrapper
+    @RequestPath(
+        path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
+        method = RequestMethod.POST
+    )
     fun rejectAssets(
         projectId: String,
         releaseId: String,
@@ -1085,14 +1112,34 @@ open class Requester (
         }
     }
 
-    interface ListFetcher<T : NovaItem> {
+    /**
+     * The **ListFetcher** interface is useful to manage the requests to refresh a list of items
+     *
+     * @author N7ghtm4r3 - Tecknobit
+     */
+    interface ListFetcher {
 
+        /**
+         * Function to refresh a list of item
+         *
+         * No-any params required
+         */
         fun refreshList()
 
     }
 
-    interface ItemFetcher<T : NovaItem> {
+    /**
+     * The **ItemFetcher** interface is useful to manage the requests to refresh a single item
+     *
+     * @author N7ghtm4r3 - Tecknobit
+     */
+    interface ItemFetcher {
 
+        /**
+         * Function to refresh a single item
+         *
+         * No-any params required
+         */
         fun refreshItem()
 
     }
