@@ -1,5 +1,6 @@
 package com.tecknobit.novacore.records.release.events;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
@@ -124,6 +125,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
      *
      * @return {@link #assetsUploaded} instance as {@link List} of {@link AssetUploaded}
      */
+    @JsonGetter(ASSETS_UPLOADED_KEY)
     public List<AssetUploaded> getAssetsUploaded() {
         return assetsUploaded;
     }
@@ -239,6 +241,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
          *
          * @return {@link #url} instance as {@link String}
          */
+        @JsonGetter(ASSET_URL_KEY)
         public String getUrl() {
             return url;
         }
