@@ -327,7 +327,6 @@ public class Release extends NovaItem implements NotificationsTarget {
      *
      * @return {@link #project} instance as {@link Project}
      */
-    @JsonIgnore
     public Project getProject() {
         return project;
     }

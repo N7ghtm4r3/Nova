@@ -1,6 +1,7 @@
 package com.tecknobit.novacore.records;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
 import jakarta.persistence.*;
@@ -168,6 +169,17 @@ public class NovaNotification extends NovaItem {
     @JsonGetter(LOGO_URL_KEY)
     public String getProjectLogo() {
         return projectLogo;
+    }
+
+    /**
+     * Method to get the project identifier <br>
+     * No-any params required
+     *
+     * @return the project identifier as {@link String}
+     */
+    @JsonIgnore
+    public String getProjectId() {
+        return projectLogo.replace("logos/", "").split("\\.")[0];
     }
 
     /**

@@ -363,6 +363,20 @@ public class Project extends NovaItem implements NotificationsTarget {
     }
 
     /**
+     * Method to get from current project a {@link Release} by its identifier
+     *
+     * @param releaseId: the identifier of the release to get
+     * @return the release to get as {@link Release} or null if not exists
+     */
+    public Release getRelease(String releaseId) {
+        if(releaseId != null)
+            for (Release release : releases)
+                if(release.getId().equals(releaseId))
+                    return release;
+        return null;
+    }
+
+    /**
      * Method to get whether the checked project has the specified release
      *
      * @param releaseId: the identifier of the release to check
