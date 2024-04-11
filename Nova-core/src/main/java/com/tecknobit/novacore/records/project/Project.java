@@ -257,29 +257,16 @@ public class Project extends NovaItem implements NotificationsTarget {
     }
 
     /**
-     * Method to get {@link #"workingProgressVersion"} instance <br>
+     * Method to get the {@link #"workingProgressVersion"} <br>
      * No-any params required
      *
-     * @return {@link #"workingProgressVersion"} instance as {@link String}
+     * @return {@link #"workingProgressVersion"} as {@link String}
      */
     @JsonIgnore
     public String getWorkingProgressVersion() {
-        return "workingProgressVersion";
-    }
-
-    /**
-     * Method to get the version of the current release work in progress <br>
-     * No-any params required
-     *
-     * @return the version of the current release work in progress as {@link String}
-     */
-    @JsonIgnore
-    public String getWorkingProgressVersionText() {
-        if("workingProgressVersion" == null)
-            return null;
-        if("workingProgressVersion".startsWith("v. "))
-            return "workingProgressVersion";
-        return "v. " + "workingProgressVersion";
+        if(!releases.isEmpty())
+            return releases.get(releases.size() - 1).getReleaseVersion();
+        return null;
     }
 
     /**

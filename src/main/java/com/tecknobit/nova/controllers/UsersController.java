@@ -85,8 +85,7 @@ public class UsersController extends NovaController {
                     return failedResponse(WRONG_SURNAME_MESSAGE);
             } else
                 return failedResponse(WRONG_NAME_MESSAGE);
-        }
-        else
+        } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
     }
 

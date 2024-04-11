@@ -141,12 +141,8 @@ public class InputValidator {
     static {
         LANGUAGES_SUPPORTED.put("it", "ITALIAN");
         LANGUAGES_SUPPORTED.put("en", "ENGLISH");
-        LANGUAGES_SUPPORTED.put("de", "GERMAN");
         LANGUAGES_SUPPORTED.put("fr", "FRENCH");
         LANGUAGES_SUPPORTED.put("es", "SPANISH");
-        LANGUAGES_SUPPORTED.put("hi", "HINDI");
-        LANGUAGES_SUPPORTED.put("pt", "PORTUGUESE");
-        LANGUAGES_SUPPORTED.put("zh", "CHINESE");
     }
 
     /**
