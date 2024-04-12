@@ -11,7 +11,6 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    //TO-DO: TO REMOVE FOR TESTING PURPOSES ONLY
     mavenLocal()
     maven("https://jitpack.io")
     maven("https://repo.clojars.org")
@@ -30,17 +29,7 @@ dependencies {
     implementation("com.vladsch.flexmark:flexmark-all:0.64.8")
     implementation("com.github.N7ghtm4r3:Mantis:1.0.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
-    //TO-DO: TO REMOVE FOR TESTING PURPOSES ONLY
     implementation("com.tecknobit.novacore:Nova-core:1.0.0")
-}
-
-tasks {
-    /*compileKotlin {
-        kotlinOptions.jvmTarget = "18"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "18"
-    }*/
 }
 
 afterEvaluate {
@@ -59,10 +48,6 @@ afterEvaluate {
 tasks.test {
     useJUnitPlatform()
 }
-
-/*kotlin {
-    jvmToolchain(18)
-}*/
 
 configurations.all {
     exclude("commons-logging", "commons-logging")
