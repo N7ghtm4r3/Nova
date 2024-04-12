@@ -148,12 +148,13 @@ To start the **Nova** service on your own infrastructure you have to follow thes
 - An SQL environment installed, it is recommended to use **MySQL**
 - Before run the backend service, **for the first time only**, you need to create a database named **nova** by
   default or a custom name that must be inserted in the connection URL cited below in this section
-- Before run the backend service, **for the first time only**, you need to store in the **resources** folder **(created automatically by 
+- Before run the backend service, **for the first time only**, you need to store in the **profiles** subfolder **(created automatically by 
   the server)** the default profile pic as below:
   ``` bash
   folderOfWhereYouPlacedTheServerFile
    |-- resources
-   |   |-- defProfilePic.png
+   |   |-- profiles
+   |       |-- defProfilePic.png
    |-- nova.jar
   ```
   This action is required to provide the **defProfilePic** as logo or profile for the users.

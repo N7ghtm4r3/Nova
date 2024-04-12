@@ -467,7 +467,7 @@ public class Release extends NovaItem implements NotificationsTarget {
     public long getLastEvent() {
         if(releaseEvents.isEmpty())
             return 0L;
-        return releaseEvents.get(releaseEvents.size() - 1).getReleaseEventTimestamp();
+        return releaseEvents.get(0).getReleaseEventTimestamp();
     }
 
     /**
