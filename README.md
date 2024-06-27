@@ -5,10 +5,6 @@
 This project, based on Java and the Spring Boot framework, is an open source tool to manage and improve the developments of your releases.
 Improve the development of your releases with **Nova**!
 
-## Implementation
-
-Add the JitPack repository to your build file
-
 ## Customize the application
 
 To customize and create your own version of this application you need to have the <a href="https://github.com/N7ghtm4r3/Nova/tree/main/Nova-core">
