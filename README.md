@@ -2,7 +2,7 @@
 
 **v1.0.0**
 
-This project, based on Java and the Spring Boot framework, is an open source tool to manage and improve the developments of your releases.
+This project, based on Java and the Spring Boot framework, is an open source self-hosted tool to manage and improve the developments of your releases.
 Improve the development of your releases with **Nova**!
 
 ## Customize the application
