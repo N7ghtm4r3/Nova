@@ -59,7 +59,7 @@ steps:
 - Mobile
   - <a href="https://github.com/N7ghtm4r3/Nova-Android#readme">Android</a>
   - iOS -> planned
-- Desktop version -> coming soon!
+- <a href="https://github.com/N7ghtm4r3/Nova-Desktop#readme">Desktop version</a>
 - <a href="https://github.com/N7ghtm4r3/Nova/releases/tag/1.0.0">Backend service "out-of-the-box"</a>
 
 ## Usages
