@@ -1,8 +1,8 @@
 package com.tecknobit.nova.controllers.projectmanagers;
 
+import com.tecknobit.nova.controllers.DefaultNovaController;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
-import com.tecknobit.nova.controllers.NovaController;
-import com.tecknobit.novacore.records.User.Role;
+import com.tecknobit.novacore.records.NovaUser.Role;
 import com.tecknobit.novacore.records.project.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * The {@code ProjectManager} class is useful to give the base utilities to work with project database operations
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaController
+ * @see DefaultNovaController
  */
-public abstract class ProjectManager extends NovaController {
+public abstract class ProjectManager extends DefaultNovaController {
 
     /**
      * {@code projectsHelper} helper to manage the project database operations

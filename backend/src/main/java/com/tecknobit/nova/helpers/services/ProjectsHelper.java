@@ -1,11 +1,11 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.nova.controllers.projectmanagers.ProjectsController;
-import com.tecknobit.nova.helpers.resources.ResourcesManager;
+import com.tecknobit.nova.helpers.resources.NovaResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
-import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.NovaUser;
 import com.tecknobit.novacore.records.project.JoiningQRCode;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.tecknobit.nova.Launcher.generateIdentifier;
+import static com.tecknobit.equinox.environment.controllers.EquinoxController.generateIdentifier;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.User.NAME_KEY;
-import static com.tecknobit.novacore.records.User.PROJECTS_KEY;
+import static com.tecknobit.novacore.records.NovaUser.NAME_KEY;
+import static com.tecknobit.novacore.records.NovaUser.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;
 import static com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY;
 import static java.lang.System.currentTimeMillis;
@@ -32,10 +32,10 @@ import static java.lang.System.currentTimeMillis;
  * The {@code ProjectsHelper} class is useful to manage all the project database operations
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see ResourcesManager
+ * @see NovaResourcesManager
  */
 @Service
-public class ProjectsHelper implements ResourcesManager {
+public class ProjectsHelper implements NovaResourcesManager {
 
     /**
      * {@code projectsRepository} instance for the projects repository
@@ -62,7 +62,7 @@ public class ProjectsHelper implements ResourcesManager {
     private NotificationsRepository notificationsRepository;
 
     /**
-     * Method to get the project of a {@link User}
+     * Method to get the project of a {@link NovaUser}
      * 
      * @param userId: the user identifier
      * @return the projects list, also where the user is the author, as {@link HashMap} of {@link String} and {@link List}
@@ -121,7 +121,7 @@ public class ProjectsHelper implements ResourcesManager {
      * @param createJoinQRCode: whether create a textual join code
      * @return the textual join code, if created, as {@link String}
      */
-    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, User.Role role,
+    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, NovaUser.Role role,
                                     boolean createJoinQRCode) {
         String joinCode = null;
         if(createJoinQRCode)
@@ -230,9 +230,9 @@ public class ProjectsHelper implements ResourcesManager {
         for (Release release : project.getReleases())
             releasesHelper.deleteRelease(null, null, release);
         projectsRepository.removeAllMembers(projectId);
-        List<User> members = project.getProjectMembers();
+        List<NovaUser> members = project.getProjectMembers();
         members.add(project.getAuthor());
-        for(User member : members) {
+        for(NovaUser member : members) {
             String memberId = member.getId();
             if(!memberId.equals(authorId)) {
                 notificationsRepository.insertProjectDeletedNotification(

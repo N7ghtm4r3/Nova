@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.apimanager.annotations.Structure;
-import com.tecknobit.apimanager.formatters.TimeFormatter;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
@@ -30,7 +30,7 @@ import static com.tecknobit.novacore.records.release.events.RejectedReleaseEvent
 @Entity
 @Structure
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class ReleaseEvent extends NovaItem {
+public abstract class ReleaseEvent extends EquinoxItem {
 
     /**
      * {@code RELEASE_EVENT_IDENTIFIER_KEY} the key for the <b>"release_event_id"</b> field
@@ -213,7 +213,7 @@ public abstract class ReleaseEvent extends NovaItem {
      */
     @JsonIgnore
     public String getReleaseEventDate() {
-        return TimeFormatter.getStringDate(releaseEventDate);
+        return timeFormatter.formatAsString(releaseEventDate);
     }
 
     /**

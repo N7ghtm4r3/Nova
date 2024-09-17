@@ -3,16 +3,12 @@ package com.tecknobit.novacore.helpers
 import com.tecknobit.apimanager.annotations.RequestPath
 import com.tecknobit.apimanager.annotations.Wrapper
 import com.tecknobit.apimanager.apis.APIRequest
-import com.tecknobit.apimanager.apis.APIRequest.*
-import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode
-import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.*
-import com.tecknobit.apimanager.formatters.JsonHelper
-import com.tecknobit.novacore.InputValidator
-import com.tecknobit.novacore.InputValidator.DEFAULT_LANGUAGE
+import com.tecknobit.apimanager.apis.APIRequest.Params
+import com.tecknobit.equinox.environment.helpers.EquinoxRequester
 import com.tecknobit.novacore.helpers.Endpoints.*
 import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
-import com.tecknobit.novacore.records.User.*
+import com.tecknobit.novacore.records.NovaUser.*
 import com.tecknobit.novacore.records.project.JoiningQRCode.CREATE_JOIN_CODE_KEY
 import com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY
 import com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY
@@ -26,243 +22,25 @@ import com.tecknobit.novacore.records.release.events.RejectedReleaseEvent.TAGS_K
 import com.tecknobit.novacore.records.release.events.RejectedTag.COMMENT_KEY
 import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag
 import com.tecknobit.novacore.records.release.events.ReleaseStandardEvent.RELEASE_EVENT_STATUS_KEY
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import org.springframework.core.io.FileSystemResource
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
-import org.springframework.web.client.RestTemplate
 import java.io.File
-import java.io.IOException
 
-/**
- * The **Requester** class is useful to communicate with the Nova's backend
- *
- * @param host: the host where is running the Nova's backend
- * @param userId: the user identifier
- * @param userToken: the user token
- *
- * @author N7ghtm4r3 - Tecknobit
- */
-open class Requester (
-    public var host: String,
-    public var userId: String? = null,
-    public var userToken: String? = null
+class NovaRequester(
+    host: String,
+    userId: String? = null,
+    userToken: String? = null
+) : EquinoxRequester(
+    host = host,
+    userId = userId,
+    userToken = userToken,
+    connectionTimeout = 5000,
+    connectionErrorMessage = DEFAULT_CONNECTION_ERROR_MESSAGE,
+    enableCertificatesValidation = true
 ) {
-
-    companion object {
-
-        /**
-         * **RESPONSE_STATUS_KEY** the key for the <b>"status"</b> field
-         */
-        const val RESPONSE_STATUS_KEY: String = "status"
-
-        /**
-         * **RESPONSE_MESSAGE_KEY** the key for the <b>"response"</b> field
-         */
-        const val RESPONSE_MESSAGE_KEY: String = "response"
-
-        /**
-         * **SERVER_NOT_REACHABLE** message to send when the server is not available at the moment when the
-         * request has been sent
-         */
-        const val SERVER_NOT_REACHABLE = "Server is temporarily unavailable"
-
-    }
-
-    /**
-     * **apiRequest** -> the instance to communicate and make the requests to the backend
-     */
-    protected val apiRequest = APIRequest(5000)
-
-    /**
-     * **headers** the headers used in the request
-     */
-    protected val headers = Headers()
-
-    /**
-     * **mustValidateCertificates** flag whether the requests must validate the SSL certificates, this need for example
-     * when the SSL is a self-signed certificate
-     */
-    protected var mustValidateCertificates = host.startsWith("https")
-
-    init {
-        changeHost(host)
-        setUserCredentials(userId, userToken)
-    }
-
-    /**
-     * Function to set the user credentials used to make the authenticated requests
-     *
-     * @param userId: the user identifier to use
-     * @param userToken: the user token to use
-     */
-    fun setUserCredentials(
-        userId: String?,
-        userToken: String?
-    ) {
-        this.userId = userId
-        this.userToken = userToken
-        if(userToken != null)
-            headers.addHeader(TOKEN_KEY, userToken)
-    }
-
-    /**
-     * Function to change during the runtime, for example when the local session changed, the host address to make the
-     * requests
-     *
-     * @param host: the new host address to use
-     */
-    fun changeHost(
-        host: String
-    ) {
-        this.host = host + BASE_ENDPOINT
-        mustValidateCertificates = host.startsWith("https")
-    }
-
-    /**
-     * Function to execute the request to sign up in the Nova's system
-     *
-     * @param serverSecret: the secret of the personal Pandoro's backend
-     * @param name: the name of the user
-     * @param surname: the surname of the user
-     * @param email: the email of the user
-     * @param password: the password of the user
-     * @param language: the language of the user
-     *
-     * @return the result of the request as [JSONObject]
-     *
-     */
-    @RequestPath(path = "/api/v1/users/signUp", method = APIRequest.RequestMethod.POST)
-    fun signUp(
-        serverSecret: String,
-        name: String,
-        surname: String,
-        email: String,
-        password: String,
-        language: String
-    ) : JSONObject {
-        val payload = Params()
-        payload.addParam(SERVER_SECRET_KEY, serverSecret)
-        payload.addParam(NAME_KEY, name)
-        payload.addParam(SURNAME_KEY, surname)
-        payload.addParam(EMAIL_KEY, email)
-        payload.addParam(PASSWORD_KEY, password)
-        payload.addParam(LANGUAGE_KEY,
-            if(!InputValidator.isLanguageValid(language))
-                DEFAULT_LANGUAGE
-            else
-                language
-        )
-        return execPost(
-            endpoint = SIGN_UP_ENDPOINT,
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute the request to sign in the Nova's system
-     *
-     * @param email: the email of the user
-     * @param password: the password of the user
-     *
-     * @return the result of the request as [JSONObject]
-     *
-     */
-    @RequestPath(path = "/api/v1/users/signIn", method = APIRequest.RequestMethod.POST)
-    fun signIn(
-        email: String,
-        password: String
-    ) : JSONObject {
-        val payload = Params()
-        payload.addParam(EMAIL_KEY, email)
-        payload.addParam(PASSWORD_KEY, password)
-        return execPost(
-            endpoint = SIGN_IN_ENDPOINT,
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute the request to change the profile pic of the user
-     *
-     * @param profilePic: the profile pic chosen by the user to set as the new profile pic
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @RequestPath(path = "/api/v1/users/{id}/changeProfilePic", method = APIRequest.RequestMethod.POST)
-    open fun changeProfilePic(
-        profilePic: File
-    ) : JSONObject {
-        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-        body.add(PROFILE_PIC_URL_KEY, FileSystemResource(profilePic))
-        return execMultipartRequest(
-            body = body,
-            endpoint = assembleUsersEndpointPath(CHANGE_PROFILE_PIC_ENDPOINT)
-        )
-    }
-
-    /**
-     * Function to execute the request to change the email of the user
-     *
-     * @param newEmail: the new email of the user
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @RequestPath(path = "/api/v1/users/{id}/changeEmail", method = APIRequest.RequestMethod.PATCH)
-    fun changeEmail(
-        newEmail: String
-    ): JSONObject {
-        val payload = Params()
-        payload.addParam(EMAIL_KEY, newEmail)
-        return execPatch(
-            endpoint = assembleUsersEndpointPath(CHANGE_EMAIL_ENDPOINT),
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute the request to change the password of the user
-     *
-     * @param newPassword: the new password of the user
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @RequestPath(path = "/api/v1/users/{id}/changePassword", method = APIRequest.RequestMethod.PATCH)
-    fun changePassword(
-        newPassword: String
-    ): JSONObject {
-        val payload = Params()
-        payload.addParam(PASSWORD_KEY, newPassword)
-        return execPatch(
-            endpoint = assembleUsersEndpointPath(CHANGE_PASSWORD_ENDPOINT),
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute the request to change the language of the user
-     *
-     * @param newLanguage: the new language of the user
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @RequestPath(path = "/api/v1/users/{id}/changeLanguage", method = APIRequest.RequestMethod.PATCH)
-    fun changeLanguage(
-        newLanguage: String
-    ): JSONObject {
-        val payload = Params()
-        payload.addParam(LANGUAGE_KEY, newLanguage)
-        return execPatch(
-            endpoint = assembleUsersEndpointPath(CHANGE_LANGUAGE_ENDPOINT),
-            payload = payload
-        )
-    }
 
     /**
      * Function to execute the request to get the user notifications
@@ -276,33 +54,6 @@ open class Requester (
         return execGet(
             endpoint = assembleUsersEndpointPath("/$NOTIFICATIONS_KEY")
         )
-    }
-
-    /**
-     * Function to execute the request to delete the account of the user
-     *
-     * No-any params required
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @RequestPath(path = "/api/v1/users/{id}", method = APIRequest.RequestMethod.DELETE)
-    fun deleteAccount(): JSONObject {
-        return execDelete(
-            endpoint = assembleUsersEndpointPath()
-        )
-    }
-
-    /**
-     * Function to assemble the endpoint to make the request to the users controller
-     *
-     * @param endpoint: the endpoint path of the url
-     *
-     * @return an endpoint to make the request as [String]
-     */
-    protected fun assembleUsersEndpointPath(
-        endpoint: String = ""
-    ): String {
-        return "$USERS_KEY/$userId$endpoint"
     }
 
     /**
@@ -328,13 +79,21 @@ open class Requester (
      * @return the result of the request as [JSONObject]
      */
     @RequestPath(path = "/api/v1/{id}/projects", method = APIRequest.RequestMethod.POST)
-    open fun addProject(
+    fun addProject(
         logoPic: File,
         projectName: String
     ) : JSONObject {
-        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-        body.add(LOGO_URL_KEY, FileSystemResource(logoPic))
-        body.add(NAME_KEY, projectName)
+        val body = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart(
+                LOGO_URL_KEY,
+                logoPic.name,
+                logoPic.readBytes().toRequestBody("*/*".toMediaType())
+            )
+            .addFormDataPart(
+                NAME_KEY,
+                projectName
+            )
+            .build()
         return execMultipartRequest(
             body = body,
             endpoint = assembleProjectsEndpointPath()
@@ -609,49 +368,26 @@ open class Requester (
      * @return the result of the request as [JSONObject]
      */
     @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = APIRequest.RequestMethod.POST)
-    open fun uploadAsset(
+    fun uploadAsset(
         projectId: String,
         releaseId: String,
         assets: List<File>
     ) : JSONObject {
-        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-        val fileSystemResourceAssets = mutableListOf<FileSystemResource> ()
+        val body = MultipartBody.Builder().setType(MultipartBody.FORM)
         assets.forEach { asset ->
-            fileSystemResourceAssets.add(FileSystemResource(asset))
+            body.addFormDataPart(
+                ASSETS_UPLOADED_KEY,
+                asset.name,
+                asset.readBytes().toRequestBody("*/*".toMediaType())
+            )
         }
-        body.put(ASSETS_UPLOADED_KEY, fileSystemResourceAssets.toList())
         return execMultipartRequest(
-            body = body,
+            body = body.build(),
             endpoint = assembleReleasesEndpointPath(
                 projectId = projectId,
                 releaseId = releaseId
             )
         )
-    }
-
-    /**
-     * Function to exec a multipart body  request
-     *
-     * @param body: the body payload of the request
-     * @param endpoint: the endpoint path of the url
-     *
-     * @return the result of the request as [JSONObject]
-     */
-     private fun execMultipartRequest(
-        body: MultiValueMap<String, Any>,
-        endpoint: String
-    ) : JSONObject {
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.MULTIPART_FORM_DATA
-        headers.add(TOKEN_KEY, userToken)
-        val requestEntity: HttpEntity<Any?> = HttpEntity<Any?>(body, headers)
-        val restTemplate = RestTemplate()
-        val response = restTemplate.postForEntity(
-            host + endpoint,
-            requestEntity,
-            String::class.java
-        ).body
-        return JSONObject(response)
     }
 
     /**
@@ -743,7 +479,8 @@ open class Requester (
         if(reasons != null)
             payload.addParam(REASONS_KEY, reasons)
         if(tags != null) {
-            payload.addParam(TAGS_KEY, formatValuesList(tags.toString()
+            payload.addParam(
+                TAGS_KEY, formatValuesList(tags.toString()
                 .replace("[", "")
                 .replace("]", "")
             ))
@@ -903,245 +640,6 @@ open class Requester (
      */
     private fun formatValuesList(values: String) : JSONArray {
         return JSONArray(values.replace(" ", "").split(","))
-    }
-
-    /**
-     * Function to execute a [APIRequest.RequestMethod.GET] request to the backend
-     *
-     * @param endpoint: the endpoint path of the request url
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @Wrapper
-    private fun execGet(
-        endpoint: String
-    ) : JSONObject {
-        return execRequest(
-            method = APIRequest.RequestMethod.GET,
-            endpoint = endpoint
-        )
-    }
-
-    /**
-     * Function to execute a [APIRequest.RequestMethod.POST] request to the backend
-     *
-     * @param endpoint: the endpoint path of the request url
-     * @param payload: the payload of the request
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @Wrapper
-    private fun execPost(
-        endpoint: String,
-        payload: Params
-    ) : JSONObject {
-        return execRequest(
-            method = APIRequest.RequestMethod.POST,
-            endpoint = endpoint,
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute a [APIRequest.RequestMethod.PUT] request to the backend
-     *
-     * @param endpoint: the endpoint path of the request url
-     * @param payload: the payload of the request
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @Wrapper
-    private fun execPut(
-        endpoint: String,
-        payload: Params
-    ) : JSONObject {
-        return execRequest(
-            method = APIRequest.RequestMethod.PUT,
-            endpoint = endpoint,
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute a [APIRequest.RequestMethod.PATCH] request to the backend
-     *
-     * @param endpoint: the endpoint path of the request url
-     * @param payload: the payload of the request
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @Wrapper
-    private fun execPatch(
-        endpoint: String,
-        payload: Params
-    ) : JSONObject {
-        return execRequest(
-            method = APIRequest.RequestMethod.PATCH,
-            endpoint = endpoint,
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute a [APIRequest.RequestMethod.DELETE] request to the backend
-     *
-     * @param endpoint: the endpoint path of the request url
-     * @param payload: the payload of the request
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    @Wrapper
-    private fun execDelete(
-        endpoint: String,
-        payload: Params? = null
-    ) : JSONObject {
-        return execRequest(
-            method = APIRequest.RequestMethod.DELETE,
-            endpoint = endpoint,
-            payload = payload
-        )
-    }
-
-    /**
-     * Function to execute a request to the backend
-     *
-     * @param method: the method of the request
-     * @param endpoint: the endpoint path of the request url
-     * @param payload: the payload of the request
-     *
-     * @return the result of the request as [JSONObject]
-     */
-    private fun execRequest(
-        method: RequestMethod,
-        endpoint: String,
-        payload: Params? = null
-    ) : JSONObject {
-        var response: String? = null
-        var jResponse: JSONObject
-        if(mustValidateCertificates)
-            apiRequest.validateSelfSignedCertificate()
-        runBlocking {
-            try {
-                async {
-                    val requestUrl = host + endpoint
-                    try {
-                        if(payload != null) {
-                            apiRequest.sendJSONPayloadedAPIRequest(
-                                requestUrl,
-                                method,
-                                headers,
-                                payload
-                            )
-                        } else {
-                            apiRequest.sendAPIRequest(
-                                requestUrl,
-                                method,
-                                headers
-                            )
-                        }
-                        response = apiRequest.response
-                    } catch (e: IOException) {
-                        response = connectionErrorMessage(SERVER_NOT_REACHABLE)
-                    }
-                }.await()
-                jResponse = JSONObject(response)
-            } catch (e: Exception) {
-                jResponse = JSONObject(connectionErrorMessage(SERVER_NOT_REACHABLE))
-            }
-        }
-        return jResponse
-    }
-
-    /**
-     * Function to set the [RESPONSE_STATUS_KEY] to send when an error during the connection occurred
-     *
-     * @param error: the error to use
-     *
-     * @return the error message as [String]
-     */
-    protected fun connectionErrorMessage(error: String): String {
-        return JSONObject()
-            .put(RESPONSE_STATUS_KEY, GENERIC_RESPONSE)
-            .put(RESPONSE_MESSAGE_KEY, error)
-            .toString()
-    }
-
-    /**
-     * Function to execute and manage the response of a request
-     *
-     * @param request: the request to execute
-     * @param onSuccess: the action to execute if the request has been successful
-     * @param onFailure: the action to execute if the request has been failed
-     * @param onConnectionError: the action to execute if the request has been failed for a connection error
-     */
-    fun sendRequest(
-        request: () -> JSONObject,
-        onSuccess: (JsonHelper) -> Unit,
-        onFailure: (JSONObject) -> Unit,
-        onConnectionError: ((JsonHelper) -> Unit)? = null
-    ) {
-        val response = request.invoke()
-        when(isSuccessfulResponse(response)) {
-            SUCCESSFUL -> onSuccess.invoke(JsonHelper(response))
-            GENERIC_RESPONSE -> {
-                if(onConnectionError != null)
-                    onConnectionError.invoke(JsonHelper(response))
-                else
-                    onFailure.invoke(response)
-            }
-            else -> onFailure.invoke(response)
-        }
-    }
-
-    /**
-     * Function to get whether the request has been successful or not
-     *
-     * @param response: the response of the request
-     *
-     * @return whether the request has been successful or not as [StandardResponseCode]
-     */
-    protected fun isSuccessfulResponse(
-        response: JSONObject?
-    ): StandardResponseCode {
-        if(response == null || !response.has(RESPONSE_STATUS_KEY))
-            return FAILED
-        return when(response.getString(RESPONSE_STATUS_KEY)) {
-            SUCCESSFUL.name -> SUCCESSFUL
-            GENERIC_RESPONSE.name -> GENERIC_RESPONSE
-            else -> FAILED
-        }
-    }
-
-    /**
-     * The **ListFetcher** interface is useful to manage the requests to refresh a list of items
-     *
-     * @author N7ghtm4r3 - Tecknobit
-     */
-    interface ListFetcher {
-
-        /**
-         * Function to refresh a list of item
-         *
-         * No-any params required
-         */
-        fun refreshList()
-
-    }
-
-    /**
-     * The **ItemFetcher** interface is useful to manage the requests to refresh a single item
-     *
-     * @author N7ghtm4r3 - Tecknobit
-     */
-    interface ItemFetcher {
-
-        /**
-         * Function to refresh a single item
-         *
-         * No-any params required
-         */
-        fun refreshItem()
-
     }
 
 }

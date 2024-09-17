@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
-import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.NovaUser.*;
 import static com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY;
 import static com.tecknobit.novacore.records.release.Release.*;
 
@@ -63,7 +63,7 @@ public class NovaNotification extends NovaItem {
             "handler"
     })
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private final User user;
+    private final NovaUser user;
 
     /**
      * {@code releaseId} the identifier of the related release
@@ -149,7 +149,7 @@ public class NovaNotification extends NovaItem {
      * @param isSent: whether the notification has been sent already before
      *
      */
-    public NovaNotification(String id, String projectLogo, User user, String releaseId, ReleaseStatus status,
+    public NovaNotification(String id, String projectLogo, NovaUser user, String releaseId, ReleaseStatus status,
                             String releaseVersion, boolean isSent) {
         super(id);
         this.projectLogo = projectLogo;
@@ -186,9 +186,9 @@ public class NovaNotification extends NovaItem {
      * Method to get {@link #user} instance <br>
      * No-any params required
      *
-     * @return {@link #user} instance as {@link User}
+     * @return {@link #user} instance as {@link NovaUser}
      */
-    public User getUser() {
+    public NovaUser getUser() {
         return user;
     }
 

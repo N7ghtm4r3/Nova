@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
-import com.tecknobit.apimanager.formatters.TimeFormatter;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NotificationsTarget;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.NovaNotification;
-import com.tecknobit.novacore.records.User.Role;
+import com.tecknobit.novacore.records.NovaUser.Role;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.events.AssetUploadingEvent;
 import com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded;
@@ -40,7 +40,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
  */
 @Entity
 @Table(name = Release.RELEASES_KEY)
-public class Release extends NovaItem implements NotificationsTarget {
+public class Release extends EquinoxItem implements NotificationsTarget {
 
     /**
      * {@code ALLOWED_ASSETS_TYPE} list of allowed type to upload as assets
@@ -383,7 +383,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      */
     @JsonIgnore
     public String getCreationDate() {
-        return TimeFormatter.getStringDate(creationDate);
+        return timeFormatter.formatAsString(creationDate);
     }
 
     /**
@@ -416,7 +416,7 @@ public class Release extends NovaItem implements NotificationsTarget {
      */
     @JsonIgnore
     public String getApprobationDate() {
-        return TimeFormatter.getStringDate(approbationDate);
+        return timeFormatter.formatAsString(approbationDate);
     }
 
     /**

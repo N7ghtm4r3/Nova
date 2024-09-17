@@ -2,7 +2,7 @@ package com.tecknobit.novacore.records.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.novacore.records.NovaItem;
-import com.tecknobit.novacore.records.User.Role;
+import com.tecknobit.novacore.records.NovaUser.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.tecknobit.novacore.records.User.ROLE_KEY;
+import static com.tecknobit.novacore.records.NovaUser.ROLE_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;

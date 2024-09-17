@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.tecknobit.equinox.environment.records.EquinoxUser.NAME_KEY;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.NovaUser.MEMBER_IDENTIFIER_KEY;
+import static com.tecknobit.novacore.records.NovaUser.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.project.Project.*;
 
 /**

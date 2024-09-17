@@ -15,7 +15,7 @@ import java.util.List;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.NovaNotification.IS_SENT_KEY;
 import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
-import static com.tecknobit.novacore.records.User.USER_KEY;
+import static com.tecknobit.novacore.records.NovaUser.USER_KEY;
 import static com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY;
 import static com.tecknobit.novacore.records.release.Release.*;
 

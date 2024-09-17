@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tecknobit.novacore.records.User.Role;
+import static com.tecknobit.novacore.records.NovaUser.Role;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.Verifying;
 import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
 

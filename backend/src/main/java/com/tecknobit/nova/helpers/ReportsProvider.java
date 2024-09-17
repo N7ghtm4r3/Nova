@@ -3,7 +3,6 @@ package com.tecknobit.nova.helpers;
 import com.tecknobit.apimanager.apis.ResourcesUtils;
 import com.tecknobit.apimanager.trading.TradingTools;
 import com.tecknobit.mantis.Mantis;
-import com.tecknobit.nova.helpers.resources.ResourcesProvider;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
@@ -21,6 +20,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+
+import static com.tecknobit.equinox.resourcesutils.ResourcesManager.RESOURCES_PATH;
+import static com.tecknobit.nova.helpers.resources.NovaResourcesManager.REPORTS_DIRECTORY;
+import static com.tecknobit.nova.helpers.resources.NovaResourcesManager.RESOURCES_REPORTS_PATH;
 
 /**
  * The {@code ReportsProvider} class is useful to create and provide the reports for the releases
@@ -137,7 +140,7 @@ public class ReportsProvider {
      * @throws Exception when an error occurred
      */
     private void deleteReleaseReportIfExists() throws Exception {
-        File reports = new File(ResourcesProvider.RESOURCES_REPORTS_PATH);
+        File reports = new File(RESOURCES_REPORTS_PATH);
         File reportToDelete = null;
         for (File report : Objects.requireNonNull(reports.listFiles())) {
             String checkReportName = report.getName();
@@ -159,7 +162,7 @@ public class ReportsProvider {
     private void setCurrentRelease(Release currentRelease) {
         this.currentRelease = currentRelease;
         releaseId = currentRelease.getId();
-        reportName = ResourcesProvider.REPORTS_DIRECTORY + "/" + currentRelease.getId() + "_" + currentRelease.getLastEvent() + ".pdf";
+        reportName = REPORTS_DIRECTORY + "/" + currentRelease.getId() + "_" + currentRelease.getLastEvent() + ".pdf";
     }
 
     /**
@@ -178,7 +181,7 @@ public class ReportsProvider {
                 .build();
         Node document = parser.parse(reportTemplate);
         String html = renderer.render(document);
-        PdfConverterExtension.exportToPdf(ResourcesProvider.RESOURCES_PATH + reportName, html, "", DataHolder.NULL);
+        PdfConverterExtension.exportToPdf(RESOURCES_PATH + reportName, html, "", DataHolder.NULL);
     }
 
     /**
@@ -204,7 +207,7 @@ public class ReportsProvider {
      * @return the {@link #reportTemplate} changed with the project logo inserted
      */
     private String insertLogo(Project project) {
-        return reportTemplate.replaceAll(PROJECT_LOGO_TAG, ResourcesProvider.RESOURCES_PATH + project.getLogoUrl());
+        return reportTemplate.replaceAll(PROJECT_LOGO_TAG, RESOURCES_PATH + project.getLogoUrl());
     }
 
     /**
@@ -240,7 +243,7 @@ public class ReportsProvider {
                     List<AssetUploaded> assets = assetUploadingEvent.getAssetsUploaded();
                     for(int j = 0; j < assets.size(); j++) {
                         AssetUploaded asset = assets.get(j);
-                        double spaceOccupied = new File(ResourcesProvider.RESOURCES_PATH + asset.getUrl()).length();
+                        double spaceOccupied = new File(RESOURCES_PATH + asset.getUrl()).length();
                         report.append("- Asset #")
                                 .append(j + 1)
                                 .append(" ")

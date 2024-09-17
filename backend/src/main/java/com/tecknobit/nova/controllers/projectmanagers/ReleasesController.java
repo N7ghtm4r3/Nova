@@ -1,7 +1,7 @@
 package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
-import com.tecknobit.nova.controllers.NovaController;
+import com.tecknobit.nova.controllers.DefaultNovaController;
 import com.tecknobit.nova.helpers.ReportsProvider;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
 import com.tecknobit.nova.helpers.services.ReleasesHelper;
@@ -19,12 +19,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
-import static com.tecknobit.nova.Launcher.generateIdentifier;
+import static com.tecknobit.equinox.environment.records.EquinoxUser.TOKEN_KEY;
 import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.helpers.Endpoints.*;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.User.PROJECTS_KEY;
-import static com.tecknobit.novacore.records.User.TOKEN_KEY;
+import static com.tecknobit.novacore.records.NovaUser.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.release.Release.*;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
@@ -41,7 +40,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent
  * The {@code ReleasesController} class is useful to manage all the release operations
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaController
+ * @see DefaultNovaController
  * @see ProjectManager
  */
 @RestController

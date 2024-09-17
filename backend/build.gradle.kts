@@ -27,6 +27,7 @@ dependencies {
     implementation("com.github.N7ghtm4r3:Mantis:1.0.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.tecknobit.novacore:novacore:1.0.1")
+    implementation("com.github.N7ghtm4r3:Equinox:1.0.3")
 }
 
 afterEvaluate {

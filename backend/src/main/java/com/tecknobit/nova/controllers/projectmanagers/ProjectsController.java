@@ -2,10 +2,10 @@ package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.apimanager.formatters.JsonHelper;
-import com.tecknobit.nova.controllers.NovaController;
+import com.tecknobit.equinox.environment.helpers.services.EquinoxUsersHelper;
+import com.tecknobit.nova.controllers.DefaultNovaController;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
-import com.tecknobit.nova.helpers.services.UsersHelper;
-import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.NovaUser;
 import com.tecknobit.novacore.records.project.JoiningQRCode;
 import com.tecknobit.novacore.records.project.Project;
 import org.json.JSONArray;
@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
-import static com.tecknobit.nova.Launcher.generateIdentifier;
+import static com.tecknobit.equinox.environment.records.EquinoxUser.TOKEN_KEY;
 import static com.tecknobit.novacore.InputValidator.*;
 import static com.tecknobit.novacore.helpers.Endpoints.*;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.NovaUser.*;
 import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
@@ -32,7 +32,7 @@ import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY
  * The {@code ProjectsController} class is useful to manage all the project operations
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaController
+ * @see DefaultNovaController
  * @see ProjectManager
  */
 @RestController
@@ -42,7 +42,7 @@ public class ProjectsController extends ProjectManager {
     /**
      * {@code usersHelper} helper to manage the users database operations
      */
-    private final UsersHelper usersHelper;
+    private final EquinoxUsersHelper<NovaUser> usersHelper;
 
     /**
      * Constructor to init the {@link ProjectsController} controller
@@ -51,7 +51,7 @@ public class ProjectsController extends ProjectManager {
      * @param usersHelper: helper to manage the users database operations
      */
     @Autowired
-    public ProjectsController(ProjectsHelper projectsHelper, UsersHelper usersHelper) {
+    public ProjectsController(ProjectsHelper projectsHelper, EquinoxUsersHelper<NovaUser> usersHelper) {
         super(projectsHelper);
         this.usersHelper = usersHelper;
     }
@@ -193,7 +193,7 @@ public class ProjectsController extends ProjectManager {
             List<String> membersEmails = JsonHelper.toList(jsonHelper.getJSONArray(PROJECT_MEMBERS_KEY, new JSONArray()));
             if(isMailingListValid(membersEmails)) {
                 try {
-                    User.Role role = User.Role.valueOf(jsonHelper.getString(ROLE_KEY));
+                    NovaUser.Role role = NovaUser.Role.valueOf(jsonHelper.getString(ROLE_KEY));
                     String QRCodeId = generateIdentifier();
                     String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role,
                             jsonHelper.getBoolean(CREATE_JOIN_CODE_KEY, false));
@@ -254,7 +254,7 @@ public class ProjectsController extends ProjectManager {
                     Project project = joiningQRCode.getProject();
                     if(project.hasNotMemberEmail(email)) {
                         if(joiningQRCode.listEmails().contains(email)) {
-                            User user = usersRepository.findUserByEmail(email);
+                            NovaUser user = usersRepository.findUserByEmail(email);
                             JSONObject response = new JSONObject();
                             String userId;
                             if(user == null) {
@@ -280,7 +280,7 @@ public class ProjectsController extends ProjectManager {
                                                         role
                                                 );
                                                 response.put(TOKEN_KEY, token)
-                                                        .put(PROFILE_PIC_URL_KEY, DEFAULT_PROFILE_PIC)
+                                                        .put(PROFILE_PIC_KEY, DEFAULT_PROFILE_PIC)
                                                         .put(ROLE_KEY, role);
                                             } catch (NoSuchAlgorithmException e) {
                                                 return failedResponse(WRONG_PASSWORD_MESSAGE);

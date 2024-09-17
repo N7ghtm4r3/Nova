@@ -1,13 +1,13 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
-import com.tecknobit.nova.helpers.resources.ResourcesManager;
+import com.tecknobit.nova.helpers.resources.NovaResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseEventsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleaseTagRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.ReleasesRepository;
 import com.tecknobit.novacore.records.NovaNotification;
-import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.NovaUser;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
@@ -24,17 +24,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tecknobit.nova.Launcher.generateIdentifier;
+import static com.tecknobit.equinox.environment.controllers.EquinoxController.generateIdentifier;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 
 /**
  * The {@code ReleasesHelper} class is useful to manage all the release database operations
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see ResourcesManager
+ * @see NovaResourcesManager
  */
 @Service
-public class ReleasesHelper implements ResourcesManager {
+public class ReleasesHelper implements NovaResourcesManager {
 
     /**
      * {@code releasesRepository} instance for the releases repository
@@ -78,9 +78,9 @@ public class ReleasesHelper implements ResourcesManager {
                 project.getId(),
                 releaseNotesContent
         );
-        List<User> members = project.getProjectMembers();
+        List<NovaUser> members = project.getProjectMembers();
         members.add(project.getAuthor());
-        for(User member : members) {
+        for(NovaUser member : members) {
             String memberId = member.getId();
             if(!memberId.equals(requesterUser)) {
                 notificationsRepository.insertNotification(
@@ -320,9 +320,9 @@ public class ReleasesHelper implements ResourcesManager {
                     status.name()
             );
         }
-        List<User> members = project.getProjectMembers();
+        List<NovaUser> members = project.getProjectMembers();
         members.add(project.getAuthor());
-        for(User member : members) {
+        for(NovaUser member : members) {
             String memberId = member.getId();
             if(!memberId.equals(requesterUser)) {
                 notificationsRepository.insertNotification(
@@ -360,9 +360,9 @@ public class ReleasesHelper implements ResourcesManager {
         deleteReportResource(releaseId);
         releasesRepository.deleteRelease(releaseId);
         if(project != null) {
-            List<User> members = project.getProjectMembers();
+            List<NovaUser> members = project.getProjectMembers();
             members.add(project.getAuthor());
-            for (User member : project.getProjectMembers()) {
+            for (NovaUser member : project.getProjectMembers()) {
                 String memberId = member.getId();
                 if(!memberId.equals(requesterUser)) {
                     notificationsRepository.insertReleaseDeletedNotification(

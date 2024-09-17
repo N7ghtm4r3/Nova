@@ -7,7 +7,7 @@ import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.novacore.records.NotificationsTarget;
 import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.NovaNotification;
-import com.tecknobit.novacore.records.User;
+import com.tecknobit.novacore.records.NovaUser;
 import com.tecknobit.novacore.records.release.Release;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Fetch;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
-import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.NovaUser.*;
 import static com.tecknobit.novacore.records.release.Release.RELEASES_KEY;
 
 /**
@@ -100,7 +100,7 @@ public class Project extends NovaItem implements NotificationsTarget {
             "handler"
     })
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private final User author;
+    private final NovaUser author;
 
     /**
      * {@code logoUrl} the logo of the project formatted as url
@@ -139,7 +139,7 @@ public class Project extends NovaItem implements NotificationsTarget {
             "hibernateLazyInitializer",
             "handler"
     })
-    private final List<User> projectMembers;
+    private final List<NovaUser> projectMembers;
 
     /**
      * {@code releases} the releases of the project
@@ -185,7 +185,7 @@ public class Project extends NovaItem implements NotificationsTarget {
         author = returnUserInstance(hItem.getJSONObject(AUTHOR_KEY));
         logoUrl = hItem.getString(LOGO_URL_KEY);
         name = hItem.getString(PROJECT_NAME_KEY);
-        projectMembers = User.returnUsersList(hItem.getJSONArray(PROJECT_MEMBERS_KEY));
+        projectMembers = NovaUser.returnUsersList(hItem.getJSONArray(PROJECT_MEMBERS_KEY));
         releases = Release.returnReleasesList(hItem.getJSONArray(RELEASES_KEY));
         joiningQRCodes = null;
     }
@@ -204,7 +204,7 @@ public class Project extends NovaItem implements NotificationsTarget {
      * @apiNote this is useful for the server-side, so for the clients will be ever hidden
      *
      */
-    public Project(String id, User author, String logoUrl, String name, List<User> projectMembers,
+    public Project(String id, NovaUser author, String logoUrl, String name, List<NovaUser> projectMembers,
                    List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
         super(id);
         this.author = author;
@@ -219,9 +219,9 @@ public class Project extends NovaItem implements NotificationsTarget {
      * Method to get {@link #author} instance <br>
      * No-any params required
      *
-     * @return {@link #author} instance as {@link User}
+     * @return {@link #author} instance as {@link NovaUser}
      */
-    public User getAuthor() {
+    public NovaUser getAuthor() {
         return author;
     }
 
@@ -250,9 +250,9 @@ public class Project extends NovaItem implements NotificationsTarget {
      * Method to get {@link #projectMembers} instance <br>
      * No-any params required
      *
-     * @return {@link #projectMembers} instance as {@link List} of {@link User}
+     * @return {@link #projectMembers} instance as {@link List} of {@link NovaUser}
      */
-    public List<User> getProjectMembers() {
+    public List<NovaUser> getProjectMembers() {
         return projectMembers;
     }
 
@@ -291,7 +291,7 @@ public class Project extends NovaItem implements NotificationsTarget {
     }
 
     /**
-     * Method to get whether a {@link User#MEMBER_IDENTIFIER_KEY} is the author of the current project
+     * Method to get whether a {@link NovaUser#MEMBER_IDENTIFIER_KEY} is the author of the current project
      *
      * @param memberId: the member identifier to check
      *
@@ -304,7 +304,7 @@ public class Project extends NovaItem implements NotificationsTarget {
     }
 
     /**
-     * Method to get whether a {@link User#MEMBER_IDENTIFIER_KEY} is a member of the checked project
+     * Method to get whether a {@link NovaUser#MEMBER_IDENTIFIER_KEY} is a member of the checked project
      * 
      * @param memberId: the member identifier to check
      *                
@@ -312,7 +312,7 @@ public class Project extends NovaItem implements NotificationsTarget {
      */
     public boolean hasMemberId(String memberId) {
         if(memberId != null) {
-            for (User member : projectMembers)
+            for (NovaUser member : projectMembers)
                 if(member.getId().equals(memberId))
                     return true;
         }
@@ -324,11 +324,11 @@ public class Project extends NovaItem implements NotificationsTarget {
      * 
      * @param memberId: the identifier of the member to get
      *                
-     * @return the member as {@link User} if exists or null if not exists
+     * @return the member as {@link NovaUser} if exists or null if not exists
      */
-    public User getMember(String memberId) {
+    public NovaUser getMember(String memberId) {
         if(memberId != null) {
-            for (User projectMember : projectMembers)
+            for (NovaUser projectMember : projectMembers)
                 if(projectMember.getId().equals(memberId))
                     return projectMember;
         }
@@ -343,7 +343,7 @@ public class Project extends NovaItem implements NotificationsTarget {
      * @return whether a member's email is not contained by the checked project as boolean
      */
     public boolean hasNotMemberEmail(String memberEmail) {
-        for (User member : projectMembers)
+        for (NovaUser member : projectMembers)
             if(member.getEmail().equals(memberEmail))
                 return false;
         return true;

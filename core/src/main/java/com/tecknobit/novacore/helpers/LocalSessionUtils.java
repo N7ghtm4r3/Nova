@@ -7,7 +7,7 @@ import java.util.List;
 import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.HOST_ADDRESS_KEY;
 import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.IS_ACTIVE_SESSION_KEY;
 import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.User.*;
+import static com.tecknobit.novacore.records.NovaUser.*;
 
 /**
  * The {@code LocalSessionUtils} class is useful to manage the local sessions of the user, so manage the credentials
@@ -34,7 +34,7 @@ public interface LocalSessionUtils {
             "CREATE TABLE IF NOT EXISTS " + SESSIONS_TABLE + " (" +
                     IDENTIFIER_KEY + " VARCHAR(32) PRIMARY KEY,\n" +
                     TOKEN_KEY + " VARCHAR(32) NOT NULL,\n" +
-                    PROFILE_PIC_URL_KEY + " TEXT NOT NULL,\n" +
+                    PROFILE_PIC_KEY + " TEXT NOT NULL,\n" +
                     NAME_KEY + " VARCHAR(20) NOT NULL,\n" +
                     SURNAME_KEY + " VARCHAR(30) NOT NULL,\n" +
                     EMAIL_KEY + " VARCHAR(75) NOT NULL,\n" +
@@ -118,7 +118,7 @@ public interface LocalSessionUtils {
      */
     @Wrapper
     default void changeProfilePic(String profilePic) {
-        changeSessionValue(PROFILE_PIC_URL_KEY, getActiveSession().hostAddress + "/" + profilePic);
+        changeSessionValue(PROFILE_PIC_KEY, getActiveSession().hostAddress + "/" + profilePic);
     }
 
     /**
