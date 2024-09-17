@@ -1,6 +1,6 @@
 # Nova
 
-**v1.0.0**
+**v1.0.1**
 
 This project, based on Java and the Spring Boot framework, is an open source self-hosted tool to manage and improve the developments of your releases.
 Improve the development of your releases with **Nova**!
@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.tecknobit.novacore:Nova-core:1.0.0'
+  implementation 'com.tecknobit.novacore:Nova-core:1.0.1'
 }
 ```
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.tecknobit.novacore:Nova-core:1.0.0")
+  implementation("com.tecknobit.novacore:Nova-core:1.0.1")
 }
 ```
 
@@ -60,7 +60,7 @@ steps:
   - <a href="https://github.com/N7ghtm4r3/Nova-Android#readme">Android</a>
   - iOS -> planned
 - <a href="https://github.com/N7ghtm4r3/Nova-Desktop#readme">Desktop version</a>
-- <a href="https://github.com/N7ghtm4r3/Nova/releases/tag/1.0.0">Backend service "out-of-the-box"</a>
+- <a href="https://github.com/N7ghtm4r3/Nova/releases/tag/1.0.1">Backend service "out-of-the-box"</a>
 
 ## Usages
 
