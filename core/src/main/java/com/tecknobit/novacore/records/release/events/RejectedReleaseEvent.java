@@ -1,6 +1,6 @@
 package com.tecknobit.novacore.records.release.events;
 
-import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ import java.util.List;
  * makes change the {@link Release}'s status to {@link ReleaseStatus#Rejected}
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  * @see ReleaseEvent
  * @see ReleaseStandardEvent

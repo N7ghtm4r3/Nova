@@ -1,6 +1,5 @@
 package com.tecknobit.novacore.records.release.events;
-
-import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
 import jakarta.persistence.Entity;
@@ -17,7 +16,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
  * The {@code ReleaseStandardEvent} class is useful to represent a standard Nova's release event
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  * @see ReleaseEvent
  */

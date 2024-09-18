@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NotificationsTarget;
-import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.NovaUser.Role;
 import com.tecknobit.novacore.records.project.Project;
@@ -34,7 +33,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
  * The {@code Release} class is useful to represent a Nova's release
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  * @see NotificationsTarget
  */

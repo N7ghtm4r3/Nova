@@ -20,9 +20,9 @@ import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.equinox.environment.records.EquinoxUser.TOKEN_KEY;
-import static com.tecknobit.novacore.InputValidator.*;
-import static com.tecknobit.novacore.helpers.Endpoints.*;
-import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.NovaInputValidator.*;
+import static com.tecknobit.novacore.helpers.NovaEndpoints.*;
+import static com.tecknobit.novacore.records.NovaUser.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.NovaUser.*;
 import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
@@ -36,7 +36,7 @@ import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY
  * @see ProjectManager
  */
 @RestController
-@RequestMapping(BASE_ENDPOINT)
+@RequestMapping(BASE_EQUINOX_ENDPOINT)
 public class ProjectsController extends ProjectManager {
 
     /**

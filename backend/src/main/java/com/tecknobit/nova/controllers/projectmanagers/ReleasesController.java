@@ -20,9 +20,8 @@ import java.util.Map;
 
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.equinox.environment.records.EquinoxUser.TOKEN_KEY;
-import static com.tecknobit.novacore.InputValidator.*;
-import static com.tecknobit.novacore.helpers.Endpoints.*;
-import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.novacore.NovaInputValidator.*;
+import static com.tecknobit.novacore.helpers.NovaEndpoints.*;
 import static com.tecknobit.novacore.records.NovaUser.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.release.Release.*;
@@ -44,7 +43,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent
  * @see ProjectManager
  */
 @RestController
-@RequestMapping(BASE_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"
+@RequestMapping(BASE_EQUINOX_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"
         + RELEASES_KEY + "/")
 public class ReleasesController extends ProjectManager {
 

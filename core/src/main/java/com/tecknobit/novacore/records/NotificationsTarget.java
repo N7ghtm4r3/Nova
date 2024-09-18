@@ -3,7 +3,7 @@ package com.tecknobit.novacore.records;
 import java.util.List;
 
 /**
- * The {@code NotificationsTarget} instance is useful to fetch the notifications of a specific {@link NovaItem}'s target
+ * The {@code NotificationsTarget} instance is useful to fetch the notifications of a specific {@link EquinoxItem}'s target
  *
  * @author N7ghtm4r3 - Tecknobit
  */

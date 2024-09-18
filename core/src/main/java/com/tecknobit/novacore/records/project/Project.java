@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NotificationsTarget;
-import com.tecknobit.novacore.records.NovaItem;
 import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.NovaUser;
 import com.tecknobit.novacore.records.release.Release;
@@ -29,13 +29,13 @@ import static com.tecknobit.novacore.records.release.Release.RELEASES_KEY;
  * The {@code Project} class is useful to represent a Nova's user
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  * @see NotificationsTarget
  */
 @Entity
 @Table(name = PROJECTS_KEY)
-public class Project extends NovaItem implements NotificationsTarget {
+public class Project extends EquinoxItem implements NotificationsTarget {
 
     /**
      * {@code PROJECT_MEMBERS_TABLE} the key for the <b>"project members"</b> table

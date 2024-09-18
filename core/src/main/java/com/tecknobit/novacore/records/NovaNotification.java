@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -23,12 +24,12 @@ import static com.tecknobit.novacore.records.release.Release.*;
  * The {@code NovaNotification} class is useful to represent a Nova's notification
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  */
 @Entity
 @Table(name = NOTIFICATIONS_KEY)
-public class NovaNotification extends NovaItem {
+public class NovaNotification extends EquinoxItem {
 
     /**
      * {@code NOTIFICATIONS_KEY} the key for the <b>"notifications"</b> field

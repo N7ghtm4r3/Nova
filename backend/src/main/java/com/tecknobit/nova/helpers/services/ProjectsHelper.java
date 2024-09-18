@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.tecknobit.equinox.environment.controllers.EquinoxController.generateIdentifier;
-import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.NovaUser.NAME_KEY;
 import static com.tecknobit.novacore.records.NovaUser.PROJECTS_KEY;
 import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;

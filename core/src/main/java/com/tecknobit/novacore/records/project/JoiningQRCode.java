@@ -1,7 +1,7 @@
 package com.tecknobit.novacore.records.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NovaUser.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -21,12 +21,12 @@ import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;
  * The {@code JoiningQRCode} class is useful to represent a Nova's joining QRCode to join in a {@link Project}
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  */
 @Entity
 @Table(name = JoiningQRCode.JOINING_QRCODES_TABLE)
-public class JoiningQRCode extends NovaItem {
+public class JoiningQRCode extends EquinoxItem {
 
     /**
      * {@code WRONG_NAME_MESSAGE} error message used when the joining qr code is expired

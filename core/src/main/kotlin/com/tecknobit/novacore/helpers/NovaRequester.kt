@@ -5,8 +5,8 @@ import com.tecknobit.apimanager.annotations.Wrapper
 import com.tecknobit.apimanager.apis.APIRequest
 import com.tecknobit.apimanager.apis.APIRequest.Params
 import com.tecknobit.equinox.environment.helpers.EquinoxRequester
-import com.tecknobit.novacore.helpers.Endpoints.*
-import com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY
+import com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY
+import com.tecknobit.novacore.helpers.NovaEndpoints.*
 import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
 import com.tecknobit.novacore.records.NovaUser.*
 import com.tecknobit.novacore.records.project.JoiningQRCode.CREATE_JOIN_CODE_KEY

@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
+import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.NovaUser.ROLE_KEY;
 import static com.tecknobit.novacore.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
 import static com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY;

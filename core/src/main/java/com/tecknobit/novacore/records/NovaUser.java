@@ -22,7 +22,7 @@ import static jakarta.persistence.EnumType.STRING;
  * The {@code NovaUser} class is useful to represent a Nova's user
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  */
 @Entity

@@ -3,7 +3,7 @@ package com.tecknobit.novacore.records.release.events;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
-import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.release.events.ReleaseEvent.ReleaseTag;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -22,12 +22,12 @@ import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE
  * The {@code RejectedTag} class is useful represent a rejected tag related to a {@link RejectedReleaseEvent}
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  */
 @Entity
 @Table(name = RejectedTag.REJECTED_TAGS_KEY)
-public final class RejectedTag extends NovaItem {
+public final class RejectedTag extends EquinoxItem {
 
     /**
      * {@code REJECTED_TAGS_KEY} the key for the <b>"rejected_tags"</b> field

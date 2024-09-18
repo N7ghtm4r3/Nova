@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
-import com.tecknobit.novacore.records.NovaItem;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
 import jakarta.persistence.*;
@@ -26,7 +26,7 @@ import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.
  * makes change the {@link Release}'s status to {@link ReleaseStatus#Verifying}
  *
  * @author N7ghtm4r3 - Tecknobit
- * @see NovaItem
+ * @see EquinoxItem
  * @see Serializable
  * @see ReleaseEvent
  * @see ReleaseStandardEvent
@@ -144,12 +144,12 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
      * The {@code AssetUploaded} class is useful to represent an asset uploaded
      *
      * @author N7ghtm4r3 - Tecknobit
-     * @see NovaItem
+     * @see EquinoxItem
      * @see Serializable
      */
     @Entity
     @Table(name = ASSETS_UPLOADED_KEY)
-    public static final class AssetUploaded extends NovaItem {
+    public static final class AssetUploaded extends EquinoxItem {
 
         /**
          * {@code ASSETS_UPLOADED_KEY} the key for the <b>"assets_uploaded"</b> field

@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import static com.tecknobit.novacore.records.NovaItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.release.events.RejectedTag.*;
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_KEY;
 

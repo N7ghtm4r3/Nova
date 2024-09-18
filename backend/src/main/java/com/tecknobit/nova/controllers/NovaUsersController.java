@@ -7,6 +7,7 @@ import com.tecknobit.nova.helpers.services.NovaUsersHelper;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
 import com.tecknobit.novacore.records.NovaNotification;
 import com.tecknobit.novacore.records.NovaUser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,10 +50,23 @@ public class NovaUsersController extends EquinoxUsersController<NovaUser> {
         super(usersHelper);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @CustomParametersOrder(order = ROLE_KEY)
     protected Object[] getSignUpCustomParams() {
         return new Object[]{Vendor};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected JSONObject assembleSignInSuccessResponse(NovaUser user) {
+        JSONObject response = super.assembleSignInSuccessResponse(user);
+        response.put(ROLE_KEY, user.getRole());
+        return response;
     }
 
     /**
