@@ -184,6 +184,24 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
     );
 
     /**
+     *  Method to execute the query to remove a tester from an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     * @param memberId: the identifier of the tester to remove
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + PROJECT_TESTERS_TABLE + " WHERE " + PROJECT_IDENTIFIER_KEY + "=:"
+                    + PROJECT_IDENTIFIER_KEY + " AND " + MEMBER_IDENTIFIER_KEY + "=:" + MEMBER_IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void removeTester(
+            @Param(PROJECT_IDENTIFIER_KEY) String projectId,
+            @Param(MEMBER_IDENTIFIER_KEY) String memberId
+    );
+
+    /**
      * Method to execute the query to remove all testers from a {@link Project}
      *
      * @param projectId: the identifier of the project

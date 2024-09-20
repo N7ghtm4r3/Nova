@@ -228,6 +228,7 @@ public class ProjectsHelper implements NovaResourcesManager {
      */
     public void removeMember(String projectId, String memberId) {
         projectsRepository.removeMember(projectId, memberId);
+        projectsRepository.removeTester(projectId, memberId);
     }
 
     /**

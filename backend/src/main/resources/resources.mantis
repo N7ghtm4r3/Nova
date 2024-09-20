@@ -16,7 +16,13 @@
         "wrong_surname_key": "Surname is not valid",
         "wrong_language_key": "Language is not supported",
         "wrong_email_key": "Email is not valid",
-        "not_authorized_key": "Not authorized or wrong details"
+        "not_authorized_key": "Not authorized or wrong details",
+        "wrong_mailing_list_key": "Mailing list is not valid",
+        "wrong_release_version_key": "The version for the release is not valid",
+        "wrong_release_notes_key": "The notes for the release are not valid",
+        "wrong_release_assets_key": "The assets uploaded are not valid",
+        "wrong_rejection_reasons_key": "The reasons of the rejection are not valid",
+        "wrong_comment_tag_key": "The comment for the tag is not valid"
     },
     "ignored_resources": {},
     "it": {
@@ -36,7 +42,13 @@
         "wrong_surname_key": "Cognome non valido",
         "wrong_language_key": "Lingua non supportata",
         "wrong_email_key": "Email non valida",
-        "not_authorized_key": "Non autorizzat o dati errati"
+        "not_authorized_key": "Non autorizzat o dati errati",
+        "wrong_mailing_list_key": "La mailing list non è valida",
+        "wrong_release_version_key": "La versione della release non e' valida",
+        "wrong_release_notes_key": "Le note per la release non sono valide",
+        "wrong_release_assets_key": "Gli asset caricati non sono validi",
+        "wrong_rejection_reasons_key": "I motivi del rifiuto non sono validi",
+        "wrong_comment_tag_key": "Il commento per il tag non e' valido"
     },
     "fr": {
         "new_asset_uploaded_key": "Nouvel actif téléchargé",
@@ -54,7 +66,13 @@
         "wrong_surname_key": "Le nom n'est pas valide",
         "wrong_language_key": "La langue n'est pas prise en charge",
         "wrong_email_key": "Le courriel n'est pas valide",
-        "not_authorized_key": "Non autorisa ou faux datails"
+        "not_authorized_key": "Détails non autorisés ou erronés",
+        "wrong_mailing_list_key": "La liste de diffusion n'est pas valide",
+        "wrong_release_version_key": "La version de la version n'est pas valide",
+        "wrong_release_notes_key": "Les notes de la version ne sont pas valides",
+        "wrong_release_assets_key": "Les ressources téléchargées ne sont pas valides",
+        "wrong_rejection_reasons_key": "Les raisons du rejet ne sont pas valables",
+        "wrong_comment_tag_key": "Le commentaire pour la balise n'est pas valide"
     },
     "es": {
         "new_asset_uploaded_key": "Nuevo recurso cargado",
@@ -72,6 +90,12 @@
         "wrong_surname_key": "El apellido no es valido",
         "wrong_language_key": "El idioma no es compatible",
         "wrong_email_key": "El correo electrinico no es valido",
-        "not_authorized_key": "No autorizados o datos incorrectos"
+        "not_authorized_key": "No autorizados o datos incorrectos",
+        "wrong_mailing_list_key": "La lista de correo no es válida",
+        "wrong_release_version_key": "La versión para el lanzamiento no es válida",
+        "wrong_release_notes_key": "Las notas de la versión no son válidas",
+        "wrong_release_assets_key": "Los activos cargados no son válidos",
+        "wrong_rejection_reasons_key": "Los motivos del rechazo no son válidos",
+        "wrong_comment_tag_key": "El comentario de la etiqueta no es válido"
     }
 }

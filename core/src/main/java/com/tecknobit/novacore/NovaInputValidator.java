@@ -19,12 +19,12 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code WRONG_MAILING_LIST_MESSAGE} error message used when the mailing list inserted is not valid
      */
-    public static final String WRONG_MAILING_LIST_MESSAGE = "Mailing list is not valid";
+    public static final String WRONG_MAILING_LIST_MESSAGE = "wrong_mailing_list_key";
 
     /**
      * {@code WRONG_RELEASE_VERSION_MESSAGE} error message used when the release version inserted is not valid
      */
-    public static final String WRONG_RELEASE_VERSION_MESSAGE = "The version for the release is not valid";
+    public static final String WRONG_RELEASE_VERSION_MESSAGE = "wrong_release_version_key";
 
     /**
      * {@code RELEASE_VERSION_MAX_LENGTH} the max valid length for the release version
@@ -34,7 +34,7 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code WRONG_RELEASE_NOTES_MESSAGE} error message used when the release notes inserted are not valid
      */
-    public static final String WRONG_RELEASE_NOTES_MESSAGE = "The notes for the release are not valid";
+    public static final String WRONG_RELEASE_NOTES_MESSAGE = "wrong_release_notes_key";
 
     /**
      * {@code RELEASE_NOTES_MAX_LENGTH} the max valid length for the release notes
@@ -44,12 +44,12 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code WRONG_ASSETS_MESSAGE} error message used when the release assets uploaded are not valid
      */
-    public static final String WRONG_ASSETS_MESSAGE = "The assets uploaded are not valid";
+    public static final String WRONG_ASSETS_MESSAGE = "wrong_release_assets_key";
 
     /**
      * {@code WRONG_REASONS_MESSAGE} error message used when the rejected reasons inserted are not valid
      */
-    public static final String WRONG_REASONS_MESSAGE = "The reasons of the rejection are not valid";
+    public static final String WRONG_REASONS_MESSAGE = "wrong_rejection_reasons_key";
 
     /**
      * {@code REASONS_MAX_LENGTH} the max valid length for the reasons
@@ -59,7 +59,7 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code WRONG_TAG_COMMENT_MESSAGE} error message used when the tag comment inserted is not valid
      */
-    public static final String WRONG_TAG_COMMENT_MESSAGE = "The comment for the tag is not valid";
+    public static final String WRONG_TAG_COMMENT_MESSAGE = "wrong_comment_tag_key";
 
     /**
      * {@code TAG_COMMENT_MAX_LENGTH} the max valid length for the tag comment
