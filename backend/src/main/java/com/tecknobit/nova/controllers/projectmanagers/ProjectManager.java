@@ -57,7 +57,7 @@ public abstract class ProjectManager extends DefaultNovaController {
      */
     protected boolean isAuthorizedUser(String userId, String projectId) {
         Project project = projectsHelper.getProject(userId, projectId);
-        return (isProjectAuthor(project, userId) || (me.isVendor() && !me.isTester(currentProject)));
+        return (isProjectAuthor(project, userId) || (currentProject != null && me.isVendor() && !me.isTester(currentProject)));
     }
 
     /**

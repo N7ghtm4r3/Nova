@@ -2,8 +2,8 @@ package com.tecknobit.novacore.helpers
 
 import com.tecknobit.apimanager.annotations.RequestPath
 import com.tecknobit.apimanager.annotations.Wrapper
-import com.tecknobit.apimanager.apis.APIRequest
 import com.tecknobit.apimanager.apis.APIRequest.Params
+import com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*
 import com.tecknobit.equinox.environment.helpers.EquinoxRequester
 import com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY
 import com.tecknobit.novacore.helpers.NovaEndpoints.*
@@ -49,7 +49,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/users/{id}/notifications", method = APIRequest.RequestMethod.GET)
+    @RequestPath(path = "/api/v1/users/{id}/notifications", method = GET)
     fun getNotifications(): JSONObject {
         return execGet(
             endpoint = assembleUsersEndpointPath("/$NOTIFICATIONS_KEY")
@@ -63,7 +63,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects", method = APIRequest.RequestMethod.GET)
+    @RequestPath(path = "/api/v1/{id}/projects", method = GET)
     fun listProjects() : JSONObject {
         return execGet(
             endpoint = assembleProjectsEndpointPath()
@@ -78,7 +78,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects", method = APIRequest.RequestMethod.POST)
+    @RequestPath(path = "/api/v1/{id}/projects", method = POST)
     fun addProject(
         logoPic: File,
         projectName: String
@@ -107,7 +107,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = APIRequest.RequestMethod.GET)
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = GET)
     fun getProject(
         projectId: String
     ) : JSONObject {
@@ -126,7 +126,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/addMembers", method = APIRequest.RequestMethod.PUT)
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/addMembers", method = PUT)
     fun addMembers(
         projectId: String,
         mailingList: String,
@@ -155,7 +155,7 @@ class NovaRequester(
      * @return the result of the request as [JSONObject]
      *
      */
-    @RequestPath(path = "/api/v1/projects/join", method = APIRequest.RequestMethod.POST)
+    @RequestPath(path = "/api/v1/projects/join", method = POST)
     @Wrapper
     fun joinWithId(
         id: String,
@@ -187,7 +187,7 @@ class NovaRequester(
      * @return the result of the request as [JSONObject]
      *
      */
-    @RequestPath(path = "/api/v1/projects/join", method = APIRequest.RequestMethod.POST)
+    @RequestPath(path = "/api/v1/projects/join", method = POST)
     @Wrapper
     fun joinWithCode(
         joinCode: String,
@@ -219,7 +219,7 @@ class NovaRequester(
      * @return the result of the request as [JSONObject]
      *
      */
-    @RequestPath(path = "/api/v1/projects/join", method = APIRequest.RequestMethod.POST)
+    @RequestPath(path = "/api/v1/projects/join", method = POST)
     private fun join(
         payload: Params,
         email: String,
@@ -239,6 +239,28 @@ class NovaRequester(
     }
 
     /**
+     * Function to execute the request to mark a member of the project as tester
+     *
+     * @param projectId: the project identifier
+     * @param memberId: the identifier of the member to mark as tester
+     *
+     * @return the result of the request as [JSONObject]
+     *
+     */
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/markAsTester", method = PATCH)
+    fun markAsTester(
+        projectId: String,
+        memberId: String
+    ) : JSONObject {
+        val payload = Params()
+        payload.addParam(MEMBER_IDENTIFIER_KEY, memberId)
+        return execPatch(
+            endpoint = assembleProjectsEndpointPath(projectId + MARK_MEMBER_AS_TESTER_ENDPOINT),
+            payload = payload
+        )
+    }
+
+    /**
      * Function to execute the request to remove a member from a project
      *
      * @param projectId: the project identifier
@@ -247,7 +269,7 @@ class NovaRequester(
      * @return the result of the request as [JSONObject]
      *
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/removeMember", method = APIRequest.RequestMethod.DELETE)
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/removeMember", method = PATCH)
     fun removeMember(
         projectId: String,
         memberId: String
@@ -268,7 +290,7 @@ class NovaRequester(
      * @return the result of the request as [JSONObject]
      *
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/leave", method = APIRequest.RequestMethod.DELETE)
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/leave", method = DELETE)
     fun leaveProject(
         projectId: String
     ) : JSONObject {
@@ -285,7 +307,7 @@ class NovaRequester(
      * @return the result of the request as [JSONObject]
      *
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = APIRequest.RequestMethod.DELETE)
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = DELETE)
     fun deleteProject(
         projectId: String
     ) : JSONObject {
@@ -319,7 +341,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/addRelease", method = APIRequest.RequestMethod.POST)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/addRelease", method = POST)
     fun addRelease(
         projectId: String,
         releaseVersion: String,
@@ -344,7 +366,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = APIRequest.RequestMethod.GET)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = GET)
     fun getRelease(
         projectId: String,
         releaseId: String
@@ -366,7 +388,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = APIRequest.RequestMethod.POST)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = POST)
     fun uploadAsset(
         projectId: String,
         releaseId: String,
@@ -402,7 +424,7 @@ class NovaRequester(
     @Wrapper
     @RequestPath(
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
-        method = APIRequest.RequestMethod.POST
+        method = POST
     )
     fun approveAssets(
         projectId: String,
@@ -431,7 +453,7 @@ class NovaRequester(
     @Wrapper
     @RequestPath(
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
-        method = APIRequest.RequestMethod.POST
+        method = POST
     )
     fun rejectAssets(
         projectId: String,
@@ -464,7 +486,7 @@ class NovaRequester(
      */
     @RequestPath(
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/comment/{asset_uploading_event_id}",
-        method = APIRequest.RequestMethod.POST
+        method = POST
     )
     private fun commentAssets(
         projectId: String,
@@ -509,7 +531,7 @@ class NovaRequester(
      */
     @RequestPath(
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/events/{release_event_id}/tags/{release_tag_id}",
-        method = APIRequest.RequestMethod.PUT
+        method = PUT
     )
     fun fillRejectedTag(
         projectId: String,
@@ -540,7 +562,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = APIRequest.RequestMethod.PATCH)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
     fun promoteRelease(
         projectId: String,
         releaseId: String,
@@ -567,7 +589,7 @@ class NovaRequester(
      */
     @RequestPath(
         path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/createReport",
-        method = APIRequest.RequestMethod.GET
+        method = GET
     )
     fun createReportRelease(
         projectId: String,
@@ -590,7 +612,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = APIRequest.RequestMethod.DELETE)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = DELETE)
     fun deleteRelease(
         projectId: String,
         releaseId: String

@@ -20,6 +20,11 @@ public class NovaEndpoints extends EquinoxBaseEndpointsSet {
     public static final String JOIN_ENDPOINT = "/join";
 
     /**
+     * {@code MARK_MEMBER_AS_TESTER_ENDPOINT} the endpoint to mark a member as tester in a project
+     */
+    public static final String MARK_MEMBER_AS_TESTER_ENDPOINT = "/markAsTester";
+
+    /**
      * {@code REMOVE_MEMBER_ENDPOINT} the endpoint to remove a member from a project
      */
     public static final String REMOVE_MEMBER_ENDPOINT = "/removeMember";

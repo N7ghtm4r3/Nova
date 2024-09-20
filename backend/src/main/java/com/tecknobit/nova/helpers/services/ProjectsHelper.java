@@ -6,6 +6,7 @@ import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRC
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
 import com.tecknobit.novacore.records.NovaUser;
+import com.tecknobit.novacore.records.NovaUser.Role;
 import com.tecknobit.novacore.records.project.JoiningQRCode;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
@@ -121,7 +122,7 @@ public class ProjectsHelper implements NovaResourcesManager {
      * @param createJoinQRCode: whether create a textual join code
      * @return the textual join code, if created, as {@link String}
      */
-    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, NovaUser.Role role,
+    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role,
                                     boolean createJoinQRCode) {
         String joinCode = null;
         if(createJoinQRCode)
@@ -211,6 +212,16 @@ public class ProjectsHelper implements NovaResourcesManager {
     }
 
     /**
+     * Method to mark a member as {@link Role#Tester} of the project
+     *
+     * @param projectId: the project identifier
+     * @param memberId: the member identifier to mark as tester
+     */
+    public void markMemberAsTester(String projectId, String memberId) {
+        projectsRepository.markMemberAsTester(projectId, memberId);
+    }
+
+    /**
      * Method to remove a member from a project
      * @param projectId: the project identifier
      * @param memberId: the member identifier of the member to remove
@@ -230,6 +241,7 @@ public class ProjectsHelper implements NovaResourcesManager {
         for (Release release : project.getReleases())
             releasesHelper.deleteRelease(null, null, release);
         projectsRepository.removeAllMembers(projectId);
+        projectsRepository.removeAllTesters(projectId);
         List<NovaUser> members = project.getProjectMembers();
         members.add(project.getAuthor());
         for(NovaUser member : members) {

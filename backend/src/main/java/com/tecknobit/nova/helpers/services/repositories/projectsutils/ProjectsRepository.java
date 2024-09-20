@@ -1,5 +1,6 @@
 package com.tecknobit.nova.helpers.services.repositories.projectsutils;
 
+import com.tecknobit.novacore.records.NovaUser.Role;
 import com.tecknobit.novacore.records.project.Project;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -125,6 +126,31 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
     );
 
     /**
+     * Method to execute the query to mark a member as {@link Role#Tester}
+     *
+     * @param projectId: the identifier of the project
+     * @param memberId:  the identifier of the member to mark as tester
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "INSERT INTO " + PROJECT_TESTERS_TABLE +
+                    " ("
+                    + PROJECT_IDENTIFIER_KEY + ","
+                    + MEMBER_IDENTIFIER_KEY +
+                    " )"
+                    + " VALUES ("
+                    + ":" + PROJECT_IDENTIFIER_KEY + ","
+                    + ":" + MEMBER_IDENTIFIER_KEY
+                    + ")",
+            nativeQuery = true
+    )
+    void markMemberAsTester(
+            @Param(PROJECT_IDENTIFIER_KEY) String projectId,
+            @Param(MEMBER_IDENTIFIER_KEY) String memberId
+    );
+
+    /**
      *  Method to execute the query to remove a member from an existing {@link Project}
      *
      * @param projectId: the identifier of the project
@@ -155,6 +181,21 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
     )
     void removeAllMembers(
             @Param(IDENTIFIER_KEY) String projectId
+    );
+
+    /**
+     * Method to execute the query to remove all testers from a {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + PROJECT_TESTERS_TABLE + " WHERE " + PROJECT_IDENTIFIER_KEY + "=:" + PROJECT_IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void removeAllTesters(
+            @Param(PROJECT_IDENTIFIER_KEY) String projectId
     );
 
     /**

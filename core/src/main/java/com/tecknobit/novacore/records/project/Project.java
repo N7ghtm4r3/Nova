@@ -154,13 +154,28 @@ public class Project extends EquinoxItem implements NotificationsTarget {
     })
     private final List<NovaUser> projectMembers;
 
-    // TODO: 20/09/2024 TO COMMENT
-    @ElementCollection
-    @CollectionTable(
-            name = PROJECT_TESTERS_TABLE
+    /**
+     * {@code testers} the testers of the project
+     */
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE
     )
-    @Column(name = MEMBER_IDENTIFIER_KEY)
-    private Set<String> testers;
+    @JoinTable(
+            name = PROJECT_TESTERS_TABLE,
+            joinColumns = {@JoinColumn(name = PROJECT_IDENTIFIER_KEY)},
+            inverseJoinColumns = {@JoinColumn(name = MEMBER_IDENTIFIER_KEY)}
+    )
+    @JsonIgnoreProperties({
+            TOKEN_KEY,
+            PASSWORD_KEY,
+            PROJECTS_KEY,
+            AUTHORED_PROJECTS_KEY,
+            NOTIFICATIONS_KEY,
+            "hibernateLazyInitializer",
+            "handler"
+    })
+    private Set<NovaUser> testers;
 
     /**
      * {@code releases} the releases of the project
@@ -221,13 +236,13 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      * @param logoUrl        : the logo of the project formatted as url
      * @param name           : the name of the project
      * @param projectMembers : the members of the project
-     * @param testers: TODO: TO COMMENT
+     * @param testers: the testers of the project
      * @param releases       : the releases of the project
      * @param joiningQRCodes : the joining QR-Codes created to join in this project
      * @apiNote this is useful for the server-side, so for the clients will be ever hidden
      */
     public Project(String id, NovaUser author, String logoUrl, String name, List<NovaUser> projectMembers,
-                   HashSet<String> testers, List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
+                   HashSet<NovaUser> testers, List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
         super(id);
         this.author = author;
         this.logoUrl = logoUrl;
@@ -239,16 +254,24 @@ public class Project extends EquinoxItem implements NotificationsTarget {
         markProjectTesters(testers);
     }
 
-    // TODO: 20/09/2024 TO COMMENT
+    /**
+     * Method to mark the {@link #projectMembers} of the project as {@link Role#Tester}
+     *
+     * @param jTesters: the list formatted as JSON of the members to mark as testers
+     */
     private void markProjectTesters(JSONArray jTesters) {
         markProjectTesters(new HashSet<>(JsonHelper.toList(jTesters)));
     }
 
-    // TODO: 20/09/2024 TO COMMENT
-    private void markProjectTesters(HashSet testers) {
+    /**
+     * Method to mark the {@link #projectMembers} of the project as {@link Role#Tester}
+     *
+     * @param testers: the list of the members to mark as testers
+     */
+    private void markProjectTesters(HashSet<NovaUser> testers) {
         this.testers = testers;
         for (NovaUser member : projectMembers)
-            if(testers.contains(member.getId()))
+            if(testers.contains(member))
                 member.setRole(Role.Tester);
     }
 
@@ -299,7 +322,7 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      *
      * @return {@link #testers} instance as {@link HashSet} of {@link String}
      */
-    public Set<String> getTesters() {
+    public Set<NovaUser> getTesters() {
         return testers;
     }
 

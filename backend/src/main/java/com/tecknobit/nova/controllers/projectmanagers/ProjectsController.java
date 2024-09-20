@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -319,6 +320,57 @@ public class ProjectsController extends ProjectManager {
     }
 
     /**
+     * Method to mark a member as {@link Role#Tester} of the project
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier from remove the member
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "member_id": "the identifier of the member to remove", -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
+    @PatchMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}" +
+                    MARK_MEMBER_AS_TESTER_ENDPOINT,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}/markAsTester", method = PATCH)
+    public String markAsTester(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
+            loadJsonHelper(payload);
+            String memberId = jsonHelper.getString(MEMBER_IDENTIFIER_KEY);
+            if(currentProject.hasMemberId(memberId)) {
+                boolean amITheProjectAuthor = currentProject.amITheProjectAuthor(id);
+                if(amITheProjectAuthor || !currentProject.amITheProjectAuthor(memberId)) {
+                    try {
+                        projectsHelper.markMemberAsTester(projectId, memberId);
+                        return successResponse();
+                    } catch (Exception e) {
+                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
+                    }
+                } else
+                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            } else
+                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        } else
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    /**
      * Method to remove a member from a project
      *
      * @param id: the identifier of the user
@@ -351,8 +403,7 @@ public class ProjectsController extends ProjectManager {
         if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
             loadJsonHelper(payload);
             String memberId = jsonHelper.getString(MEMBER_IDENTIFIER_KEY);
-            Project project = projectsHelper.getProject(id, projectId);
-            if(project.hasMemberId(memberId) && !isProjectAuthor(memberId, projectId)) {
+            if(currentProject.hasMemberId(memberId) && !isProjectAuthor(memberId, projectId)) {
                 projectsHelper.removeMember(projectId, memberId);
                 return successResponse();
             } else
