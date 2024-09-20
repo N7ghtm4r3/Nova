@@ -24,8 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tecknobit.novacore.records.project.Project.PROJECT_KEY;
-import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
+import static com.tecknobit.novacore.records.project.Project.*;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 import static com.tecknobit.novacore.records.release.events.ReleaseEvent.RELEASE_EVENT_DATE_KEY;
 
@@ -203,6 +202,7 @@ public class Release extends EquinoxItem implements NotificationsTarget {
     @JsonIgnoreProperties({
             PROJECT_MEMBERS_KEY,
             RELEASES_KEY,
+            PROJECT_TESTERS_KEY,
             "hibernateLazyInitializer",
             "handler"
     })

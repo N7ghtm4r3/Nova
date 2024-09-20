@@ -3,6 +3,7 @@ package com.tecknobit.novacore.records;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.equinox.environment.records.EquinoxUser;
 import com.tecknobit.novacore.records.project.Project;
 import jakarta.persistence.*;
@@ -38,6 +39,11 @@ public class NovaUser extends EquinoxUser {
          * releases status such as: promote to alpha, beta or latest version
          */
         Vendor,
+
+        /**
+         * {@code Tester} this pseudo-role allow the user to approve or reject the releases
+         */
+        Tester,
 
         /**
          * {@code Customer} this role allow the user to approve or reject the releases and manage their
@@ -97,11 +103,12 @@ public class NovaUser extends EquinoxUser {
      * {@code role} the role of the user on the server
      *
      * @apiNote this value cannot change on server, this means when the user
-     * execute the authentication on the server with a role it will be ever the same
+     * execute the authentication on the server with a role it will be ever the same, but it can be set as {@link Role#Tester}
+     * for each project where him/her is member
      */
     @Enumerated(value = STRING)
     @Column(name = ROLE_KEY)
-    private final Role role;
+    private Role role;
 
     /**
      * {@code NovaNotification} the list of the notifications which belong to the user
@@ -147,13 +154,13 @@ public class NovaUser extends EquinoxUser {
      * Constructor to init the {@link NovaUser} class
      *
      * @param id: identifier of the user
-     * @param token:{@code token} the token which the user is allowed to operate on server
-     * @param name:{@code name} the name of the user
-     * @param surname:{@code surname} the surname of the user
-     * @param email:{@code email} the email of the user
-     * @param password:{@code password} the password of the user
-     * @param language:{@code language} the language selected by the user
-     * @param role:{@code role} the role of the user on the server           @apiNote this value cannot change on server, this means when the user      execute the authentication on the server with a role it will be ever the same
+     * @param token: the token which the user is allowed to operate on server
+     * @param name: the name of the user
+     * @param surname: the surname of the user
+     * @param email: the email of the user
+     * @param password: the password of the user
+     * @param language: the language selected by the user
+     * @param role: the role of the user on the server
      */
     public NovaUser(String id, String token, String name, String surname, String email, String password, String language,
                     Role role) {
@@ -165,16 +172,16 @@ public class NovaUser extends EquinoxUser {
      *
      *
      * @param id: identifier of the user
-     * @param token:{@code token} the token which the user is allowed to operate on server
-     * @param name:{@code name} the name of the user
-     * @param surname:{@code surname} the surname of the user
-     * @param email:{@code email} the email of the user
+     * @param token: the token which the user is allowed to operate on server
+     * @param name: the name of the user
+     * @param surname: the surname of the user
+     * @param email: the email of the user
      * @param profilePicUrl:{@code profilePicUrl} the profile pic of the user formatted as url
-     * @param password:{@code password} the password of the user
-     * @param authoredProjects:{@code authoredProjects} list of projects which user is the author           @apiNote if the user is a {@link Role#Customer} will be ever empty
+     * @param password: the password of the user
+     * @param authoredProjects:{@code authoredProjects} list of projects which user is the author
      * @param projects:{@code projects} list of projects which user is a member
-     * @param language:{@code language} the language selected by the user
-     * @param role:{@code role} the role of the user on the server           @apiNote this value cannot change on server, this means when the user      execute the authentication on the server with a role it will be ever the same
+     * @param language: the language selected by the user
+     * @param role: the role of the user on the server
      * @param notifications:{@code NovaNotification} the list of the notifications which belong to the user
      */
     public NovaUser(String id, String name, String surname, String email, String profilePicUrl, String token, String password,
@@ -195,6 +202,15 @@ public class NovaUser extends EquinoxUser {
      */
     public List<Project> getProjects() {
         return projects;
+    }
+
+    /**
+     * Method to set the {@link #role} instance
+     *
+     * @param role: the role of the user
+     */
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     /**
@@ -226,6 +242,19 @@ public class NovaUser extends EquinoxUser {
     @JsonIgnore
     public boolean isVendor() {
         return role == Role.Vendor;
+    }
+
+    /**
+     * Method to get whether the member is a {@link Role#Tester} <br>
+     * No-any params required
+     *
+     * @param project: the project to check if the user is a {@link Role#Tester}
+     *
+     * @return whether the member is a {@link Role#Tester} as boolean
+     */
+    @JsonIgnore
+    public boolean isTester(Project project) {
+        return project.getTesters().contains(id);
     }
 
     /**

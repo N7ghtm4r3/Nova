@@ -441,6 +441,16 @@ public interface LocalSessionUtils {
         }
 
         /**
+         * Method to get whether the member is a {@link Role#Tester} <br>
+         * No-any params required
+         *
+         * @return whether the member is a {@link Role#Tester} as boolean
+         */
+        public boolean isTester() {
+            return role == Role.Tester;
+        }
+
+        /**
          * Method to get whether the member is a {@link Role#Customer} <br>
          * No-any params required
          *

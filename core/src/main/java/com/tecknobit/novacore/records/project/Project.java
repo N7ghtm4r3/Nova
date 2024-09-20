@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
+import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NotificationsTarget;
 import com.tecknobit.novacore.records.NovaNotification;
@@ -19,7 +20,9 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY;
 import static com.tecknobit.novacore.records.NovaUser.*;
@@ -41,6 +44,11 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      * {@code PROJECT_MEMBERS_TABLE} the key for the <b>"project members"</b> table
      */
     public static final String PROJECT_MEMBERS_TABLE = "project_members";
+
+    /**
+     * {@code PROJECT_TESTERS_TABLE} the key for the <b>"project testers"</b> table
+     */
+    public static final String PROJECT_TESTERS_TABLE = "project_testers";
 
     /**
      * {@code PROJECT_IDENTIFIER_KEY} the key for the <b>"project_id"</b> field
@@ -71,6 +79,11 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      * {@code PROJECT_MEMBERS_KEY} the key for the <b>"projectMembers"</b> field
      */
     public static final String PROJECT_MEMBERS_KEY = "projectMembers";
+
+    /**
+     * {@code PROJECT_TESTERS_KEY} the key for the <b>"testers"</b> field
+     */
+    public static final String PROJECT_TESTERS_KEY = "testers";
 
     /**
      * {@code WORKING_PROGRESS_VERSION_KEY} the key for the <b>"working_progress_version"</b> field
@@ -141,6 +154,14 @@ public class Project extends EquinoxItem implements NotificationsTarget {
     })
     private final List<NovaUser> projectMembers;
 
+    // TODO: 20/09/2024 TO COMMENT
+    @ElementCollection
+    @CollectionTable(
+            name = PROJECT_TESTERS_TABLE
+    )
+    @Column(name = MEMBER_IDENTIFIER_KEY)
+    private Set<String> testers;
+
     /**
      * {@code releases} the releases of the project
      */
@@ -171,7 +192,7 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      * @apiNote empty constructor required
      */
     public Project() {
-        this(null, null, null, null, List.of(), List.of(), List.of());
+        this(null, null, null, null, List.of(), new HashSet<>(), List.of(), List.of());
     }
 
     /**
@@ -186,33 +207,49 @@ public class Project extends EquinoxItem implements NotificationsTarget {
         logoUrl = hItem.getString(LOGO_URL_KEY);
         name = hItem.getString(PROJECT_NAME_KEY);
         projectMembers = NovaUser.returnUsersList(hItem.getJSONArray(PROJECT_MEMBERS_KEY));
+        JSONArray testers = hItem.getJSONArray(PROJECT_TESTERS_KEY, new JSONArray());
         releases = Release.returnReleasesList(hItem.getJSONArray(RELEASES_KEY));
         joiningQRCodes = null;
+        markProjectTesters(testers);
     }
 
     /**
      * Constructor to init the {@link Project} class
      *
-     * @param id: identifier of the project
-     * @param author the author of the project
-     * @param logoUrl: the logo of the project formatted as url
-     * @param name: the name of the project
-     * @param projectMembers: the members of the project
-     * @param releases: the releases of the project
-     * @param joiningQRCodes: the joining QR-Codes created to join in this project
-     *
+     * @param id             : identifier of the project
+     * @param author         the author of the project
+     * @param logoUrl        : the logo of the project formatted as url
+     * @param name           : the name of the project
+     * @param projectMembers : the members of the project
+     * @param testers: TODO: TO COMMENT
+     * @param releases       : the releases of the project
+     * @param joiningQRCodes : the joining QR-Codes created to join in this project
      * @apiNote this is useful for the server-side, so for the clients will be ever hidden
-     *
      */
     public Project(String id, NovaUser author, String logoUrl, String name, List<NovaUser> projectMembers,
-                   List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
+                   HashSet<String> testers, List<Release> releases, List<JoiningQRCode> joiningQRCodes) {
         super(id);
         this.author = author;
         this.logoUrl = logoUrl;
         this.name = name;
         this.projectMembers = projectMembers;
+        this.testers = testers;
         this.releases = releases;
         this.joiningQRCodes = joiningQRCodes;
+        markProjectTesters(testers);
+    }
+
+    // TODO: 20/09/2024 TO COMMENT
+    private void markProjectTesters(JSONArray jTesters) {
+        markProjectTesters(new HashSet<>(JsonHelper.toList(jTesters)));
+    }
+
+    // TODO: 20/09/2024 TO COMMENT
+    private void markProjectTesters(HashSet testers) {
+        this.testers = testers;
+        for (NovaUser member : projectMembers)
+            if(testers.contains(member.getId()))
+                member.setRole(Role.Tester);
     }
 
     /**
@@ -254,6 +291,16 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      */
     public List<NovaUser> getProjectMembers() {
         return projectMembers;
+    }
+
+    /**
+     * Method to get {@link #testers} instance <br>
+     * No-any params required
+     *
+     * @return {@link #testers} instance as {@link HashSet} of {@link String}
+     */
+    public Set<String> getTesters() {
+        return testers;
     }
 
     /**

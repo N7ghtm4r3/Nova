@@ -44,7 +44,7 @@ import static com.tecknobit.novacore.records.release.events.ReleaseStandardEvent
  */
 @RestController
 @RequestMapping(BASE_EQUINOX_ENDPOINT  + "{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}/"
-        + RELEASES_KEY + "/")
+        + RELEASES_KEY)
 public class ReleasesController extends ProjectManager {
 
     /**
@@ -89,19 +89,18 @@ public class ReleasesController extends ProjectManager {
      * @return the result of the request as {@link String}
      */
     @PostMapping(
-            path = ADD_RELEASE_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
     )
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/addRelease", method = POST)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases", method = POST)
     public String addRelease(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
             @RequestHeader(TOKEN_KEY) String token,
             @RequestBody Map<String, String> payload
     ) {
-        if(isMe(id, token) && amIProjectMember(id, projectId)) {
+        if(isMe(id, token) && amIProjectMember(id, projectId) && !me.isTester(currentProject)) {
             loadJsonHelper(payload);
             String releaseVersion = jsonHelper.getString(RELEASE_VERSION_KEY);
             releaseVersion = releaseVersion.replaceFirst("^v\\.", "");
@@ -144,7 +143,7 @@ public class ReleasesController extends ProjectManager {
      * @apiNote the notifications related to the release belong to the user will be set as red and deleted
      */
     @GetMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
@@ -181,7 +180,7 @@ public class ReleasesController extends ProjectManager {
      * @apiNote this request, if successful, will make change the release status to {@link ReleaseStatus#Verifying}
      */
     @PostMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}" + UPLOAD_ASSETS_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
@@ -257,7 +256,7 @@ public class ReleasesController extends ProjectManager {
      * {@link ReleaseStatus#Rejected}
      */
     @PostMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}" + COMMENT_ASSET_ENDPOINT + "{" + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + "}",
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}" + COMMENT_ASSET_ENDPOINT + "{" + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
@@ -347,7 +346,7 @@ public class ReleasesController extends ProjectManager {
      * @return the result of the request as {@link String}
      */
     @PutMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}" + EVENTS_ENDPOINT + "{" + RELEASE_EVENT_IDENTIFIER_KEY + "}"
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}" + EVENTS_ENDPOINT + "{" + RELEASE_EVENT_IDENTIFIER_KEY + "}"
                     + TAGS_ENDPOINT + "{" + RELEASE_TAG_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
@@ -409,7 +408,7 @@ public class ReleasesController extends ProjectManager {
      * @return the result of the request as {@link String}
      */
     @PatchMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
@@ -479,7 +478,7 @@ public class ReleasesController extends ProjectManager {
      * @return the result of the request as {@link String}, if successful includes the path to reach the report
      */
     @GetMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}" + CREATE_REPORT_ENDPOINT,
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}" + CREATE_REPORT_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
@@ -521,7 +520,7 @@ public class ReleasesController extends ProjectManager {
      * @return the result of the request as {@link String}
      */
     @DeleteMapping(
-            path = "{" + RELEASE_IDENTIFIER_KEY + "}",
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}",
             headers = {
                     TOKEN_KEY
             }
@@ -533,7 +532,7 @@ public class ReleasesController extends ProjectManager {
             @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token
     ) {
-        if(isMe(id, token) && amIProjectMember(id, projectId)) {
+        if(isMe(id, token) && amIProjectMember(id, projectId) && !me.isTester(currentProject)) {
             Release release = getReleaseIfAuthorized(releaseId);
             if(release != null) {
                 releasesHelper.deleteRelease(id, currentProject, release);

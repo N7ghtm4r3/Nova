@@ -70,7 +70,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
     private final List<AssetUploaded> assetsUploaded;
 
     /**
-     * {@code commented} whether these assets have already been commented by the {@link Role#Customer}
+     * {@code commented} whether these assets have already been commented by the {@link Role#Customer} or {@link Role#Tester}
      */
     @Column(
             name = COMMENTED_KEY,

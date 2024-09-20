@@ -30,9 +30,9 @@ public class NovaEndpoints extends EquinoxBaseEndpointsSet {
     public static final String LEAVE_ENDPOINT = "/leave";
 
     /**
-     * {@code ADD_RELEASE_ENDPOINT} the endpoint to add a new release
+     * {@code UPLOAD_ASSETS_ENDPOINT} the endpoint to upload assets to a release
      */
-    public static final String ADD_RELEASE_ENDPOINT = "/addRelease";
+    public static final String UPLOAD_ASSETS_ENDPOINT = "/uploadAssets";
 
     /**
      * {@code COMMENT_ASSET_ENDPOINT} the endpoint to comment an asset uploading of a release

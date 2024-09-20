@@ -330,8 +330,7 @@ class NovaRequester(
         payload.addParam(RELEASE_NOTES_KEY, releaseNotes)
         return execPost(
             endpoint =  assembleReleasesEndpointPath(
-                projectId = projectId,
-                endpoint = ADD_RELEASE_ENDPOINT
+                projectId = projectId
             ),
             payload = payload
         )
@@ -385,7 +384,8 @@ class NovaRequester(
             body = body.build(),
             endpoint = assembleReleasesEndpointPath(
                 projectId = projectId,
-                releaseId = releaseId
+                releaseId = releaseId,
+                endpoint = UPLOAD_ASSETS_ENDPOINT
             )
         )
     }
