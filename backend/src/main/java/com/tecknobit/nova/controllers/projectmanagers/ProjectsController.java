@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -155,6 +154,45 @@ public class ProjectsController extends ProjectManager {
                 return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         } else
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    /**
+     * Method to update a project
+     *
+     * @param id: the identifier of the user
+     * @param token: the token of the user
+     * @param projectId: the project identifier to update
+     *
+     * @return the result of the request as {@link String}
+     */
+    @PostMapping(
+            path = "/{" + IDENTIFIER_KEY + "}/" + PROJECTS_KEY + "/{" + PROJECT_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{projectId}", method = PATCH)
+    public String editProject(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @ModelAttribute ProjectsHelper.ProjectPayload payload
+    ) {
+        if(!isMe(id, token))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        Project project = projectsHelper.getProject(id, projectId);
+        if(project == null || !project.amITheProjectAuthor(id))
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        try {
+            MultipartFile logo = payload.logo_url();
+            String name = payload.name();
+            if(!isProjectNameValid(name))
+                return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            projectsHelper.editProject(name, logo, projectId);
+            return successResponse();
+        } catch (Exception e) {
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
     }
 
     /**

@@ -96,6 +96,28 @@ public class ReleasesHelper implements NovaResourcesManager {
     }
 
     /**
+     * Method to edit an existing release
+     *
+     * @param releaseId: the identifier of the release
+     * @param releaseVersion: the version of the release
+     * @param releaseNotesContent: the notes attached to the release
+     */
+    public void editRelease(String releaseId, String releaseVersion, String releaseNotesContent) {
+        if(releaseVersion == null) {
+            releasesRepository.editRelease(
+                    releaseId,
+                    releaseNotesContent
+            );
+        } else {
+            releasesRepository.editRelease(
+                    releaseId,
+                    releaseVersion,
+                    releaseNotesContent
+            );
+        }
+    }
+
+    /**
      * Method to get a release
      *
      * @param releaseId: the release identifier

@@ -11,8 +11,10 @@ import com.tecknobit.novacore.records.NovaNotification.NOTIFICATIONS_KEY
 import com.tecknobit.novacore.records.NovaUser.*
 import com.tecknobit.novacore.records.project.JoiningQRCode.CREATE_JOIN_CODE_KEY
 import com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY
+import com.tecknobit.novacore.records.project.Project
 import com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY
 import com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY
+import com.tecknobit.novacore.records.release.Release
 import com.tecknobit.novacore.records.release.Release.*
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus.Approved
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus.Rejected
@@ -32,11 +34,13 @@ import java.io.File
 class NovaRequester(
     host: String,
     userId: String? = null,
-    userToken: String? = null
+    userToken: String? = null,
+    debugMode: Boolean = false
 ) : EquinoxRequester(
     host = host,
     userId = userId,
     userToken = userToken,
+    debugMode = debugMode,
     connectionTimeout = 5000,
     connectionErrorMessage = DEFAULT_CONNECTION_ERROR_MESSAGE,
     enableCertificatesValidation = true
@@ -83,21 +87,88 @@ class NovaRequester(
         logoPic: File,
         projectName: String
     ) : JSONObject {
-        val body = MultipartBody.Builder().setType(MultipartBody.FORM)
-            .addFormDataPart(
-                LOGO_URL_KEY,
-                logoPic.name,
-                logoPic.readBytes().toRequestBody("*/*".toMediaType())
-            )
-            .addFormDataPart(
-                NAME_KEY,
-                projectName
-            )
-            .build()
+        val body = createProjectPayload(
+            logoPic = logoPic,
+            projectName = projectName
+        )
         return execMultipartRequest(
             body = body,
             endpoint = assembleProjectsEndpointPath()
         )
+    }
+
+    /**
+     * Function to execute the request to edit an existing project
+     *
+     * @param project: the project to edit
+     * @param logoPic: the project logo
+     * @param projectName: the name of the project
+     *
+     * @return the result of the request as [JSONObject]
+     */
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}", method = POST)
+    fun editProject(
+        project: Project,
+        logoPic: File?,
+        projectName: String
+    ) : JSONObject {
+        return editProject(
+            projectId = project.id,
+            logoPic = logoPic,
+            projectName = projectName
+        )
+    }
+
+    /**
+     * Function to execute the request to edit an existing project
+     *
+     * @param projectId: the identifier of the project
+     * @param logoPic: the project logo
+     * @param projectName: the name of the project
+     *
+     * @return the result of the request as [JSONObject]
+     */
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}", method = POST)
+    fun editProject(
+        projectId: String,
+        logoPic: File?,
+        projectName: String
+    ) : JSONObject {
+        val body = createProjectPayload(
+            logoPic = logoPic,
+            projectName = projectName
+        )
+        return execMultipartRequest(
+            body = body,
+            endpoint = assembleProjectsEndpointPath(projectId)
+        )
+    }
+
+    /**
+     * Function to create the payload for the project requests
+     *
+     * @param logoPic: the project logo
+     * @param projectName: the name of the project
+     *
+     * @return the payload of the request as [MultipartBody]
+     */
+    private fun createProjectPayload(
+        logoPic: File?,
+        projectName: String
+    ) : MultipartBody {
+        val body = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart(
+                NAME_KEY,
+                projectName
+            )
+        if(logoPic != null) {
+            body .addFormDataPart(
+                LOGO_URL_KEY,
+                logoPic.name,
+                logoPic.readBytes().toRequestBody("*/*".toMediaType())
+            )
+        }
+        return body.build()
     }
 
     /**
@@ -323,7 +394,7 @@ class NovaRequester(
      *
      * @return an endpoint to make the request as [String]
      */
-    protected fun assembleProjectsEndpointPath(
+    private fun assembleProjectsEndpointPath(
         endpoint: String = ""
     ): String {
         var vEndpoint: String = endpoint
@@ -341,21 +412,95 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/addRelease", method = POST)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases", method = POST)
     fun addRelease(
         projectId: String,
         releaseVersion: String,
         releaseNotes: String
     ) : JSONObject {
-        val payload = Params()
-        payload.addParam(RELEASE_VERSION_KEY, releaseVersion)
-        payload.addParam(RELEASE_NOTES_KEY, releaseNotes)
+        val payload = createReleasePayload(
+            releaseVersion = releaseVersion,
+            releaseNotes = releaseNotes
+        )
         return execPost(
             endpoint =  assembleReleasesEndpointPath(
                 projectId = projectId
             ),
             payload = payload
         )
+    }
+
+    /**
+     * Function to execute the request to edit an existing release
+     *
+     * @param project: the project where the release is attached
+     * @param release: the release to edit
+     * @param releaseVersion: the version for the release
+     * @param releaseNotes: the notes attached to the release
+     *
+     * @return the result of the request as [JSONObject]
+     */
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
+    fun editRelease(
+        project: Project,
+        release: Release,
+        releaseVersion: String,
+        releaseNotes: String
+    ) : JSONObject {
+        return editRelease(
+            projectId = project.id,
+            releaseId = release.id,
+            releaseVersion = releaseVersion,
+            releaseNotes = releaseNotes
+        )
+    }
+
+    /**
+     * Function to execute the request to edit an existing release
+     *
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier of the release to edit
+     * @param releaseVersion: the version for the release
+     * @param releaseNotes: the notes attached to the release
+     *
+     * @return the result of the request as [JSONObject]
+     */
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
+    fun editRelease(
+        projectId: String,
+        releaseId: String,
+        releaseVersion: String,
+        releaseNotes: String
+    ) : JSONObject {
+        val payload = createReleasePayload(
+            releaseVersion = releaseVersion,
+            releaseNotes = releaseNotes
+        )
+        return execPatch(
+            endpoint =  assembleReleasesEndpointPath(
+                projectId = projectId,
+                releaseId = releaseId
+            ),
+            payload = payload
+        )
+    }
+
+    /**
+     * Function to create the payload for the release requests
+     *
+     * @param releaseVersion: the version for the release
+     * @param releaseNotes: the notes attached to the release
+     *
+     * @return the payload of the request as [Params]
+     */
+    private fun createReleasePayload(
+        releaseVersion: String,
+        releaseNotes: String
+    ) : Params {
+        val payload = Params()
+        payload.addParam(RELEASE_VERSION_KEY, releaseVersion)
+        payload.addParam(RELEASE_NOTES_KEY, releaseNotes)
+        return payload
     }
 
     /**
@@ -562,7 +707,7 @@ class NovaRequester(
      *
      * @return the result of the request as [JSONObject]
      */
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/promote", method = PATCH)
     fun promoteRelease(
         projectId: String,
         releaseId: String,
@@ -574,6 +719,7 @@ class NovaRequester(
             endpoint =  assembleReleasesEndpointPath(
                 projectId = projectId,
                 releaseId = releaseId,
+                endpoint = PROMOTE_RELEASE_ENDPOINT
             ),
             payload = payload
         )
@@ -635,7 +781,7 @@ class NovaRequester(
 
      * @return an endpoint to make the request as [String]
      */
-    protected fun assembleReleasesEndpointPath(
+    private fun assembleReleasesEndpointPath(
         projectId: String,
         releaseId: String = "",
         extraId: String = "",

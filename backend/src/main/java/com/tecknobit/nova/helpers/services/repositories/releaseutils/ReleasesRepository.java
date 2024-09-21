@@ -60,6 +60,49 @@ public interface ReleasesRepository extends JpaRepository<Release, String> {
     );
 
     /**
+     * Method to execute the query to edit an existing {@link Release}
+     *
+     * @param releaseId: the identifier of the release
+     * @param releaseNotes: the notes attached to the release
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + RELEASES_KEY +
+                    " SET " +
+                    RELEASE_NOTES_KEY + "=:" + RELEASE_NOTES_KEY  +
+                    " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void editRelease(
+            @Param(IDENTIFIER_KEY) String releaseId,
+            @Param(RELEASE_NOTES_KEY) String releaseNotes
+    );
+
+    /**
+     * Method to execute the query to edit an existing {@link Release}
+     *
+     * @param releaseId: the identifier of the release
+     * @param releaseVersion: the version of the release
+     * @param releaseNotes: the notes attached to the release
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + RELEASES_KEY +
+                    " SET " +
+                    RELEASE_VERSION_KEY + "=:" + RELEASE_VERSION_KEY + "," +
+                    RELEASE_NOTES_KEY + "=:" + RELEASE_NOTES_KEY  +
+                    " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void editRelease(
+            @Param(IDENTIFIER_KEY) String releaseId,
+            @Param(RELEASE_VERSION_KEY) String releaseVersion,
+            @Param(RELEASE_NOTES_KEY) String releaseNotes
+    );
+
+    /**
      * Method to execute the query to approve an existing {@link Release}
      *
      * @param releaseId: the identifier of the release to approve

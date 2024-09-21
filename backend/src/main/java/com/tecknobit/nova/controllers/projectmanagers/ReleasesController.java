@@ -102,32 +102,96 @@ public class ReleasesController extends ProjectManager {
     ) {
         if(isMe(id, token) && amIProjectMember(id, projectId) && !me.isTester(currentProject)) {
             loadJsonHelper(payload);
-            String releaseVersion = jsonHelper.getString(RELEASE_VERSION_KEY);
-            releaseVersion = releaseVersion.replaceFirst("^v\\.", "");
-            if(!releaseVersion.startsWith(" "))
-                releaseVersion = " " + releaseVersion;
-            releaseVersion = "v." + releaseVersion;
+            String releaseVersion = formatReleaseVersion();
             String releaseNotes = jsonHelper.getString(RELEASE_NOTES_KEY);
-            if(currentProject != null) {
-                if(isReleaseVersionValid(releaseVersion) && currentProject.hasNotReleaseVersion(releaseVersion)) {
-                    if(areReleaseNotesValid(releaseNotes)) {
-                        String releaseId = generateIdentifier();
-                        releasesHelper.addRelease(
-                                id,
-                                currentProject,
-                                releaseId,
-                                releaseVersion,
-                                releaseNotes
-                        );
-                        return successResponse();
-                    } else
-                        return failedResponse(WRONG_RELEASE_NOTES_MESSAGE);
+            if(isReleaseVersionValid(releaseVersion) && currentProject.hasNotReleaseVersion(releaseVersion)) {
+                if(areReleaseNotesValid(releaseNotes)) {
+                    String releaseId = generateIdentifier();
+                    releasesHelper.addRelease(
+                            id,
+                            currentProject,
+                            releaseId,
+                            releaseVersion,
+                            releaseNotes
+                    );
+                    return successResponse();
                 } else
-                    return failedResponse(WRONG_RELEASE_VERSION_MESSAGE);
+                    return failedResponse(WRONG_RELEASE_NOTES_MESSAGE);
             } else
-                return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+                return failedResponse(WRONG_RELEASE_VERSION_MESSAGE);
         } else
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+    }
+
+    /**
+     * Method to add a release
+     *
+     * @param id: the identifier of the user
+     * @param projectId: the project identifier where the release is attached
+     * @param releaseId: the release identifier of the release to edit
+     * @param token: the token of the user
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "release_version": "the version for the release", -> [String]
+     *                  "release_notes": "the notes attached to the release" -> [String]
+     *              }
+     *      }
+     * </pre>
+     *
+     * @return the result of the request as {@link String}
+     */
+    @PatchMapping(
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
+    public String editRelease(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
+            @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        if(!isMe(id, token) || !amIProjectMember(id, projectId) || me.isTester(currentProject))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        Release release = getReleaseIfAuthorized(releaseId);
+        if(release == null)
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        loadJsonHelper(payload);
+        String releaseVersion = formatReleaseVersion();
+        String releaseNotes = jsonHelper.getString(RELEASE_NOTES_KEY);
+        if(!isReleaseVersionValid(releaseVersion))
+            return failedResponse(WRONG_RELEASE_VERSION_MESSAGE);
+        if(!areReleaseNotesValid(releaseNotes))
+            return failedResponse(WRONG_RELEASE_NOTES_MESSAGE);
+        if(release.getReleaseVersion().equals(releaseVersion))
+            releaseVersion = null;
+        else if(!currentProject.hasNotReleaseVersion(releaseVersion))
+            return failedResponse(WRONG_RELEASE_VERSION_MESSAGE);
+        releasesHelper.editRelease(
+                releaseId,
+                releaseVersion,
+                releaseNotes
+        );
+        return successResponse();
+    }
+
+    /**
+     * Method to format the version of a release <br>
+     * No-any params required
+     *
+     * @return the version of a release formatted as {@link String}
+     */
+    private String formatReleaseVersion() {
+        String releaseVersion = jsonHelper.getString(RELEASE_VERSION_KEY);
+        releaseVersion = releaseVersion.replaceFirst("^v\\.", "");
+        if(!releaseVersion.startsWith(" "))
+            releaseVersion = " " + releaseVersion;
+        return "v." + releaseVersion;
     }
 
     /**
@@ -408,12 +472,12 @@ public class ReleasesController extends ProjectManager {
      * @return the result of the request as {@link String}
      */
     @PatchMapping(
-            path = "/{" + RELEASE_IDENTIFIER_KEY + "}",
+            path = "/{" + RELEASE_IDENTIFIER_KEY + "}" + PROMOTE_RELEASE_ENDPOINT,
             headers = {
                     TOKEN_KEY
             }
     )
-    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}", method = PATCH)
+    @RequestPath(path = "/api/v1/{id}/projects/{project_id}/releases/{release_id}/promote", method = PATCH)
     public String promoteRelease(
             @PathVariable(IDENTIFIER_KEY) String id,
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,

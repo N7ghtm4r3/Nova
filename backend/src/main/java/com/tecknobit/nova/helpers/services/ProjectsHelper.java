@@ -102,6 +102,33 @@ public class ProjectsHelper implements NovaResourcesManager {
     }
 
     /**
+     * Method to edit an existing project
+     *
+     * @param name: the name of the project
+     * @param logo: the logo of the project
+     * @param projectId: the project identifier
+     */
+    public void editProject(String name, MultipartFile logo, String projectId) throws IOException {
+        boolean logoEdited = logo != null && !logo.isEmpty();
+        String logoUrl = null;
+        if(logoEdited) {
+            logoUrl = createLogoResource(logo, projectId);
+            projectsRepository.editProject(
+                    projectId,
+                    logoUrl,
+                    name
+            );
+        } else {
+            projectsRepository.editProject(
+                    projectId,
+                    name
+            );
+        }
+        if(logoEdited)
+            saveResource(logo, logoUrl);
+    }
+
+    /**
      * Method to get a project
      * 
      * @param userId: the user identifier

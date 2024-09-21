@@ -45,6 +45,11 @@ public class NovaEndpoints extends EquinoxBaseEndpointsSet {
     public static final String COMMENT_ASSET_ENDPOINT = "/comment/";
 
     /**
+     * {@code PROMOTE_RELEASE_ENDPOINT} the endpoint to promote a release
+     */
+    public static final String PROMOTE_RELEASE_ENDPOINT = "/promote";
+
+    /**
      * {@code EVENTS_ENDPOINT} the endpoint to work with the events of a release
      */
     public static final String EVENTS_ENDPOINT = "/events/";

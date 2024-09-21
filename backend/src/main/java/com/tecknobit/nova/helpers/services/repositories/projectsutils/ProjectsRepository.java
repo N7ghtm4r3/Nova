@@ -78,6 +78,49 @@ public interface ProjectsRepository extends JpaRepository<Project, String> {
     );
 
     /**
+     *  Method to execute the query to edit an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     * @param name: the project name
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + PROJECTS_KEY +
+                    " SET "
+                    + NAME_KEY + "=:" + NAME_KEY +
+                    " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void editProject(
+            @Param(IDENTIFIER_KEY) String projectId,
+            @Param(NAME_KEY) String name
+    );
+
+    /**
+     *  Method to execute the query to add an existing {@link Project}
+     *
+     * @param projectId: the identifier of the project
+     * @param logoUrl: the logo of the project formatted as url
+     * @param name: the project name
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "UPDATE " + PROJECTS_KEY +
+                    " SET " +
+                    NAME_KEY + "=:" + NAME_KEY + "," +
+                    LOGO_URL_KEY + "=:" + LOGO_URL_KEY  +
+                    " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void editProject(
+            @Param(IDENTIFIER_KEY) String projectId,
+            @Param(LOGO_URL_KEY) String logoUrl,
+            @Param(NAME_KEY) String name
+    );
+
+    /**
      *  Method to execute the query to get an existing {@link Project} if the user is authorized
      *
      * @param projectId: the identifier of the project
