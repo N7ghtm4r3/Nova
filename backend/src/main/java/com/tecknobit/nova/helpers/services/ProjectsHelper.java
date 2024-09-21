@@ -146,14 +146,10 @@ public class ProjectsHelper implements NovaResourcesManager {
      * @param projectId: the project identifier
      * @param membersEmails: the mailing list of the members to add
      * @param role: the role to attribute at the members
-     * @param createJoinQRCode: whether create a textual join code
      * @return the textual join code, if created, as {@link String}
      */
-    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role,
-                                    boolean createJoinQRCode) {
-        String joinCode = null;
-        if(createJoinQRCode)
-            joinCode = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
+    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role) {
+        String joinCode = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
         joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), joinCode, projectId,
                 formatAllowedEmails(membersEmails), role.name());
         return joinCode;

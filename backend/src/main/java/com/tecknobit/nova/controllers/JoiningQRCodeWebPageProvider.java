@@ -150,9 +150,7 @@ public class JoiningQRCodeWebPageProvider {
         String URIScheme = APIRequest.createDataURIScheme(QRCode);
         qrCodeHelper.deleteQRCode(QRCode);
         model.addAttribute(MAIN_TEXT, URIScheme);
-        String joinCode = joiningQRCode.getJoinCode();
-        if(joinCode != null)
-            model.addAttribute(SUB_TEXT, joinCode);
+        model.addAttribute(SUB_TEXT, joiningQRCode.getJoinCode());
         return JOIN_CODE_KEY;
     }
 

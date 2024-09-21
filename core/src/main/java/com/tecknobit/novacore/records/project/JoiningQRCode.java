@@ -92,8 +92,6 @@ public class JoiningQRCode extends EquinoxItem {
      */
     @Column(
             name = JOIN_CODE_KEY,
-            columnDefinition = "VARCHAR(6) DEFAULT NULL",
-            insertable = false,
             unique = true
     )
     private final String joinCode;

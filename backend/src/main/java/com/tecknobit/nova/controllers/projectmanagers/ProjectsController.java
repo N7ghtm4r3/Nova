@@ -207,7 +207,6 @@ public class ProjectsController extends ProjectManager {
      *              {
      *                  "projectMembers": "the emails of the members", -> [List of String]
      *                  "role": "the role to attribute at the members" -> [String]
-     *                  "createJoinCode": "whether create a textual join code" -> [boolean]
      *              }
      *      }
      * </pre>
@@ -234,8 +233,7 @@ public class ProjectsController extends ProjectManager {
                 try {
                     NovaUser.Role role = NovaUser.Role.valueOf(jsonHelper.getString(ROLE_KEY));
                     String QRCodeId = generateIdentifier();
-                    String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role,
-                            jsonHelper.getBoolean(CREATE_JOIN_CODE_KEY, false));
+                    String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role);
                     JSONObject response = new JSONObject()
                             .put(IDENTIFIER_KEY, QRCodeId);
                     if(joinCode != null)
