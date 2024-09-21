@@ -49,7 +49,6 @@ public interface NovaResourcesManager extends ResourcesManager {
      * Method to create the pathname for an asset
      *
      * @param resource: the resource from create its pathname
-     * @param resourceId: the resource identifier
      * @return the pathname created for an asset
      */
     @Wrapper

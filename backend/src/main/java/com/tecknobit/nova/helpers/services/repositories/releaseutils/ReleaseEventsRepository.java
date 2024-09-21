@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import static com.tecknobit.equinox.environment.records.EquinoxUser.NAME_KEY;
 import static com.tecknobit.novacore.records.release.Release.RELEASE_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.*;
 import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
@@ -39,6 +40,7 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
      * @param releaseEventDate: date when the event occurred
      * @param releaseId: the identifier of the release when the event occurred
      * @param status: the status of the event ({@link ReleaseStatus#Verifying})
+     * @param comment: the comment about the assets uploaded
      */
     @Modifying(clearAutomatically = true)
     @Transactional
@@ -48,20 +50,24 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
                     + IDENTIFIER_KEY + ","
                     + RELEASE_EVENT_DATE_KEY + ","
                     + RELEASE_IDENTIFIER_KEY + ","
-                    + RELEASE_EVENT_STATUS_KEY
+                    + RELEASE_EVENT_STATUS_KEY + ","
+                    + COMMENT_KEY
                     + " )"
                     + " VALUES ("
                     + ":" + IDENTIFIER_KEY + ","
                     + ":" + RELEASE_EVENT_DATE_KEY + ","
                     + ":" + RELEASE_IDENTIFIER_KEY + ","
-                    + ":" + RELEASE_EVENT_STATUS_KEY + ")",
+                    + ":" + RELEASE_EVENT_STATUS_KEY + ","
+                    + ":" + COMMENT_KEY
+                    + ")",
             nativeQuery = true
     )
     void insertAssetUploading(
             @Param(IDENTIFIER_KEY) String eventId,
             @Param(RELEASE_EVENT_DATE_KEY) long releaseEventDate,
             @Param(RELEASE_IDENTIFIER_KEY) String releaseId,
-            @Param(RELEASE_EVENT_STATUS_KEY) String status
+            @Param(RELEASE_EVENT_STATUS_KEY) String status,
+            @Param(COMMENT_KEY) String comment
     );
 
     /**
@@ -70,6 +76,7 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
      * @param eventId: the identifier of the event
      * @param assetId: the identifier of the asset
      * @param assetUrl: the url to reach the asset
+     * @param assetName: the name of the asset
      */
     @Modifying(clearAutomatically = true)
     @Transactional
@@ -78,18 +85,22 @@ public interface ReleaseEventsRepository extends JpaRepository<ReleaseEvent, Str
                     " ("
                     + IDENTIFIER_KEY + ","
                     + ASSET_URL_KEY + ","
-                    + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY +
+                    + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + ","
+                    + NAME_KEY +
                     " )"
                     + " VALUES ("
                     + ":" + IDENTIFIER_KEY + ","
                     + ":" + ASSET_URL_KEY + ","
-                    + ":" + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + ")",
+                    + ":" + ASSET_UPLOADING_EVENT_IDENTIFIER_KEY + ","
+                    + ":" + NAME_KEY
+                    + ")",
             nativeQuery = true
     )
     void insertAsset(
             @Param(IDENTIFIER_KEY) String assetId,
             @Param(ASSET_URL_KEY) String assetUrl,
-            @Param(ASSET_UPLOADING_EVENT_IDENTIFIER_KEY) String eventId
+            @Param(ASSET_UPLOADING_EVENT_IDENTIFIER_KEY) String eventId,
+            @Param(NAME_KEY) String assetName
     );
 
     /**

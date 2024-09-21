@@ -530,6 +530,7 @@ class NovaRequester(
      * @param projectId: the project identifier where the release is attached
      * @param releaseId: the release identifier where upload the assets
      * @param assets: the list of the assets to upload
+     * @param comment: the comment about the assets uploaded
      *
      * @return the result of the request as [JSONObject]
      */
@@ -537,7 +538,8 @@ class NovaRequester(
     fun uploadAsset(
         projectId: String,
         releaseId: String,
-        assets: List<File>
+        assets: List<File>,
+        comment: String
     ) : JSONObject {
         val body = MultipartBody.Builder().setType(MultipartBody.FORM)
         assets.forEach { asset ->
@@ -545,6 +547,10 @@ class NovaRequester(
                 ASSETS_UPLOADED_KEY,
                 asset.name,
                 asset.readBytes().toRequestBody("*/*".toMediaType())
+            )
+            body.addFormDataPart(
+                COMMENT_KEY,
+                comment
             )
         }
         return execMultipartRequest(

@@ -144,20 +144,24 @@ public class ReleasesHelper implements NovaResourcesManager {
      * @param project: the project where the release is attached
      * @param releaseId: the release identifier
      * @param assets: the assets to upload
+     * @param comment: the comment for the uploaded assets
      *
      * @return whether the upload has been successful
      *
      * @apiNote will be created the related {@link NovaNotification} for each member, not the author of the request,
      * of the project
      */
-    public boolean uploadAssets(String requesterUser, Project project, String releaseId,
-                                MultipartFile[] assets) throws IOException {
+    public boolean uploadAssets(String requesterUser, Project project, String releaseId, MultipartFile[] assets,
+                                String comment) throws IOException {
         String eventId = generateIdentifier();
+        if(comment.isEmpty())
+            comment = null;
         releaseEventsRepository.insertAssetUploading(
                 eventId,
                 System.currentTimeMillis(),
                 releaseId,
-                Verifying.name()
+                Verifying.name(),
+                comment
         );
         for (MultipartFile asset : assets) {
             if(!asset.isEmpty()) {
@@ -166,7 +170,8 @@ public class ReleasesHelper implements NovaResourcesManager {
                 releaseEventsRepository.insertAsset(
                         assetId,
                         assetPath,
-                        eventId
+                        eventId,
+                        asset.getOriginalFilename()
                 );
                 saveResource(asset, assetPath);
             } else

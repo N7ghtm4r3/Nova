@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tecknobit.equinox.environment.records.EquinoxUser.NAME_KEY;
 import static com.tecknobit.novacore.records.NovaUser.Role;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.Verifying;
 import static com.tecknobit.novacore.records.release.events.AssetUploadingEvent.AssetUploaded.ASSETS_UPLOADED_KEY;
@@ -51,6 +52,11 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
     public static final String ASSET_UPLOADING_EVENT_IDENTIFIER_KEY = "asset_uploading_event_id";
 
     /**
+     * {@code COMMENT_KEY} the key for the <b>"comment"</b> flag
+     */
+    public static final String COMMENT_KEY = "comment";
+
+    /**
      * {@code COMMENTED_KEY} the key for the <b>"commented"</b> flag
      */
     public static final String COMMENTED_KEY = "commented";
@@ -70,6 +76,16 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
     private final List<AssetUploaded> assetsUploaded;
 
     /**
+     * {@code comment} the comment about the assets uploaded
+     */
+    @Column(
+            name = COMMENT_KEY,
+            columnDefinition = "TEXT DEFAULT NULL",
+            insertable = false
+    )
+    private final String comment;
+
+    /**
      * {@code commented} whether these assets have already been commented by the {@link Role#Customer} or {@link Role#Tester}
      */
     @Column(
@@ -87,7 +103,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
      * @apiNote empty constructor required
      */
     public AssetUploadingEvent() {
-        this(null, -1, null, List.of(), false);
+        this(null, -1, null, List.of(), null , false);
     }
 
     /**
@@ -99,23 +115,25 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
     public AssetUploadingEvent(JSONObject jAssetUploadingEvent) {
         super(jAssetUploadingEvent);
         assetsUploaded = AssetUploaded.returnAssetUploadedList(hItem.getJSONArray(ASSETS_UPLOADED_KEY));
+        comment = hItem.getString(COMMENT_KEY);
         commented = hItem.getBoolean(COMMENTED_KEY);
     }
 
     /**
      * Constructor to init the {@link AssetUploadingEvent} class
      *
-     * @param id: the identifier of the event
-     * @param release: the date when the event occurred
-     * @param releaseEventDate: the date when the event is occurred
-     * @param assetsUploaded: list of the assets have been uploaded in the events
-     * @param commented: whether these assets have already been commented by the {@link Role#Customer}
-     *
+     * @param id               : the identifier of the event
+     * @param releaseEventDate : the date when the event is occurred
+     * @param release          : the date when the event occurred
+     * @param assetsUploaded   : list of the assets have been uploaded in the events
+     * @param comment: the comment about the assets uploaded
+     * @param commented        : whether these assets have already been commented by the {@link Role#Customer}
      */
     public AssetUploadingEvent(String id, long releaseEventDate, Release release, List<AssetUploaded> assetsUploaded,
-                               boolean commented) {
+                               String comment, boolean commented) {
         super(id, releaseEventDate, release, Verifying);
         this.assetsUploaded = assetsUploaded;
+        this.comment = comment;
         this.commented = commented;
     }
 
@@ -128,6 +146,16 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
     @JsonGetter(ASSETS_UPLOADED_KEY)
     public List<AssetUploaded> getAssetsUploaded() {
         return assetsUploaded;
+    }
+
+    /**
+     * Method to get {@link #comment} instance <br>
+     * No-any params required
+     *
+     * @return {@link #comment} instance as {@link String}
+     */
+    public String getComment() {
+        return comment;
     }
 
     /**
@@ -188,6 +216,15 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
         private final String url;
 
         /**
+         * {@code name} the name of the asset uploaded
+         */
+        @Column(
+                name = NAME_KEY,
+                columnDefinition = "TEXT DEFAULT NULL"
+        )
+        private final String name;
+
+        /**
          * Constructor to init the {@link AssetUploaded} class <br>
          *
          * No-any params required
@@ -195,7 +232,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
          * @apiNote empty constructor required
          */
         public AssetUploaded() {
-            this(null, null, null);
+            this(null, null, null, null);
         }
 
         /**
@@ -208,6 +245,7 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
             super(jAssetUploaded);
             assetUploadingEvent = null;
             url = hItem.getString(ASSET_URL_KEY);
+            name = hItem.getString(NAME_KEY, id);
         }
 
         /**
@@ -216,12 +254,13 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
          * @param id: the identifier of the asset uploaded
          * @param assetUploadingEvent: event where the asset has been uploaded
          * @param url: the url which the asset can be downloaded
-         *
+         * @param name: the name of the asset uploaded
          */
-        public AssetUploaded(String id, AssetUploadingEvent assetUploadingEvent, String url) {
+        public AssetUploaded(String id, AssetUploadingEvent assetUploadingEvent, String url, String name) {
             super(id);
             this.assetUploadingEvent = assetUploadingEvent;
             this.url = url;
+            this.name = name;
         }
 
         /**
@@ -244,6 +283,16 @@ public class AssetUploadingEvent extends ReleaseStandardEvent {
         @JsonGetter(ASSET_URL_KEY)
         public String getUrl() {
             return url;
+        }
+
+        /**
+         * Method to get {@link #name} instance <br>
+         * No-any params required
+         *
+         * @return {@link #name} instance as {@link String}
+         */
+        public String getName() {
+            return name;
         }
 
         /**

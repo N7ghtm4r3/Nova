@@ -238,6 +238,7 @@ public class ReleasesController extends ProjectManager {
      * @param releaseId: the release identifier where upload the asset
      * @param token: the token of the user
      * @param assets: the assets to upload
+     * @param comment: the comment about the assets uploaded
      *
      * @return the result of the request as {@link String}
      *
@@ -255,7 +256,11 @@ public class ReleasesController extends ProjectManager {
             @PathVariable(PROJECT_IDENTIFIER_KEY) String projectId,
             @PathVariable(RELEASE_IDENTIFIER_KEY) String releaseId,
             @RequestHeader(TOKEN_KEY) String token,
-            @RequestParam(ASSETS_UPLOADED_KEY) MultipartFile[] assets
+            @RequestParam(ASSETS_UPLOADED_KEY) MultipartFile[] assets,
+            @RequestParam(
+                    name = AssetUploadingEvent.COMMENT_KEY,
+                    required = false
+            ) String comment
     ) {
         if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
             Release release = getReleaseIfAuthorized(releaseId);
@@ -263,7 +268,7 @@ public class ReleasesController extends ProjectManager {
                 switch (release.getStatus()) {
                     case New, Rejected, Alpha, Beta -> {
                         try {
-                            if(releasesHelper.uploadAssets(id, currentProject, releaseId, assets))
+                            if(releasesHelper.uploadAssets(id, currentProject, releaseId, assets, comment))
                                 return successResponse();
                             return failedResponse(WRONG_ASSETS_MESSAGE);
                         } catch (IOException e) {
