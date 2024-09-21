@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +24,10 @@ import java.util.Locale;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.GET;
 import static com.tecknobit.equinox.environment.helpers.EquinoxBaseEndpointsSet.BASE_EQUINOX_ENDPOINT;
 import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
+import static com.tecknobit.equinox.environment.records.EquinoxUser.NAME_KEY;
 import static com.tecknobit.equinox.inputs.InputValidator.HOST_ADDRESS_KEY;
 import static com.tecknobit.novacore.records.project.JoiningQRCode.JOINING_QRCODES_KEY;
 import static com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY;
-import static org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText.NAME_KEY;
 
 /**
  * The {@code JoiningQRCodeWebPageProvider} class is useful to provide the dedicated web page of a {@link JoiningQRCode}
@@ -57,6 +58,21 @@ public class JoiningQRCodeWebPageProvider {
      * {@code INVALID_QR_CODE_PAGE} the page when the QRCode requested is not valid
      */
     private static final String INVALID_QR_CODE_PAGE = "invalid_code";
+
+    /**
+     * {@code TEMP_QR_FILE} the pathname for the temporary QRCode file
+     */
+    private static final String TEMP_QR_FILE = "qr_temp.png";
+
+    /**
+     * {@code QR_CODE_BACKGROUND} the background color to apply to the QR code
+     */
+    private static final String QR_CODE_BACKGROUND = "#FFFBFF";
+
+    /**
+     * {@code API_IPIFY_ORG_ENDPOINT} the endpoint to get the current ip address where the server is running
+     */
+    private static final String API_IPIFY_ORG_ENDPOINT = "https://api.ipify.org";
 
     /**
      * {@code MAIN_TEXT} the main text Thymeleaf tag
@@ -96,7 +112,7 @@ public class JoiningQRCodeWebPageProvider {
         JoiningQRCode joiningQRCode = codesHelper.getJoiningQrcode(QRCodeId);
         if(joiningQRCode == null || !joiningQRCode.isValid())
             return codeNotExistsOrExpired(joiningQRCode, model);
-        return qrcodePage(joiningQRCode, model);
+        return qrcodePage(joiningQRCode, model, request);
     }
 
     /**
@@ -120,35 +136,38 @@ public class JoiningQRCodeWebPageProvider {
      *
      * @param joiningQRCode: the custom link requested
      * @param model: the model used by Thymeleaf to format the web page
+     * @param request: the http request useful to get the current protocol, ip and server port
      *
      * @return the title of the correct page as {@link String}
      **/
-    private String qrcodePage(JoiningQRCode joiningQRCode, Model model) throws Exception {
-        model.addAttribute(JOIN_CODE_KEY, joiningQRCode);
+    private String qrcodePage(JoiningQRCode joiningQRCode, Model model, HttpServletRequest request) throws Exception {
         model.addAttribute(NAME_KEY, joiningQRCode.getProject().getName());
         QRCodeHelper qrCodeHelper = new QRCodeHelper();
         JSONObject data = new JSONObject()
-                .put(HOST_ADDRESS_KEY, "activeLocalSession.hostAddress")
+                .put(HOST_ADDRESS_KEY, getHostAddressValue(request))
                 .put(IDENTIFIER_KEY, joiningQRCode.getId());
-        File QRCode = qrCodeHelper.createQRCode(data, "temp.png", 200);
+        File QRCode = qrCodeHelper.createQRCode(data, TEMP_QR_FILE, 200, QR_CODE_BACKGROUND);
         String URIScheme = APIRequest.createDataURIScheme(QRCode);
         qrCodeHelper.deleteQRCode(QRCode);
-        System.out.println(URIScheme);
         model.addAttribute(MAIN_TEXT, URIScheme);
-
-        /*boolean hasUniqueAccess = customLink.hasUniqueAccess();
-        model.addAttribute(UNIQUE_ACCESS_KEY, hasUniqueAccess);
-        if(hasUniqueAccess)
-            model.addAttribute(LINK_UNIQUE_ACCESS_WARN_TEXT, mantis.getResource("link_unique_access_warn_key"));
-        if(customLink.mustValidateFields()) {
-            model.addAttribute(MAIN_TEXT, mantis.getResource("fill_the_below_form_key"));
-            model.addAttribute(VALIDATE_BUTTON_TEXT, mantis.getResource("validate_key"));
-        }
-        model.addAttribute(RESOURCES_TITLE_TEXT, mantis.getResource("copy_the_resources_key"));
-        if(!isPreviewMode && hasUniqueAccess)
-            codesHelper.deleteLink(customLink.getId());*/
-
+        String joinCode = joiningQRCode.getJoinCode();
+        if(joinCode != null)
+            model.addAttribute(SUB_TEXT, joinCode);
         return JOIN_CODE_KEY;
+    }
+
+    /**
+     * Method to get the current server details
+     *
+     * @param request: the http request useful to get the current protocol, ip and server port
+     * @return protocol, ip and server port formatted as url as {@link String}
+     */
+    private String getHostAddressValue(HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
+        String serverIp = restTemplate.getForObject(API_IPIFY_ORG_ENDPOINT, String.class);
+        String protocol = request.getScheme();
+        int serverPort = request.getServerPort();
+        return protocol + "://" + serverIp + ":" + serverPort;
     }
 
 }
