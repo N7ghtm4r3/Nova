@@ -22,7 +22,9 @@
         "wrong_release_notes_key": "The notes for the release are not valid",
         "wrong_release_assets_key": "The assets uploaded are not valid",
         "wrong_rejection_reasons_key": "The reasons of the rejection are not valid",
-        "wrong_comment_tag_key": "The comment for the tag is not valid"
+        "wrong_comment_tag_key": "The comment for the tag is not valid",
+        "invalid_code_key": "Invalid QR Code...",
+        "invalid_code_subtext_key": "The link requested not exists or has been expired."
     },
     "ignored_resources": {},
     "it": {
@@ -48,14 +50,16 @@
         "wrong_release_notes_key": "Le note per la release non sono valide",
         "wrong_release_assets_key": "Gli asset caricati non sono validi",
         "wrong_rejection_reasons_key": "I motivi del rifiuto non sono validi",
-        "wrong_comment_tag_key": "Il commento per il tag non e' valido"
+        "wrong_comment_tag_key": "Il commento per il tag non e' valido",
+        "invalid_code_key": "Codice QR non valido...",
+        "invalid_code_subtext_key": "Il codice QR richiesto non esiste o e' scaduto."
     },
     "fr": {
         "new_asset_uploaded_key": "Nouvel actif téléchargé",
         "asset_has_been_approved_key": "L'actif a été approuvé",
         "beta_timeline_message_key": "L'élément a été promu en version bêta",
         "latest_timeline_message_key": "La version est promue comme la plus récente !",
-        "creation_date_key": "Date de création :",
+        "creation_date_key": "Date de création:",
         "alpha_timeline_message_key": "L'élément a été promu en version Alpha",
         "connection_error_message_key": "Le serveur est temporairement indisponible",
         "wrong_procedure_key": "Mauvaise procadure",
@@ -72,7 +76,9 @@
         "wrong_release_notes_key": "Les notes de la version ne sont pas valides",
         "wrong_release_assets_key": "Les ressources téléchargées ne sont pas valides",
         "wrong_rejection_reasons_key": "Les raisons du rejet ne sont pas valables",
-        "wrong_comment_tag_key": "Le commentaire pour la balise n'est pas valide"
+        "wrong_comment_tag_key": "Le commentaire pour la balise n'est pas valide",
+        "invalid_code_key": "Code QR non valide...",
+        "invalid_code_subtext_key": "Le code QR demandé n'existe pas ou a expiré."
     },
     "es": {
         "new_asset_uploaded_key": "Nuevo recurso cargado",
@@ -96,6 +102,8 @@
         "wrong_release_notes_key": "Las notas de la versión no son válidas",
         "wrong_release_assets_key": "Los activos cargados no son válidos",
         "wrong_rejection_reasons_key": "Los motivos del rechazo no son válidos",
-        "wrong_comment_tag_key": "El comentario de la etiqueta no es válido"
+        "wrong_comment_tag_key": "El comentario de la etiqueta no es válido",
+        "invalid_code_key": "Código QR no válido...",
+        "invalid_code_subtext_key": "El código QR solicitado no existe o ha caducado."
     }
 }
