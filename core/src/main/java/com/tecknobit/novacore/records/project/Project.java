@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.apimanager.annotations.Returner;
-import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.novacore.records.NotificationsTarget;
 import com.tecknobit.novacore.records.NovaNotification;
@@ -260,7 +259,10 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      * @param jTesters: the list formatted as JSON of the members to mark as testers
      */
     private void markProjectTesters(JSONArray jTesters) {
-        markProjectTesters(new HashSet<>(JsonHelper.toList(jTesters)));
+        HashSet<NovaUser> testers = new HashSet<>();
+        for (int j = 0; j < jTesters.length(); j++)
+            testers.add(new NovaUser(jTesters.getJSONObject(j)));
+        markProjectTesters(testers);
     }
 
     /**
