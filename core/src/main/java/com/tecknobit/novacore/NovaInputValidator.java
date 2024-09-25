@@ -39,7 +39,7 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code RELEASE_NOTES_MAX_LENGTH} the max valid length for the release notes
      */
-    public static final int RELEASE_NOTES_MAX_LENGTH = 300;
+    public static final int RELEASE_NOTES_MAX_LENGTH = 255;
 
     /**
      * {@code WRONG_ASSETS_MESSAGE} error message used when the release assets uploaded are not valid
@@ -54,7 +54,7 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code REASONS_MAX_LENGTH} the max valid length for the reasons
      */
-    public static final int REASONS_MAX_LENGTH = 300;
+    public static final int REASONS_MAX_LENGTH = 255;
 
     /**
      * {@code WRONG_TAG_COMMENT_MESSAGE} error message used when the tag comment inserted is not valid
@@ -64,7 +64,7 @@ public class NovaInputValidator extends InputValidator {
     /**
      * {@code TAG_COMMENT_MAX_LENGTH} the max valid length for the tag comment
      */
-    public static final int TAG_COMMENT_MAX_LENGTH = 300;
+    public static final int TAG_COMMENT_MAX_LENGTH = 255;
 
     /**
      * Constructor to init the {@link NovaInputValidator} class <br>
