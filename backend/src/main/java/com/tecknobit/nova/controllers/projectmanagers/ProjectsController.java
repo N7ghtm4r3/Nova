@@ -91,7 +91,8 @@ public class ProjectsController extends ProjectManager {
      *      {@code
      *              {
      *                  "logoUrl": "the logo of the project path", -> [String]
-     *                  "name": "the project name" -> [String]
+     *                  "name": "the project name" -> [String],
+     *                  "projectMembers": "the identifiers of the members", -> [List of String]
      *              }
      *      }
      * </pre>
@@ -114,9 +115,11 @@ public class ProjectsController extends ProjectManager {
             try {
                 MultipartFile logo = payload.logo_url();
                 String name = payload.name();
-                if(!logo.isEmpty() && isProjectNameValid(name))
-                    return successResponse(projectsHelper.addProject(name, logo, generateIdentifier(), id));
-                else
+                if(!logo.isEmpty() && isProjectNameValid(name)) {
+                    System.out.println(payload.membersList());
+                    JSONObject result = projectsHelper.addProject(name, logo, payload.membersList(), generateIdentifier(), id);
+                    return successResponse(result);
+                } else
                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
             } catch (Exception e) {
                 return failedResponse(WRONG_PROCEDURE_MESSAGE);
@@ -162,6 +165,16 @@ public class ProjectsController extends ProjectManager {
      * @param id: the identifier of the user
      * @param token: the token of the user
      * @param projectId: the project identifier to update
+     * @param payload: payload of the request
+     * <pre>
+     *      {@code
+     *              {
+     *                  "logoUrl": "the logo of the project path", -> [String]
+     *                  "name": "the project name" -> [String],
+     *                  "projectMembers": "the identifiers of the members", -> [List of String]
+     *              }
+     *      }
+     * </pre>
      *
      * @return the result of the request as {@link String}
      */
@@ -188,7 +201,7 @@ public class ProjectsController extends ProjectManager {
             String name = payload.name();
             if(!isProjectNameValid(name))
                 return failedResponse(WRONG_PROCEDURE_MESSAGE);
-            projectsHelper.editProject(name, logo, projectId);
+            projectsHelper.editProject(name, logo, payload.membersList(), projectId);
             return successResponse();
         } catch (Exception e) {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);

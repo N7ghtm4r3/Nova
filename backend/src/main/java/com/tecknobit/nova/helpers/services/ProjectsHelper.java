@@ -1,16 +1,17 @@
 package com.tecknobit.nova.helpers.services;
 
+import com.tecknobit.apimanager.annotations.Returner;
 import com.tecknobit.nova.controllers.projectmanagers.ProjectsController;
 import com.tecknobit.nova.helpers.resources.NovaResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.ProjectsRepository;
 import com.tecknobit.nova.helpers.services.repositories.releaseutils.NotificationsRepository;
 import com.tecknobit.novacore.records.NovaUser;
-import com.tecknobit.novacore.records.NovaUser.Role;
 import com.tecknobit.novacore.records.project.JoiningQRCode;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,8 @@ import java.util.List;
 
 import static com.tecknobit.equinox.environment.controllers.EquinoxController.generateIdentifier;
 import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.NovaUser.NAME_KEY;
-import static com.tecknobit.novacore.records.NovaUser.PROJECTS_KEY;
-import static com.tecknobit.novacore.records.project.Project.AUTHOR_KEY;
-import static com.tecknobit.novacore.records.project.Project.LOGO_URL_KEY;
+import static com.tecknobit.novacore.records.NovaUser.*;
+import static com.tecknobit.novacore.records.project.Project.*;
 import static java.lang.System.currentTimeMillis;
 
 /**
@@ -36,7 +35,25 @@ import static java.lang.System.currentTimeMillis;
  * @see NovaResourcesManager
  */
 @Service
-public class ProjectsHelper implements NovaResourcesManager {
+public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaResourcesManager {
+
+    /**
+     * {@code JOIN_MEMBERS_QUERY} the query used to join members in a project
+     */
+    protected static final String JOIN_MEMBERS_QUERY =
+            "REPLACE INTO " + PROJECT_MEMBERS_TABLE +
+                    "(" +
+                    IDENTIFIER_KEY + "," +
+                    MEMBER_IDENTIFIER_KEY +
+                    ")" +
+                    " VALUES ";
+
+    /**
+     * {@code REMOVE_MEMBERS_QUERY} the query used to remove members from a project
+     */
+    private static final String REMOVE_MEMBERS_QUERY =
+            "DELETE FROM " + PROJECT_MEMBERS_TABLE + " WHERE "
+                    + MEMBER_IDENTIFIER_KEY + "='%s' " + "AND " + IDENTIFIER_KEY + " IN (";
 
     /**
      * {@code projectsRepository} instance for the projects repository
@@ -82,9 +99,11 @@ public class ProjectsHelper implements NovaResourcesManager {
      * @param logo: the logo of the project
      * @param projectId: the project identifier
      * @param authorId: the author identifier
+     * @param members: the members of the project
      * @return the details of the new project created as {@link JSONObject}
      */
-    public JSONObject addProject(String name, MultipartFile logo, String projectId, String authorId) throws IOException {
+    public JSONObject addProject(String name, MultipartFile logo, ArrayList<String> members, String projectId,
+                                 String authorId) throws IOException {
         String logoUrl = createLogoResource(logo, projectId);
         projectsRepository.addProject(
                 projectId,
@@ -92,7 +111,14 @@ public class ProjectsHelper implements NovaResourcesManager {
                 name,
                 authorId
         );
-        projectsRepository.joinMember(projectId, authorId);
+        members.add(authorId);
+        executeInsertBatch(JOIN_MEMBERS_QUERY, RELATIONSHIP_VALUES_SLICE, members, query -> {
+            int index = 1;
+            for (String member : members) {
+                query.setParameter(index++, projectId);
+                query.setParameter(index++, member);
+            }
+        });
         saveResource(logo, logoUrl);
         return new JSONObject()
                 .put(NAME_KEY, name)
@@ -107,8 +133,9 @@ public class ProjectsHelper implements NovaResourcesManager {
      * @param name: the name of the project
      * @param logo: the logo of the project
      * @param projectId: the project identifier
+     * @param members: the members of the project
      */
-    public void editProject(String name, MultipartFile logo, String projectId) throws IOException {
+    public void editProject(String name, MultipartFile logo, List<String> members, String projectId) throws IOException {
         boolean logoEdited = logo != null && !logo.isEmpty();
         String logoUrl = null;
         if(logoEdited) {
@@ -286,8 +313,27 @@ public class ProjectsHelper implements NovaResourcesManager {
      * Record class used ad payload for the {@link ProjectsController#addProject(String, String, ProjectPayload)} request
      *
      * @param logo_url: the logo of the project
-     * @param name: the name of the project
+     * @param name: the title of the project
+     * @param projectMembers: the members of the project
      */
-    public record ProjectPayload(MultipartFile logo_url, String name) {}
+    public record ProjectPayload(MultipartFile logo_url, String name, String projectMembers) {
+
+        /**
+         * Method to get the members list from the payload <br>
+         *
+         * No-any params required
+         *
+         * @return the members list as {@link ArrayList} of {@link String}
+         */
+        @Returner
+        public ArrayList<String> membersList() {
+            ArrayList<String> members = new ArrayList<>();
+            JSONArray jMembers = new JSONArray(projectMembers);
+            for (int j = 0; j < jMembers.length(); j++)
+                members.add(jMembers.getString(j));
+            return members;
+        }
+
+    }
 
 }

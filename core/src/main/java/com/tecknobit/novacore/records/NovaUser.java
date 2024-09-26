@@ -153,6 +153,17 @@ public class NovaUser extends EquinoxUser {
     /**
      * Constructor to init the {@link NovaUser} class
      *
+     * @param member: member details as list
+     *
+     */
+    public NovaUser(List<String> member) {
+        this(member.get(0), member.get(2), member.get(3), member.get(4), member.get(1), null, null, null, null,
+                member.get(4), Role.valueOf(member.get(5)), null);
+    }
+
+    /**
+     * Constructor to init the {@link NovaUser} class
+     *
      * @param id: identifier of the user
      * @param token: the token which the user is allowed to operate on server
      * @param name: the name of the user

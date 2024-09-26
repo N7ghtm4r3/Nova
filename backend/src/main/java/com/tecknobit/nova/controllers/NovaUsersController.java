@@ -70,6 +70,31 @@ public class NovaUsersController extends EquinoxUsersController<NovaUser> {
     }
 
     /**
+     * Method to get the potential members to add in a project
+     *
+     * @param id:    the identifier of the user
+     * @param token: the token of the user
+     *
+     * @return the result of the request as [JSONObject]
+     *
+     */
+    @GetMapping(
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}", method = GET)
+    public <T> T getPotentialMembers(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if(!isMe(id, token))
+            return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        return (T) successResponse(((NovaUsersHelper)usersHelper).getPotentialMembers(id));
+    }
+
+    /**
      * Method to get the notifications of the user
      *
      * @param id: the identifier of the user
