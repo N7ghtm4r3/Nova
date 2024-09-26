@@ -1,6 +1,7 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.annotations.Returner;
+import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.nova.controllers.projectmanagers.ProjectsController;
 import com.tecknobit.nova.helpers.resources.NovaResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
@@ -41,7 +42,7 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      * {@code JOIN_MEMBERS_QUERY} the query used to join members in a project
      */
     protected static final String JOIN_MEMBERS_QUERY =
-            "REPLACE INTO " + PROJECT_MEMBERS_TABLE +
+            "INSERT IGNORE INTO " + PROJECT_MEMBERS_TABLE +
                     "(" +
                     IDENTIFIER_KEY + "," +
                     MEMBER_IDENTIFIER_KEY +
@@ -132,10 +133,11 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      *
      * @param name: the name of the project
      * @param logo: the logo of the project
-     * @param projectId: the project identifier
+     * @param project: the project to edit
      * @param members: the members of the project
      */
-    public void editProject(String name, MultipartFile logo, List<String> members, String projectId) throws IOException {
+    public void editProject(String name, MultipartFile logo, List<String> members, Project project) throws IOException {
+        String projectId = project.getId();
         boolean logoEdited = logo != null && !logo.isEmpty();
         String logoUrl = null;
         if(logoEdited) {
@@ -151,6 +153,22 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
                     name
             );
         }
+        manageItems(new ItemsManagementWorkflow() {
+            @Override
+            public List<String> getIds() {
+                return new ArrayList<>(project.getProjectMembers().stream().map(EquinoxItem::getId).toList());
+            }
+
+            @Override
+            public String insertQuery() {
+                return JOIN_MEMBERS_QUERY;
+            }
+
+            @Override
+            public String deleteQuery() {
+                return REMOVE_MEMBERS_QUERY;
+            }
+        }, projectId, members);
         if(logoEdited)
             saveResource(logo, logoUrl);
     }

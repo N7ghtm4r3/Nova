@@ -201,7 +201,7 @@ public class ProjectsController extends ProjectManager {
             String name = payload.name();
             if(!isProjectNameValid(name))
                 return failedResponse(WRONG_PROCEDURE_MESSAGE);
-            projectsHelper.editProject(name, logo, payload.membersList(), projectId);
+            projectsHelper.editProject(name, logo, payload.membersList(), project);
             return successResponse();
         } catch (Exception e) {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
