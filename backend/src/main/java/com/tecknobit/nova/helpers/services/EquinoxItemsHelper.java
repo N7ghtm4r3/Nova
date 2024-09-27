@@ -152,7 +152,7 @@ public abstract class EquinoxItemsHelper<T extends EquinoxItem> {
      * @param batchQuery: the batch query to execute
      */
     protected void manageItems(ItemsManagementWorkflow workflow, String valuesSlice, String itemId,
-                                     List<String> ids, BatchQuery batchQuery) {
+                               List<String> ids, BatchQuery batchQuery) {
         List<String> currentItemsIds = workflow.getIds();
         executeInsertBatch(workflow.insertQuery(), valuesSlice, ids, batchQuery);
         currentItemsIds.removeAll(ids);

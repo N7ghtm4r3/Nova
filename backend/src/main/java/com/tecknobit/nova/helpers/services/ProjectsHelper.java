@@ -1,7 +1,6 @@
 package com.tecknobit.nova.helpers.services;
 
 import com.tecknobit.apimanager.annotations.Returner;
-import com.tecknobit.equinox.environment.records.EquinoxItem;
 import com.tecknobit.nova.controllers.projectmanagers.ProjectsController;
 import com.tecknobit.nova.helpers.resources.NovaResourcesManager;
 import com.tecknobit.nova.helpers.services.repositories.projectsutils.JoiningQRCodeRepository;
@@ -42,7 +41,7 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      * {@code JOIN_MEMBERS_QUERY} the query used to join members in a project
      */
     protected static final String JOIN_MEMBERS_QUERY =
-            "INSERT IGNORE INTO " + PROJECT_MEMBERS_TABLE +
+            "REPLACE INTO " + PROJECT_MEMBERS_TABLE +
                     "(" +
                     IDENTIFIER_KEY + "," +
                     MEMBER_IDENTIFIER_KEY +
@@ -54,7 +53,7 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      */
     private static final String REMOVE_MEMBERS_QUERY =
             "DELETE FROM " + PROJECT_MEMBERS_TABLE + " WHERE "
-                    + MEMBER_IDENTIFIER_KEY + "='%s' " + "AND " + IDENTIFIER_KEY + " IN (";
+                    + IDENTIFIER_KEY + "='%s' " + "AND " + MEMBER_IDENTIFIER_KEY + " IN (";
 
     /**
      * {@code projectsRepository} instance for the projects repository
@@ -141,7 +140,7 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
         boolean logoEdited = logo != null && !logo.isEmpty();
         String logoUrl = null;
         if(logoEdited) {
-            logoUrl = createLogoResource(logo, projectId);
+            logoUrl = createLogoResource(logo, projectId + System.currentTimeMillis());
             projectsRepository.editProject(
                     projectId,
                     logoUrl,
@@ -153,10 +152,22 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
                     name
             );
         }
+        manageProjectMembers(project, members);
+        if(logoEdited) {
+            deleteLogoResource(projectId);
+            saveResource(logo, logoUrl);
+        }
+    }
+
+    private void manageProjectMembers(Project project, List<String> editedMembers) {
+        String projectId = project.getId();
         manageItems(new ItemsManagementWorkflow() {
             @Override
             public List<String> getIds() {
-                return new ArrayList<>(project.getProjectMembers().stream().map(EquinoxItem::getId).toList());
+                ArrayList<String> members = new ArrayList<>();
+                for (NovaUser member : project.getProjectMembers())
+                    members.add(member.getId());
+                return members;
             }
 
             @Override
@@ -168,9 +179,13 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
             public String deleteQuery() {
                 return REMOVE_MEMBERS_QUERY;
             }
-        }, projectId, members);
-        if(logoEdited)
-            saveResource(logo, logoUrl);
+        }, RELATIONSHIP_VALUES_SLICE, projectId, editedMembers, query -> {
+            int index = 1;
+            for (String member : editedMembers) {
+                query.setParameter(index++, projectId);
+                query.setParameter(index++, member);
+            }
+        });
     }
 
     /**

@@ -140,7 +140,8 @@ public class Project extends EquinoxItem implements NotificationsTarget {
     @JoinTable(
             name = PROJECT_MEMBERS_TABLE,
             joinColumns = {@JoinColumn(name = IDENTIFIER_KEY)},
-            inverseJoinColumns = {@JoinColumn(name = MEMBER_IDENTIFIER_KEY)}
+            inverseJoinColumns = {@JoinColumn(name = MEMBER_IDENTIFIER_KEY)},
+            uniqueConstraints = { @UniqueConstraint(columnNames = {IDENTIFIER_KEY, MEMBER_IDENTIFIER_KEY}) }
     )
     @JsonIgnoreProperties({
             TOKEN_KEY,
