@@ -8,13 +8,12 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.tecknobit.equinox.environment.records.EquinoxUser.EMAIL_KEY;
 import static com.tecknobit.novacore.records.NovaUser.ROLE_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;
 
 /**
@@ -32,6 +31,11 @@ public class JoiningQRCode extends EquinoxItem {
      * {@code WRONG_NAME_MESSAGE} error message used when the joining qr code is expired
      */
     public static final String EXPIRED_JOINING_QRCODE_MESSAGE = "This qrcode is expired";
+
+    /**
+     * {@code JOINING_QRCODES_MEMBERS_KEY} the key for the <b>"joining_qrcode_members"</b> field
+     */
+    public static final String JOINING_QRCODES_MEMBERS_KEY = "joining_qrcode_members";
 
     /**
      * {@code JOINING_QRCODES_KEY} the key for the <b>"joiningQrcodes"</b> field
@@ -64,26 +68,29 @@ public class JoiningQRCode extends EquinoxItem {
     private final Project project;
 
     /**
-     * {@code membersEmails} the list of emails allowed to use the joining qrcode to join in the project
+     * {@code invitedMembers} the list of emails allowed to use the joining qrcode to join in the project
      */
-    @Column(name = PROJECT_MEMBERS_KEY)
-    private final String membersEmails;
+    @ElementCollection(
+            fetch = FetchType.EAGER
+    )
+    @CollectionTable(
+            name = JOINING_QRCODES_MEMBERS_KEY,
+            joinColumns = @JoinColumn(name = IDENTIFIER_KEY),
+            foreignKey = @ForeignKey(
+                    foreignKeyDefinition = "FOREIGN KEY (" + IDENTIFIER_KEY + ") REFERENCES "
+                            + JOINING_QRCODES_TABLE + "(" + IDENTIFIER_KEY + ") ON DELETE CASCADE"
+            )
+    )
+    @MapKeyColumn(name = EMAIL_KEY)
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = ROLE_KEY)
+    private final HashMap<String, Role> invitedMembers;
 
     /**
      * {@code creationDate} the date of the creation of the joining qrcode
      */
     @Column(name = CREATION_DATE_KEY)
     private final long creationDate;
-
-    /**
-     * {@code role} the role specified which the {@link #membersEmails} will have
-     *
-     * @apiNote the role, if some user is already logged in, will be used to compare the values and if not
-     * equals will be automatically removed from the {@link #membersEmails} list
-     */
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = ROLE_KEY)
-    private final Role role;
 
     /**
      * {@code joinCode} textual join code e.g. M1L2G3
@@ -104,7 +111,7 @@ public class JoiningQRCode extends EquinoxItem {
      * @apiNote empty constructor required
      */
     public JoiningQRCode() {
-        this(null, null, "", -1, null, null);
+        this(null, null, null, -1, null);
     }
 
     /**
@@ -112,18 +119,16 @@ public class JoiningQRCode extends EquinoxItem {
      *
      * @param QRCodeId: the identifier of the joining qrcode
      * @param project: the project attached to the joining qrcode
-     * @param membersEmails: the list of emails allowed to use the joining qrcode to join in the project
+     * @param invitedMembers: the list of emails allowed to use the joining qrcode to join in the project
      * @param creationDate: the date of the creation of the joining qrcode
-     * @param role: the role specified which the {@link #membersEmails} will have
      * @param joinCode: textual join code e.g. M1L2G3
      */
-    public JoiningQRCode(String QRCodeId, Project project, String membersEmails, long creationDate, Role role,
+    public JoiningQRCode(String QRCodeId, Project project, HashMap<String, Role> invitedMembers, long creationDate,
                          String joinCode) {
         super(QRCodeId);
         this.project = project;
-        this.membersEmails = membersEmails;
+        this.invitedMembers = invitedMembers;
         this.creationDate = creationDate;
-        this.role = role;
         this.joinCode = joinCode;
     }
 
@@ -138,37 +143,28 @@ public class JoiningQRCode extends EquinoxItem {
     }
 
     /**
-     * Method to get {@link #membersEmails} instance <br>
+     * Method to get {@link #invitedMembers} instance <br>
      * No-any params required
      *
-     * @return {@link #membersEmails} instance as {@link String}
+     * @return {@link #invitedMembers} instance as {@link HashMap} of {@link String} and {@link Role}
      */
-    public String getMembersEmails() {
-        return membersEmails;
+    public HashMap<String, Role> getInvitedMembers() {
+        return invitedMembers;
     }
 
     /**
-     * Method to get {@link #role} instance <br>
-     * No-any params required
+     * Method to get whether a member is invited, so allowed to join in a {@link Project}, with the current
+     * joining code
      *
-     * @return {@link #role} instance as {@link Role}
-     */
-    public Role getRole() {
-        return role;
-    }
-
-    /**
-     * Method to get the list of members emails allowed <br>
-     * No-any params required
+     * @param email: the email of the member check
+     * @param role: the role of the member to check
      *
-     * @return the list of members emails allowed as {@link List} of {@link String}
+     * @return whether the member has been invited as {@code boolean}
      */
     @JsonIgnore
-    public ArrayList<String> listEmails() {
-        String emailsValues = membersEmails.replaceAll(" ", "");
-        if(emailsValues.isEmpty())
-            return new ArrayList<>();
-        return new ArrayList<>(List.of(emailsValues.split(",")));
+    public boolean allowedInvitedMember(String email, Role role) {
+        Role guardRole = invitedMembers.get(email);
+        return guardRole != null && role == guardRole;
     }
 
     /**

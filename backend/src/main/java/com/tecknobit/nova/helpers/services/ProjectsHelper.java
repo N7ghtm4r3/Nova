@@ -25,6 +25,7 @@ import java.util.List;
 import static com.tecknobit.equinox.environment.controllers.EquinoxController.generateIdentifier;
 import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.NovaUser.*;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.JOINING_QRCODES_MEMBERS_KEY;
 import static com.tecknobit.novacore.records.project.Project.*;
 import static java.lang.System.currentTimeMillis;
 
@@ -54,6 +55,18 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
     private static final String REMOVE_MEMBERS_QUERY =
             "DELETE FROM " + PROJECT_MEMBERS_TABLE + " WHERE "
                     + IDENTIFIER_KEY + "='%s' " + "AND " + MEMBER_IDENTIFIER_KEY + " IN (";
+
+    /**
+     * {@code INSERT_JOINING_QR_CODE_MEMBERS} the query used to insert the members invited in a project with a {@link JoiningQRCode}
+     */
+    protected static final String INSERT_JOINING_QR_CODE_MEMBERS =
+            "INSERT INTO " + JOINING_QRCODES_MEMBERS_KEY +
+                    "(" +
+                    IDENTIFIER_KEY + "," +
+                    ROLE_KEY + "," +
+                    EMAIL_KEY +
+                    ")" +
+                    " VALUES ";
 
     /**
      * {@code projectsRepository} instance for the projects repository
@@ -204,14 +217,20 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      * 
      * @param QRCodeId: the identifier of the qrcode
      * @param projectId: the project identifier
-     * @param membersEmails: the mailing list of the members to add
-     * @param role: the role to attribute at the members
+     * @param invitedMembers: the mailing list of the members to add with their role
      * @return the textual join code, if created, as {@link String}
      */
-    public String createJoiningQrcode(String QRCodeId, String projectId, List<String> membersEmails, Role role) {
+    public String createJoiningQrcode(String QRCodeId, String projectId, List<JSONObject> invitedMembers) {
         String joinCode = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
-        joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), joinCode, projectId,
-                formatAllowedEmails(membersEmails), role.name());
+        joiningQRCodeRepository.insertJoiningQRCode(QRCodeId, currentTimeMillis(), joinCode, projectId);
+        executeInsertBatch(INSERT_JOINING_QR_CODE_MEMBERS, TUPLE_VALUES_SLICE, invitedMembers, query -> {
+            int index = 1;
+            for (JSONObject member : invitedMembers) {
+                query.setParameter(index++, QRCodeId);
+                query.setParameter(index++, member.getString(ROLE_KEY));
+                query.setParameter(index++, member.getString(EMAIL_KEY));
+            }
+        });
         return joinCode;
     }
 
@@ -234,17 +253,6 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
     }
 
     /**
-     * Method to remove a member from the mailing list of the joining qrcode. <br>
-     * This method is used when a user is not allowed to join in a project because is already member
-     * or the role do not match if the user is already logged in
-     * @param joiningQRCode: the joining qrcode to update
-     * @param email: the email of the member to remove
-     */
-    public void removeWrongEmailMember(JoiningQRCode joiningQRCode, String email) {
-        removeMemberFromMailingList(joiningQRCode, email);
-    }
-
-    /**
      * Method to join a new member in a project
      *
      * @param joiningQRCode: the joining qrcode used to join
@@ -263,26 +271,7 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      * @param email: the email of the member to remove
      */
     public void removeMemberFromMailingList(JoiningQRCode joiningQRCode, String email) {
-        ArrayList<String> membersEmails = joiningQRCode.listEmails();
-        if(membersEmails.contains(email)) {
-            membersEmails.remove(email);
-            String QRCodeId = joiningQRCode.getId();
-            if(membersEmails.isEmpty())
-                joiningQRCodeRepository.deleteJoiningQRCode(QRCodeId);
-            else
-                joiningQRCodeRepository.updateJoiningQRCode(QRCodeId, formatAllowedEmails(membersEmails));
-        }
-    }
-
-    /**
-     * Method to format the mailing list to save in the database
-     * @param emails: the list of the emails to format
-     * @return the list of the emails formatted as {@link String}
-     */
-    private String formatAllowedEmails(List<String> emails) {
-        return emails.toString().toLowerCase()
-                .replace("[", "")
-                .replace("]", "");
+        joiningQRCodeRepository.removeMemberFromMailingList(joiningQRCode.getId(), email);
     }
 
     /**
@@ -361,9 +350,11 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
         @Returner
         public ArrayList<String> membersList() {
             ArrayList<String> members = new ArrayList<>();
-            JSONArray jMembers = new JSONArray(projectMembers);
-            for (int j = 0; j < jMembers.length(); j++)
-                members.add(jMembers.getString(j));
+            if(projectMembers != null) {
+                JSONArray jMembers = new JSONArray(projectMembers);
+                for (int j = 0; j < jMembers.length(); j++)
+                    members.add(jMembers.getString(j));
+            }
             return members;
         }
 

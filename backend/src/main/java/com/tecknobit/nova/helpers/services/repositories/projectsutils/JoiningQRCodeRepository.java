@@ -10,9 +10,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
-import static com.tecknobit.novacore.records.NovaUser.ROLE_KEY;
-import static com.tecknobit.novacore.records.project.JoiningQRCode.JOINING_QRCODES_TABLE;
-import static com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY;
+import static com.tecknobit.equinox.environment.records.EquinoxUser.EMAIL_KEY;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_TABLE;
 import static com.tecknobit.novacore.records.release.Release.CREATION_DATE_KEY;
@@ -35,8 +34,6 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
      * @param creationDate: the creation date when the qrcode has been created
      * @param joinCode: the textual join code
      * @param projectId: the project identifier where join with the qrcode
-     * @param role: the role to attribute at the members
-     * @param projectMembers: the emails of the members
      */
     @Modifying(clearAutomatically = true)
     @Transactional
@@ -46,16 +43,13 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
                     + IDENTIFIER_KEY + ","
                     + CREATION_DATE_KEY + ","
                     + JOIN_CODE_KEY + ","
-                    + PROJECT_IDENTIFIER_KEY + ","
-                    + PROJECT_MEMBERS_TABLE + ","
-                    + ROLE_KEY + ")"
+                    + PROJECT_IDENTIFIER_KEY
+                    + ")"
                     + " VALUES ("
                     + ":" + IDENTIFIER_KEY + ","
                     + ":" + CREATION_DATE_KEY + ","
                     + ":" + JOIN_CODE_KEY + ","
-                    + ":" + PROJECT_IDENTIFIER_KEY + ","
-                    + ":" + ROLE_KEY + ","
-                    + ":" + PROJECT_MEMBERS_TABLE
+                    + ":" + PROJECT_IDENTIFIER_KEY
                     + ")",
             nativeQuery = true
     )
@@ -63,9 +57,7 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
             @Param(IDENTIFIER_KEY) String joiningQRCodeId,
             @Param(CREATION_DATE_KEY) long creationDate,
             @Param(JOIN_CODE_KEY) String joinCode,
-            @Param(PROJECT_IDENTIFIER_KEY) String projectId,
-            @Param(ROLE_KEY) String role,
-            @Param(PROJECT_MEMBERS_TABLE) String projectMembers
+            @Param(PROJECT_IDENTIFIER_KEY) String projectId
     );
 
     /**
@@ -131,6 +123,25 @@ public interface JoiningQRCodeRepository extends JpaRepository<JoiningQRCode, St
     )
     void deleteJoiningQRCode(
             @Param(IDENTIFIER_KEY) String joiningQRCodeId
+    );
+
+    /**
+     *  Method to execute the query to delete from an existing {@link JoiningQRCode} an email of a member invited with that
+     *  joining qrcode
+     *
+     * @param joiningQRCodeId: the identifier of the qrcode
+     * @param email: the email of the member to remove
+     */
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + JOINING_QRCODES_MEMBERS_KEY + " WHERE " + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY +
+                    " AND " + EMAIL_KEY + "=:" + EMAIL_KEY,
+            nativeQuery = true
+    )
+    void removeMemberFromMailingList(
+            @Param(IDENTIFIER_KEY) String joiningQRCodeId,
+            @Param(EMAIL_KEY) String email
     );
 
 }

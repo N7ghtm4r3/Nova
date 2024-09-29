@@ -1,8 +1,11 @@
 package com.tecknobit.novacore;
 
 import com.tecknobit.equinox.inputs.InputValidator;
+import org.json.JSONObject;
 
 import java.util.List;
+
+import static com.tecknobit.equinox.environment.records.EquinoxUser.EMAIL_KEY;
 
 /**
  * The {@code NovaInputValidator} class is useful to validate the inputs
@@ -92,24 +95,16 @@ public class NovaInputValidator extends InputValidator {
      *
      * @return whether the mailing list is valid or not as {@code boolean}
      */
-    public static boolean isMailingListValid(String mailingList) {
-        mailingList = mailingList.replaceAll(" ", "");
-        return isMailingListValid(List.of(mailingList.split(",")));
-    }
-
-    /**
-     * Method to validate a mailing list
-     *
-     * @param mailingList: mailing list value to check the validity
-     *
-     * @return whether the mailing list is valid or not as {@code boolean}
-     */
-    public static boolean isMailingListValid(List<String> mailingList) {
-        if(mailingList != null && !mailingList.isEmpty()) {
-            for (String email : mailingList)
-                if(!isEmailValid(email))
-                    return false;
-            return true;
+    public static boolean isMailingListValid(List<JSONObject> mailingList) {
+        try {
+            if(mailingList != null && !mailingList.isEmpty()) {
+                for (JSONObject member : mailingList)
+                    if(!isEmailValid(member.getString(EMAIL_KEY)))
+                        return false;
+                return true;
+            }
+        } catch (IllegalArgumentException e) {
+            return false;
         }
         return false;
     }

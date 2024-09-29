@@ -1,7 +1,6 @@
 package com.tecknobit.nova.controllers.projectmanagers;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
-import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.equinox.environment.helpers.services.EquinoxUsersHelper;
 import com.tecknobit.nova.controllers.DefaultNovaController;
 import com.tecknobit.nova.helpers.services.ProjectsHelper;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +22,9 @@ import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.*;
 import static com.tecknobit.equinox.environment.records.EquinoxUser.TOKEN_KEY;
 import static com.tecknobit.novacore.NovaInputValidator.*;
 import static com.tecknobit.novacore.helpers.NovaEndpoints.*;
-import static com.tecknobit.novacore.records.NovaUser.IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.NovaUser.*;
-import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.EXPIRED_JOINING_QRCODE_MESSAGE;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_MEMBERS_KEY;
 
@@ -116,12 +116,12 @@ public class ProjectsController extends ProjectManager {
                 MultipartFile logo = payload.logo_url();
                 String name = payload.name();
                 if(!logo.isEmpty() && isProjectNameValid(name)) {
-                    System.out.println(payload.membersList());
                     JSONObject result = projectsHelper.addProject(name, logo, payload.membersList(), generateIdentifier(), id);
                     return successResponse(result);
                 } else
                     return failedResponse(WRONG_PROCEDURE_MESSAGE);
             } catch (Exception e) {
+                e.printStackTrace();
                 return failedResponse(WRONG_PROCEDURE_MESSAGE);
             }
         } else
@@ -239,26 +239,25 @@ public class ProjectsController extends ProjectManager {
             @RequestHeader(TOKEN_KEY) String token,
             @RequestBody String payload
     ) {
-        if(isMe(id, token) && isAuthorizedUser(id, projectId)) {
-            loadJsonHelper(payload);
-            List<String> membersEmails = JsonHelper.toList(jsonHelper.getJSONArray(PROJECT_MEMBERS_KEY, new JSONArray()));
-            if(isMailingListValid(membersEmails)) {
-                try {
-                    NovaUser.Role role = NovaUser.Role.valueOf(jsonHelper.getString(ROLE_KEY));
-                    String QRCodeId = generateIdentifier();
-                    String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, membersEmails, role);
-                    JSONObject response = new JSONObject()
-                            .put(IDENTIFIER_KEY, QRCodeId);
-                    if(joinCode != null)
-                        response.put(JOIN_CODE_KEY, joinCode);
-                    return successResponse(response);
-                } catch (Exception e) {
-                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                }
-            } else
-                return failedResponse(WRONG_MAILING_LIST_MESSAGE);
-        } else
+        if(!isMe(id, token) && isAuthorizedUser(id, projectId))
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        loadJsonHelper(payload);
+        JSONArray jInvitedMembers = jsonHelper.getJSONArray(PROJECT_MEMBERS_KEY, new JSONArray());
+        List<JSONObject> invitedMembers = new ArrayList<>();
+        for (int j = 0; j < jInvitedMembers.length(); j++)
+            invitedMembers.add(jInvitedMembers.getJSONObject(j));
+        if(!isMailingListValid(invitedMembers))
+            return failedResponse(WRONG_MAILING_LIST_MESSAGE);
+        try {
+            String QRCodeId = generateIdentifier();
+            String joinCode = projectsHelper.createJoiningQrcode(QRCodeId, projectId, invitedMembers);
+            JSONObject response = new JSONObject().put(IDENTIFIER_KEY, QRCodeId);
+            if(joinCode != null)
+                response.put(JOIN_CODE_KEY, joinCode);
+            return successResponse(response);
+        } catch (Exception e) {
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
     }
 
     /**
@@ -297,75 +296,66 @@ public class ProjectsController extends ProjectManager {
             String joinCode = jsonHelper.getString(JOIN_CODE_KEY, "-1");
             joiningQRCode = projectsHelper.getJoiningQrcodeByJoinCode(joinCode);
         }
-        if(joiningQRCode != null) {
-            if(joiningQRCode.isValid()) {
-                String email = jsonHelper.getString(EMAIL_KEY, "").toLowerCase();
-                if(isEmailValid(email)) {
-                    Project project = joiningQRCode.getProject();
-                    if(project.hasNotMemberEmail(email)) {
-                        if(joiningQRCode.listEmails().contains(email)) {
-                            NovaUser user = usersRepository.findUserByEmail(email);
-                            JSONObject response = new JSONObject();
-                            String userId;
-                            if(user == null) {
-                                String name = jsonHelper.getString(NAME_KEY);
-                                String surname = jsonHelper.getString(SURNAME_KEY);
-                                String password = jsonHelper.getString(PASSWORD_KEY);
-                                String language = jsonHelper.getString(LANGUAGE_KEY, DEFAULT_LANGUAGE);
-                                if(isNameValid(name)) {
-                                    if(isSurnameValid(surname)) {
-                                        if(isPasswordValid(password)) {
-                                            userId = generateIdentifier();
-                                            String token = generateIdentifier();
-                                            Role role = joiningQRCode.getRole();
-                                            try {
-                                                usersHelper.signUpUser(
-                                                        userId,
-                                                        token,
-                                                        name,
-                                                        surname,
-                                                        email,
-                                                        password,
-                                                        language,
-                                                        role
-                                                );
-                                                response.put(TOKEN_KEY, token)
-                                                        .put(PROFILE_PIC_KEY, DEFAULT_PROFILE_PIC)
-                                                        .put(ROLE_KEY, role);
-                                            } catch (NoSuchAlgorithmException e) {
-                                                return failedResponse(WRONG_PASSWORD_MESSAGE);
-                                            }
-                                        } else
-                                            return failedResponse(WRONG_PASSWORD_MESSAGE);
-                                    } else
-                                        return failedResponse(WRONG_SURNAME_MESSAGE);
-                                } else
-                                    return failedResponse(WRONG_NAME_MESSAGE);
-                            } else {
-                                if(user.getRole() != joiningQRCode.getRole()) {
-                                    projectsHelper.removeWrongEmailMember(joiningQRCode, user.getEmail());
-                                    return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                                }
-                                userId = user.getId();
-                            }
-                            projectsHelper.joinMember(joiningQRCode, email, userId);
-                            return successResponse(
-                                    response.put(IDENTIFIER_KEY, userId)
-                            );
-                        } else
-                            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-                    } else {
-                        projectsHelper.removeMemberFromMailingList(joiningQRCode, email);
-                        return failedResponse(WRONG_PROCEDURE_MESSAGE);
-                    }
-                } else
-                    return failedResponse(WRONG_EMAIL_MESSAGE);
-            } else {
-                projectsHelper.deleteJoiningQrcode(QRCodeId);
-                return failedResponse(EXPIRED_JOINING_QRCODE_MESSAGE);
+        if(joiningQRCode == null)
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        if(!joiningQRCode.isValid()) {
+            projectsHelper.deleteJoiningQrcode(QRCodeId);
+            return failedResponse(EXPIRED_JOINING_QRCODE_MESSAGE);
+        }
+        String email = jsonHelper.getString(EMAIL_KEY, "");
+        if(!isEmailValid(email))
+            failedResponse(WRONG_EMAIL_MESSAGE);
+        Project project = joiningQRCode.getProject();
+        if(project.hasMemberEmail(email)) {
+            projectsHelper.removeMemberFromMailingList(joiningQRCode, email);
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
+        Role role;
+        try {
+            role = Role.valueOf(jsonHelper.getString(ROLE_KEY));
+        } catch (IllegalArgumentException e) {
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
+        if(!joiningQRCode.allowedInvitedMember(email, role))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        NovaUser user = usersRepository.findUserByEmail(email);
+        JSONObject response = new JSONObject();
+        String userId;
+        if(user == null) {
+            String name = jsonHelper.getString(NAME_KEY);
+            String surname = jsonHelper.getString(SURNAME_KEY);
+            String password = jsonHelper.getString(PASSWORD_KEY);
+            String language = jsonHelper.getString(LANGUAGE_KEY, DEFAULT_LANGUAGE);
+            if(!isNameValid(name))
+                return failedResponse(WRONG_NAME_MESSAGE);
+            if(!isSurnameValid(surname))
+                return failedResponse(WRONG_SURNAME_MESSAGE);
+            if(!isPasswordValid(password))
+                return failedResponse(WRONG_PASSWORD_MESSAGE);
+            userId = generateIdentifier();
+            String token = generateIdentifier();
+            try {
+                usersHelper.signUpUser(
+                        userId,
+                        token,
+                        name,
+                        surname,
+                        email,
+                        password,
+                        language,
+                        role
+                );
+                response.put(TOKEN_KEY, token)
+                        .put(PROFILE_PIC_KEY, DEFAULT_PROFILE_PIC)
+                        .put(ROLE_KEY, role);
+            } catch (NoSuchAlgorithmException e) {
+                return failedResponse(WRONG_PASSWORD_MESSAGE);
             }
         } else
-            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+            userId = user.getId();
+        response.put(IDENTIFIER_KEY, userId);
+        projectsHelper.joinMember(joiningQRCode, email, userId);
+        return successResponse(response);
     }
 
     /**

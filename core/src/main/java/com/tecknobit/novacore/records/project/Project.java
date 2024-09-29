@@ -415,11 +415,11 @@ public class Project extends EquinoxItem implements NotificationsTarget {
      *
      * @return whether a member's email is not contained by the checked project as boolean
      */
-    public boolean hasNotMemberEmail(String memberEmail) {
+    public boolean hasMemberEmail(String memberEmail) {
         for (NovaUser member : projectMembers)
             if(member.getEmail().equals(memberEmail))
-                return false;
-        return true;
+                return true;
+        return false;
     }
 
     /**
