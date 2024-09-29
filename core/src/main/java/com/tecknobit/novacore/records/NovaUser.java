@@ -265,7 +265,12 @@ public class NovaUser extends EquinoxUser {
      */
     @JsonIgnore
     public boolean isTester(Project project) {
-        return project.getTesters().contains(id);
+        if(project != null) {
+            for (NovaUser tester : project.getTesters())
+                if(tester.getId().equals(id))
+                    return true;
+        }
+        return false;
     }
 
     /**
