@@ -260,8 +260,8 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      * @param memberId: the identifier of the member
      */
     public void joinMember(JoiningQRCode joiningQRCode, String email, String memberId) {
-        removeMemberFromMailingList(joiningQRCode, email);
         projectsRepository.joinMember(joiningQRCode.getProject().getId(), memberId);
+        removeMemberFromMailingList(joiningQRCode, email);
     }
 
     /**
@@ -272,15 +272,18 @@ public class ProjectsHelper extends EquinoxItemsHelper<Project> implements NovaR
      */
     public void removeMemberFromMailingList(JoiningQRCode joiningQRCode, String email) {
         joiningQRCodeRepository.removeMemberFromMailingList(joiningQRCode.getId(), email);
+        joiningQRCode.getInvitedMembers().remove(email);
+        if(joiningQRCode.getInvitedMembers().isEmpty())
+            deleteJoiningQrcode(joiningQRCode);
     }
 
     /**
      * Method to delete a joining qrcode
      *
-     * @param QRCodeId: the identifier of the qrcode to delete
+     * @param joiningQRCode: the qrcode to delete
      */
-    public void deleteJoiningQrcode(String QRCodeId) {
-        joiningQRCodeRepository.deleteJoiningQRCode(QRCodeId);
+    public void deleteJoiningQrcode(JoiningQRCode joiningQRCode) {
+        joiningQRCodeRepository.deleteJoiningQRCode(joiningQRCode.getId());
     }
 
     /**

@@ -26,8 +26,7 @@ import static com.tecknobit.equinox.environment.helpers.EquinoxBaseEndpointsSet.
 import static com.tecknobit.equinox.environment.records.EquinoxItem.IDENTIFIER_KEY;
 import static com.tecknobit.equinox.environment.records.EquinoxUser.NAME_KEY;
 import static com.tecknobit.equinox.inputs.InputValidator.HOST_ADDRESS_KEY;
-import static com.tecknobit.novacore.records.project.JoiningQRCode.JOINING_QRCODES_KEY;
-import static com.tecknobit.novacore.records.project.JoiningQRCode.JOIN_CODE_KEY;
+import static com.tecknobit.novacore.records.project.JoiningQRCode.*;
 
 /**
  * The {@code JoiningQRCodeWebPageProvider} class is useful to provide the dedicated web page of a {@link JoiningQRCode}
@@ -124,10 +123,10 @@ public class JoiningQRCodeWebPageProvider {
      * @return the title of the invalid page as {@link String}
      */
     private String codeNotExistsOrExpired(JoiningQRCode joiningQRCode, Model model) {
-        model.addAttribute(MAIN_TEXT, mantis.getResource("invalid_code_key"));
+        model.addAttribute(MAIN_TEXT, mantis.getResource(EXPIRED_JOINING_QRCODE_MESSAGE));
         model.addAttribute(SUB_TEXT, mantis.getResource("invalid_code_subtext_key"));
         if(joiningQRCode != null)
-            codesHelper.deleteJoiningQrcode(joiningQRCode.getId());
+            codesHelper.deleteJoiningQrcode(joiningQRCode);
         return INVALID_QR_CODE_PAGE;
     }
 

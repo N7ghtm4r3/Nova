@@ -6,11 +6,14 @@ import com.tecknobit.novacore.records.NovaUser.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.tecknobit.equinox.environment.helpers.EquinoxBaseEndpointsSet.BASE_EQUINOX_ENDPOINT;
 import static com.tecknobit.equinox.environment.records.EquinoxUser.EMAIL_KEY;
 import static com.tecknobit.novacore.records.NovaUser.ROLE_KEY;
 import static com.tecknobit.novacore.records.project.Project.PROJECT_IDENTIFIER_KEY;
@@ -30,7 +33,7 @@ public class JoiningQRCode extends EquinoxItem {
     /**
      * {@code WRONG_NAME_MESSAGE} error message used when the joining qr code is expired
      */
-    public static final String EXPIRED_JOINING_QRCODE_MESSAGE = "This qrcode is expired";
+    public static final String EXPIRED_JOINING_QRCODE_MESSAGE = "invalid_code_key";
 
     /**
      * {@code JOINING_QRCODES_MEMBERS_KEY} the key for the <b>"joining_qrcode_members"</b> field
@@ -84,7 +87,7 @@ public class JoiningQRCode extends EquinoxItem {
     @MapKeyColumn(name = EMAIL_KEY)
     @Enumerated(value = EnumType.STRING)
     @Column(name = ROLE_KEY)
-    private final HashMap<String, Role> invitedMembers;
+    private final Map<String, Role> invitedMembers;
 
     /**
      * {@code creationDate} the date of the creation of the joining qrcode
@@ -111,7 +114,7 @@ public class JoiningQRCode extends EquinoxItem {
      * @apiNote empty constructor required
      */
     public JoiningQRCode() {
-        this(null, null, null, -1, null);
+        this(null, null, new HashMap<>(), -1, null);
     }
 
     /**
@@ -133,6 +136,19 @@ public class JoiningQRCode extends EquinoxItem {
     }
 
     /**
+     * Constructor to init the {@link JoiningQRCode} class
+     *
+     * @param jJoiningQRCode: item formatted as JSON
+     */
+    public JoiningQRCode(JSONObject jJoiningQRCode) {
+        super(jJoiningQRCode);
+        project = null;
+        invitedMembers = null;
+        creationDate = -1L;
+        joinCode = hItem.getString(JOIN_CODE_KEY);
+    }
+
+    /**
      * Method to get {@link #project} instance <br>
      * No-any params required
      *
@@ -148,7 +164,7 @@ public class JoiningQRCode extends EquinoxItem {
      *
      * @return {@link #invitedMembers} instance as {@link HashMap} of {@link String} and {@link Role}
      */
-    public HashMap<String, Role> getInvitedMembers() {
+    public Map<String, Role> getInvitedMembers() {
         return invitedMembers;
     }
 
@@ -197,6 +213,15 @@ public class JoiningQRCode extends EquinoxItem {
      */
     public boolean isValid() {
         return (System.currentTimeMillis() - creationDate) < TimeUnit.MINUTES.toMillis(15);
+    }
+
+    /**
+     * Method to get the share link for the current joining QR-Code
+     * @param currentHostAddress: the current host address of the local session
+     * @return the share link as {@link String}
+     */
+    public String getShareLink(String currentHostAddress) {
+        return currentHostAddress + BASE_EQUINOX_ENDPOINT + JOINING_QRCODES_KEY + "/" + id;
     }
 
 }

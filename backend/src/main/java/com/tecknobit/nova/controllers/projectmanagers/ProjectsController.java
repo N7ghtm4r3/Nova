@@ -288,18 +288,11 @@ public class ProjectsController extends ProjectManager {
             @RequestBody Map<String, String> payload
     ) {
         loadJsonHelper(payload);
-        JoiningQRCode joiningQRCode;
-        String QRCodeId = jsonHelper.getString(IDENTIFIER_KEY, null);
-        if(QRCodeId != null)
-            joiningQRCode = projectsHelper.getJoiningQrcode(QRCodeId);
-        else {
-            String joinCode = jsonHelper.getString(JOIN_CODE_KEY, "-1");
-            joiningQRCode = projectsHelper.getJoiningQrcodeByJoinCode(joinCode);
-        }
+        JoiningQRCode joiningQRCode = fetchJoiningQRCode();
         if(joiningQRCode == null)
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
         if(!joiningQRCode.isValid()) {
-            projectsHelper.deleteJoiningQrcode(QRCodeId);
+            projectsHelper.deleteJoiningQrcode(joiningQRCode);
             return failedResponse(EXPIRED_JOINING_QRCODE_MESSAGE);
         }
         String email = jsonHelper.getString(EMAIL_KEY, "");
@@ -312,7 +305,7 @@ public class ProjectsController extends ProjectManager {
         }
         Role role;
         try {
-            role = Role.valueOf(jsonHelper.getString(ROLE_KEY));
+            role = Role.valueOf(jsonHelper.getString(ROLE_KEY, ""));
         } catch (IllegalArgumentException e) {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
         }
@@ -356,6 +349,18 @@ public class ProjectsController extends ProjectManager {
         response.put(IDENTIFIER_KEY, userId);
         projectsHelper.joinMember(joiningQRCode, email, userId);
         return successResponse(response);
+    }
+
+    private JoiningQRCode fetchJoiningQRCode() {
+        JoiningQRCode joiningQRCode;
+        String QRCodeId = jsonHelper.getString(IDENTIFIER_KEY, null);
+        if(QRCodeId != null)
+            joiningQRCode = projectsHelper.getJoiningQrcode(QRCodeId);
+        else {
+            String joinCode = jsonHelper.getString(JOIN_CODE_KEY, "-1");
+            joiningQRCode = projectsHelper.getJoiningQrcodeByJoinCode(joinCode);
+        }
+        return joiningQRCode;
     }
 
     /**
