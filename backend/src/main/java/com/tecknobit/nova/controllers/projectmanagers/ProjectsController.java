@@ -351,6 +351,12 @@ public class ProjectsController extends ProjectManager {
         return successResponse(response);
     }
 
+    /**
+     * Method to get a joining code from the database <br>
+     *
+     * No-any params required
+     * @return a joining code as {@link JoiningQRCode}, if not exists {@code null} instead
+     */
     private JoiningQRCode fetchJoiningQRCode() {
         JoiningQRCode joiningQRCode;
         String QRCodeId = jsonHelper.getString(IDENTIFIER_KEY, null);

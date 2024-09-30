@@ -114,7 +114,7 @@ public class JoiningQRCode extends EquinoxItem {
      * @apiNote empty constructor required
      */
     public JoiningQRCode() {
-        this(null, null, new HashMap<>(), -1, null);
+        this(null, null, new HashMap<>(), -1, "");
     }
 
     /**
