@@ -1,8 +1,10 @@
 package com.tecknobit.nova.helpers;
 
 import com.tecknobit.apimanager.apis.ResourcesUtils;
+import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.apimanager.trading.TradingTools;
 import com.tecknobit.mantis.Mantis;
+import com.tecknobit.nova.helpers.resources.NovaResourcesManager;
 import com.tecknobit.novacore.records.project.Project;
 import com.tecknobit.novacore.records.release.Release;
 import com.tecknobit.novacore.records.release.Release.ReleaseStatus;
@@ -21,16 +23,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import static com.tecknobit.equinox.resourcesutils.ResourcesManager.RESOURCES_PATH;
-import static com.tecknobit.nova.helpers.resources.NovaResourcesManager.REPORTS_DIRECTORY;
-import static com.tecknobit.nova.helpers.resources.NovaResourcesManager.RESOURCES_REPORTS_PATH;
-
 /**
  * The {@code ReportsProvider} class is useful to create and provide the reports for the releases
  *
  * @author N7ghtm4r3 - Tecknobit
  */
-public class ReportsProvider {
+public class ReportsProvider implements NovaResourcesManager {
 
     /**
      * {@code PROJECT_LOGO_TAG} the tag to indicate where is the project logo and where place the real value
@@ -69,6 +67,31 @@ public class ReportsProvider {
     public static final String RELEASE_EVENTS_TAG = "<release_events>";
 
     /**
+     * {@code SLASH} the slash character
+     */
+    private static final String SLASH = "/";
+
+    /**
+     * {@code UNDERSCORE} the underscore character
+     */
+    private static final String UNDERSCORE = "_";
+
+    /**
+     * {@code VERSION_REGEX} the regex to clear the version of a release
+     */
+    private static final String VERSION_REGEX = "v\\. ";
+
+    /**
+     * {@code PDF_EXTENSION} extension to apply to the reports files
+     */
+    private static final String PDF_EXTENSION = ".pdf";
+
+    /**
+     * {@code timeFormatter} the formatter used to format the timestamp values
+     */
+    private static final TimeFormatter timeFormatter = TimeFormatter.getInstance("dd_MM_YYYY");
+
+    /**
      * {@code reportTemplate} the report template to use and where place the real instead of the tags
      */
     private String reportTemplate;
@@ -105,11 +128,6 @@ public class ReportsProvider {
     private Release currentRelease;
 
     /**
-     * {@code releaseId} the release identifier on which create its report
-     */
-    private String releaseId;
-
-    /**
      * {@code reportName} the report name
      */
     private String reportName;
@@ -144,7 +162,7 @@ public class ReportsProvider {
         File reportToDelete = null;
         for (File report : Objects.requireNonNull(reports.listFiles())) {
             String checkReportName = report.getName();
-            if(checkReportName.contains(releaseId) && !reportName.endsWith(checkReportName)) {
+            if(checkReportName.contains(removeVersionPrefix()) && !reportName.endsWith(checkReportName)) {
                 reportToDelete = report;
                 break;
             }
@@ -161,8 +179,31 @@ public class ReportsProvider {
      */
     private void setCurrentRelease(Release currentRelease) {
         this.currentRelease = currentRelease;
-        releaseId = currentRelease.getId();
-        reportName = REPORTS_DIRECTORY + "/" + currentRelease.getId() + "_" + currentRelease.getLastEvent() + ".pdf";
+        reportName = formatReportName();
+    }
+
+    /**
+     * Method to format the name for the report <br>
+     *
+     * No-any params required
+     * @return name formatted as {@link String}
+     */
+    private String formatReportName() {
+        String reportName = REPORTS_DIRECTORY + SLASH + currentRelease.getProject().getName() + UNDERSCORE;
+        reportName += removeVersionPrefix() + UNDERSCORE;
+        reportName += currentRelease.getStatus() + UNDERSCORE;
+        reportName += timeFormatter.formatAsString(currentRelease.getLastEvent());
+        return reportName + PDF_EXTENSION;
+    }
+
+    /**
+     * Method to clear the version of a {@link Release} using the {@link #VERSION_REGEX}
+     *
+     * No-any params required
+     * @return version formatted as {@link String}
+     */
+    private String removeVersionPrefix() {
+        return currentRelease.getReleaseVersion().replaceFirst(VERSION_REGEX, "");
     }
 
     /**

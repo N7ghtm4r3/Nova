@@ -53,11 +53,6 @@ public class ReleasesController extends ProjectManager {
     private final ReleasesHelper releasesHelper;
 
     /**
-     * {@code reportsProvider} helper to manage the reports creation and their serve
-     */
-    private final ReportsProvider reportsProvider;
-
-    /**
      * Constructor to init the {@link ProjectsController} controller
      *
      * @param projectsHelper: helper to manage the projects database operations
@@ -67,7 +62,6 @@ public class ReleasesController extends ProjectManager {
     public ReleasesController(ProjectsHelper projectsHelper, ReleasesHelper releasesHelper) {
         super(projectsHelper);
         this.releasesHelper = releasesHelper;
-        reportsProvider = new ReportsProvider();
     }
 
     /**
@@ -563,6 +557,7 @@ public class ReleasesController extends ProjectManager {
             Release release = getReleaseIfAuthorized(releaseId);
             if(release != null) {
                 if(!release.getReleaseEvents().isEmpty()) {
+                    ReportsProvider reportsProvider = new ReportsProvider();
                     try {
                         return successResponse(new JSONObject()
                                 .put(RELEASE_REPORT_PATH, reportsProvider.getReleaseReport(release))
