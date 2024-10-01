@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.equinox.environment.controllers.EquinoxController.generateIdentifier;
+import static com.tecknobit.nova.helpers.ReportsProvider.VERSION_REGEX;
 import static com.tecknobit.novacore.records.release.Release.ReleaseStatus.*;
 
 /**
@@ -384,7 +385,7 @@ public class ReleasesHelper implements NovaResourcesManager {
             else
                 releaseEventsRepository.deleteReleaseEvent(eventId);
         }
-        deleteReportResource(releaseId);
+        deleteReportResource(release.getReleaseVersion().replaceFirst(VERSION_REGEX, ""));
         releasesRepository.deleteRelease(releaseId);
         if(project != null) {
             List<NovaUser> members = project.getProjectMembers();

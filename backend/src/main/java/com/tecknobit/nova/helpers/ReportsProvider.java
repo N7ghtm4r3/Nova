@@ -79,7 +79,7 @@ public class ReportsProvider implements NovaResourcesManager {
     /**
      * {@code VERSION_REGEX} the regex to clear the version of a release
      */
-    private static final String VERSION_REGEX = "v\\. ";
+    public static final String VERSION_REGEX = "v\\. ";
 
     /**
      * {@code PDF_EXTENSION} extension to apply to the reports files
