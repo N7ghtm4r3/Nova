@@ -1,8 +1,11 @@
 package com.tecknobit.novacore.helpers;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
+import com.tecknobit.novacore.records.NovaUser;
+import com.tecknobit.novacore.records.project.Project;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.HOST_ADDRESS_KEY;
 import static com.tecknobit.novacore.helpers.LocalSessionUtils.NovaSession.IS_ACTIVE_SESSION_KEY;
@@ -444,10 +447,17 @@ public interface LocalSessionUtils {
          * Method to get whether the member is a {@link Role#Tester} <br>
          * No-any params required
          *
+         * @param project: the project to check if the user is a {@link Role#Tester}
+         *
          * @return whether the member is a {@link Role#Tester} as boolean
          */
-        public boolean isTester() {
-            return role == Role.Tester;
+        public boolean isTester(Project project) {
+            Set<NovaUser> testers = project.getTesters();
+            for (NovaUser tester : testers) {
+                if (tester.getId().equals(id))
+                    return true;
+            }
+            return false;
         }
 
         /**
