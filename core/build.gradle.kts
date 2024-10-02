@@ -47,6 +47,7 @@ configurations.all {
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(18)
 }

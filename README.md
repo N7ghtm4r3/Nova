@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.tecknobit.novacore:Nova-core:1.0.1'
+  implementation 'com.tecknobit.novacore:novacore:1.0.1'
 }
 ```
 
@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.tecknobit.novacore:Nova-core:1.0.1")
+  implementation("com.tecknobit.novacore:novacore:1.0.1")
 }
 ```
 
@@ -51,15 +51,12 @@ dependencies {
 - Java
 - Kotlin
 
-## Roadmap
+## Architecture
 
-This project will be constantly developed to reach different platforms to work on, following the platforms releases
-steps:
-
-- Mobile
-  - <a href="https://github.com/N7ghtm4r3/Nova-Android#readme">Android</a>
-  - iOS -> planned
-- <a href="https://github.com/N7ghtm4r3/Nova-Desktop#readme">Desktop version</a>
+### Clients
+- <a href="https://github.com/N7ghtm4r3/Nova-Clients#readme">Android and Desktop</a>
+  
+### Backend 
 - <a href="https://github.com/N7ghtm4r3/Nova/releases/tag/1.0.1">Backend service "out-of-the-box"</a>
 
 ## Usages
@@ -142,8 +139,6 @@ To start the **Nova** service on your own infrastructure you have to follow thes
 
 - At least **Java 18 JDK** installed on your machine
 - An SQL environment installed, it is recommended to use **MySQL**
-- Before run the backend service, **for the first time only**, you need to create a database named **nova** by
-  default or a custom name that must be inserted in the connection URL cited below in this section
 - Before run the backend service, **for the first time only**, you need to store in the **profiles** subfolder **(created automatically by 
   the server)** the default profile pic as below:
   ``` bash
