@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.3.0/ZeroClipboard.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <title th:text="${name}"></title>
+    <script type="importmap">
+        {
+          "imports": {
+            "@material/web/": "https://esm.run/@material/web/"
+          }
+        }
+    </script>
+    <script type="module">
+        import '@material/web/all.js';
+        import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    </script>
+    <style>
+        :root {
+          --md-sys-color-primary: rgb(132 84 22);
+          --md-sys-color-surface-tint: rgb(132 84 22);
+          --md-sys-color-on-primary: rgb(255 255 255);
+          --md-sys-color-primary-container: rgb(255 220 188);
+          --md-sys-color-on-primary-container: rgb(44 23 0);
+          --md-sys-color-secondary: rgb(114 90 66);
+          --md-sys-color-on-secondary: rgb(255 255 255);
+          --md-sys-color-secondary-container: rgb(254 221 190);
+          --md-sys-color-on-secondary-container: rgb(40 24 5);
+          --md-sys-color-tertiary: rgb(86 99 59);
+          --md-sys-color-on-tertiary: rgb(255 255 255);
+          --md-sys-color-tertiary-container: rgb(218 233 182);
+          --md-sys-color-on-tertiary-container: rgb(21 31 1);
+          --md-sys-color-error: rgb(186 26 26);
+          --md-sys-color-on-error: rgb(255 255 255);
+          --md-sys-color-error-container: rgb(255 218 214);
+          --md-sys-color-on-error-container: rgb(65 0 2);
+          --md-sys-color-background: rgb(255 248 244);
+          --md-sys-color-on-background: rgb(33 26 20);
+          --md-sys-color-surface: rgb(255 248 244);
+          --md-sys-color-on-surface: rgb(33 26 20);
+          --md-sys-color-surface-variant: rgb(241 223 208);
+          --md-sys-color-on-surface-variant: rgb(80 69 58);
+          --md-sys-color-outline: rgb(130 117 104);
+          --md-sys-color-outline-variant: rgb(213 196 181);
+          --md-sys-color-shadow: rgb(0 0 0);
+          --md-sys-color-scrim: rgb(0 0 0);
+          --md-sys-color-inverse-surface: rgb(55 47 40);
+          --md-sys-color-inverse-on-surface: rgb(253 238 227);
+          --md-sys-color-inverse-primary: rgb(251 186 115);
+          --md-sys-color-primary-fixed: rgb(255 220 188);
+          --md-sys-color-on-primary-fixed: rgb(44 23 0);
+          --md-sys-color-primary-fixed-dim: rgb(251 186 115);
+          --md-sys-color-on-primary-fixed-variant: rgb(104 61 0);
+          --md-sys-color-secondary-fixed: rgb(254 221 190);
+          --md-sys-color-on-secondary-fixed: rgb(40 24 5);
+          --md-sys-color-secondary-fixed-dim: rgb(224 193 163);
+          --md-sys-color-on-secondary-fixed-variant: rgb(88 67 44);
+          --md-sys-color-tertiary-fixed: rgb(218 233 182);
+          --md-sys-color-on-tertiary-fixed: rgb(21 31 1);
+          --md-sys-color-tertiary-fixed-dim: rgb(190 204 156);
+          --md-sys-color-on-tertiary-fixed-variant: rgb(63 75 38);
+          --md-sys-color-surface-dim: rgb(230 216 204);
+          --md-sys-color-surface-bright: rgb(255 248 244);
+          --md-sys-color-surface-container-lowest: rgb(255 255 255);
+          --md-sys-color-surface-container-low: rgb(255 241 231);
+          --md-sys-color-surface-container: rgb(250 235 224);
+          --md-sys-color-surface-container-high: rgb(244 230 218);
+          --md-sys-color-surface-container-highest: rgb(238 224 213);
+        }
+
+        .dark {
+          --md-sys-color-primary: rgb(251 186 115);
+          --md-sys-color-surface-tint: rgb(251 186 115);
+          --md-sys-color-on-primary: rgb(73 41 0);
+          --md-sys-color-primary-container: rgb(104 61 0);
+          --md-sys-color-on-primary-container: rgb(255 220 188);
+          --md-sys-color-secondary: rgb(224 193 163);
+          --md-sys-color-on-secondary: rgb(64 45 23);
+          --md-sys-color-secondary-container: rgb(88 67 44);
+          --md-sys-color-on-secondary-container: rgb(254 221 190);
+          --md-sys-color-tertiary: rgb(190 204 156);
+          --md-sys-color-on-tertiary: rgb(41 52 17);
+          --md-sys-color-tertiary-container: rgb(63 75 38);
+          --md-sys-color-on-tertiary-container: rgb(218 233 182);
+          --md-sys-color-error: rgb(255 180 171);
+          --md-sys-color-on-error: rgb(105 0 5);
+          --md-sys-color-error-container: rgb(147 0 10);
+          --md-sys-color-on-error-container: rgb(255 218 214);
+          --md-sys-color-background: rgb(25 18 12);
+          --md-sys-color-on-background: rgb(238 224 213);
+          --md-sys-color-surface: rgb(25 18 12);
+          --md-sys-color-on-surface: rgb(238 224 213);
+          --md-sys-color-surface-variant: rgb(80 69 58);
+          --md-sys-color-on-surface-variant: rgb(213 196 181);
+          --md-sys-color-outline: rgb(157 142 129);
+          --md-sys-color-outline-variant: rgb(80 69 58);
+          --md-sys-color-shadow: rgb(0 0 0);
+          --md-sys-color-scrim: rgb(0 0 0);
+          --md-sys-color-inverse-surface: rgb(238 224 213);
+          --md-sys-color-inverse-on-surface: rgb(55 47 40);
+          --md-sys-color-inverse-primary: rgb(132 84 22);
+          --md-sys-color-primary-fixed: rgb(255 220 188);
+          --md-sys-color-on-primary-fixed: rgb(44 23 0);
+          --md-sys-color-primary-fixed-dim: rgb(251 186 115);
+          --md-sys-color-on-primary-fixed-variant: rgb(104 61 0);
+          --md-sys-color-secondary-fixed: rgb(254 221 190);
+          --md-sys-color-on-secondary-fixed: rgb(40 24 5);
+          --md-sys-color-secondary-fixed-dim: rgb(224 193 163);
+          --md-sys-color-on-secondary-fixed-variant: rgb(88 67 44);
+          --md-sys-color-tertiary-fixed: rgb(218 233 182);
+          --md-sys-color-on-tertiary-fixed: rgb(21 31 1);
+          --md-sys-color-tertiary-fixed-dim: rgb(190 204 156);
+          --md-sys-color-on-tertiary-fixed-variant: rgb(63 75 38);
+          --md-sys-color-surface-dim: rgb(25 18 12);
+          --md-sys-color-surface-bright: rgb(64 56 48);
+          --md-sys-color-surface-container-lowest: rgb(19 13 7);
+          --md-sys-color-surface-container-low: rgb(33 26 20);
+          --md-sys-color-surface-container: rgb(37 30 23);
+          --md-sys-color-surface-container-high: rgb(48 41 33);
+          --md-sys-color-surface-container-highest: rgb(59 51 44);
+        }
+
+        body {
+            text-align: center;
+            background-color: #F2A242;
+        }
+
+        h1 {
+            font-family: "Roboto", system-ui;
+            font-weight: 700;
+            font-style: normal;
+            font-size: 40px;
+            color: white;
+        }
+
+        .main_text {
+            padding-top:20px;
+            font-family: "Roboto", sans-serif;
+            font-size: 30px;
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .card {
+            height:205px;
+            width:205px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+            border-radius: 5px;
+            background-color: #FFFBFF;
+            justify-content: center
+        }
+
+        .sub_text {
+            margin-top: 10px;
+            display:inline-block;
+            font-family: "Roboto", system-ui;
+            font-weight: 700;
+            font-style: normal;
+            font-size: 30px;
+            letter-spacing: 3px;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+<h1 th:text="${name}">Project title</h1>
+<div class="container">
+    <div class="card">
+        <img th:src="${main_text}" alt="join_code"/> <br>
+    </div>
+    <div style="text-align: center;">
+        <span class="sub_text" th:text="${sub_text}"></span>
+        <md-filled-tonal-icon-button class="copyButton">
+            <md-icon style="width: 20px; height: 20px;">
+                content_copy
+            </md-icon>
+        </md-filled-tonal-icon-button>
+    </div>
+    <script>
+        const copyButton = document.querySelector('.copyButton');
+        const joinCodeElement = document.querySelector('.sub_text');
+        copyButton.addEventListener('click', function() {
+            const textToCopy = joinCodeElement.textContent;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    alert('Resource copied!');
+                })
+                .catch(err => {
+                    console.error('Error copying text: ', err);
+                });
+        });
+    </script>
+</div>
+</body>
+</html>
